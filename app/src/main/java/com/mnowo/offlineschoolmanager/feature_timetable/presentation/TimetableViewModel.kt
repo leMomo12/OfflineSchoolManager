@@ -18,11 +18,13 @@ class TimetableViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    fun bottomNav(screen: Screen) {
+    fun bottomNav(screen: Screen, currentScreen: Screen) {
         viewModelScope.launch {
-            _eventFlow.emit(
-                UiEvent.Navigate(screen.route)
-            )
+            if(screen != currentScreen) {
+                _eventFlow.emit(
+                    UiEvent.Navigate(screen.route)
+                )
+            }
         }
     }
 }

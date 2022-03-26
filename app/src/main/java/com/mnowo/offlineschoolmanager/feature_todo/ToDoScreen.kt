@@ -7,6 +7,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -15,10 +16,16 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
+import com.mnowo.offlineschoolmanager.core.Screen
+import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoViewModel
+import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
 @Composable
-fun ToDoScreen() {
+fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltViewModel()) {
     val fredoka = rememberFredoka()
 
     val staggeredText = listOf(
@@ -33,9 +40,24 @@ fun ToDoScreen() {
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
     )
 
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest {
+            when (it) {
+                is UiEvent.Navigate -> {
+                    navController.navigate(it.route)
+                }
+                is UiEvent.ShowSnackbar -> {
+
+                }
+            }
+        }
+    }
+
     Scaffold(
         bottomBar = {
-           // BottomAppBar(toDo = true)
+            BottomAppBar(toDo = true, onClick = {
+                viewModel.bottomNav(it, currentScreen = Screen.ToDoScreen)
+            })
         }
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
+import com.mnowo.offlineschoolmanager.core.Screen
 import com.mnowo.offlineschoolmanager.core.WindowInfo
 import com.mnowo.offlineschoolmanager.core.rememberWindowInfo
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
@@ -53,7 +54,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     Scaffold(
         bottomBar = {
             BottomAppBar(home = true, onClick = {
-                viewModel.bottomNav(it)
+                viewModel.bottomNav(it, currentScreen = Screen.HomeScreen)
             })
         }
     ) {

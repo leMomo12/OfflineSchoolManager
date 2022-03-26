@@ -4,13 +4,14 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Filter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
+import com.mnowo.offlineschoolmanager.core.Screen
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -45,7 +47,9 @@ fun TimetableScreen(navController: NavController, viewModel: TimetableViewModel 
 
     Scaffold(
         bottomBar = {
-            //BottomAppBar(timetable = true)
+            BottomAppBar(timetable = true, onClick = {
+                viewModel.bottomNav(it, currentScreen = Screen.TimetableScreen)
+            })
         }
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -77,7 +81,8 @@ fun TimetableTitle(fredoka: FontFamily) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp)
+            .padding(start = 20.dp, end = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = "Timetable",
@@ -85,6 +90,9 @@ fun TimetableTitle(fredoka: FontFamily) {
             fontWeight = FontWeight.Medium,
             fontSize = 32.sp
         )
+        IconButton(onClick = {  }) {
+            Icon(Icons.Default.Filter, contentDescription = "", modifier = Modifier.scale(1.2f))
+        }
     }
 }
 

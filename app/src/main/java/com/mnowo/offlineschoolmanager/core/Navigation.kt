@@ -14,11 +14,11 @@ fun Navigation(navController: NavHostController) {
         }
 
         composable(Screen.TimetableScreen.route) {
-            TimetableScreen()
+            TimetableScreen(navController = navController)
         }
 
         composable(Screen.SubjectScreen.route) {
-            SubjectScreen()
+            SubjectScreen(navController = navController)
         }
 
         composable(Screen.GradeScreen.route) {
@@ -26,11 +26,11 @@ fun Navigation(navController: NavHostController) {
         }
 
         composable(Screen.ToDoScreen.route) {
-            ToDoScreen()
+            ToDoScreen(navController = navController)
         }
 
         composable(Screen.ExamScreen.route) {
-            ExamScreen()
+            ExamScreen(navController = navController)
         }
     }
 }
