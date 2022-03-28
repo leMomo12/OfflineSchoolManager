@@ -1,8 +1,10 @@
 package com.mnowo.offlineschoolmanager.core
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
@@ -23,7 +25,13 @@ fun AddSubjectBottomSheet(
     onCloseBottomSheet: () -> Unit,
     subjectName: String,
     onSubjectNameChanged: (String) -> Unit,
-    subjectError: Boolean
+    subjectError: Boolean,
+    color: Color,
+    onColorChangedClicked: () -> Unit,
+    roomName: String,
+    onRoomNameChanged: (String) -> Unit,
+    roomError: Boolean,
+    onAddClicked: () -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
         Box(
@@ -38,18 +46,25 @@ fun AddSubjectBottomSheet(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(0.92f)
-            .padding(start = 20.dp, end = 20.dp)
+            .padding(start = 20.dp, end = 20.dp),
     ) {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .padding(top = 10.dp)
                 .clickable {
                     onCloseBottomSheet()
-                }) {
+                }
+        ) {
             Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
             Spacer(modifier = Modifier.padding(horizontal = 3.dp))
             Text(text = "Back", color = LightBlue)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                OutlinedButton(onClick = { onAddClicked() }, border = BorderStroke(1.dp, color = LightBlue)) {
+                    Text(text = "Add", color = LightBlue)
+                }
+            }
         }
 
         Divider(modifier = Modifier.padding(top = 40.dp), color = Color.LightGray, 1.dp)
@@ -57,78 +72,43 @@ fun AddSubjectBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(end = 20.dp, top = 10.dp),
+                .padding(start = 30.dp, end = 30.dp, top = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Row(
+            OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                isError = subjectError,
+                value = subjectName,
+                label = { Text(text = "Subject name") },
+                onValueChange = {
+                    onSubjectNameChanged(it)
+                })
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Subject name")
-
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                    BasicTextField(
-                        value = subjectName,
-                        onValueChange = onSubjectNameChanged,
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        maxLines = 1
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .padding(vertical = 10.dp),
-                        color = Color.LightGray,
-                        thickness = 1.dp
-                    )
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(color = color)
+                )
+                Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+                OutlinedButton(onClick = { onColorChangedClicked() }, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Pick color")
                 }
             }
-
-            Row(
+            OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(text = "Pick Color")
-
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                    Box(modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .padding(10.dp)) {
-                        Text(text = "")
-                    }
-                    Divider(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .padding(vertical = 10.dp),
-                        color = Color.LightGray,
-                        thickness = 1.dp
-                    )
+                isError = roomError,
+                value = roomName,
+                label = { Text(text = "Room") },
+                onValueChange = {
+                    onRoomNameChanged(it)
                 }
-            }
-            
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(text = "Room")
-
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                    BasicTextField(
-                        value = subjectName,
-                        onValueChange = onSubjectNameChanged,
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        maxLines = 1
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .padding(vertical = 10.dp),
-                        color = Color.LightGray,
-                        thickness = 1.dp
-                    )
-                }
-            }
+            )
         }
     }
 }

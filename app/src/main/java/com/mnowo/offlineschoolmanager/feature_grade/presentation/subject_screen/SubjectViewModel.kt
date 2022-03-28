@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
 import com.mnowo.offlineschoolmanager.core.AddSubjectEvent
+import com.mnowo.offlineschoolmanager.core.PickColorEvent
 import com.mnowo.offlineschoolmanager.core.Screen
 import com.mnowo.offlineschoolmanager.core.TextFieldState
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeEvent
@@ -25,18 +26,23 @@ class SubjectViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-
     private val _subjectState = mutableStateOf(TextFieldState())
     val subjectState: State<TextFieldState> = _subjectState
 
     private val _roomState = mutableStateOf(TextFieldState())
     val roomState: State<TextFieldState> = _roomState
 
-    private val _colorState = mutableStateOf<Color?>(null)
-    val colorState: State<Color?> = _colorState
+    private val _colorState = mutableStateOf(value = Color.LightGray)
+    val colorState: State<Color> = _colorState
 
-    private val _subjectErrorState = mutableStateOf<Boolean>(false)
+    private val _subjectErrorState = mutableStateOf(false)
     val subjectErrorState: State<Boolean> = _subjectErrorState
+
+    private val _roomErrorState = mutableStateOf(false)
+    val roomErrorState: State<Boolean> = _roomErrorState
+
+    private val _showColorDialog = mutableStateOf(value = false)
+    val showColorDialog: State<Boolean> = _showColorDialog
 
     fun onEvent(event: SubjectEvent) {
         when (event) {
@@ -65,6 +71,17 @@ class SubjectViewModel @Inject constructor(
                 )
             }
             is AddSubjectEvent.PickedColor -> {
+                _showColorDialog.value = true
+            }
+        }
+    }
+
+    fun onPickColorEvent(event: PickColorEvent) {
+        when (event) {
+            is PickColorEvent.DismissDialog -> {
+                _showColorDialog.value = false
+            }
+            is PickColorEvent.ColorPicked -> {
                 _colorState.value = event.color
             }
         }

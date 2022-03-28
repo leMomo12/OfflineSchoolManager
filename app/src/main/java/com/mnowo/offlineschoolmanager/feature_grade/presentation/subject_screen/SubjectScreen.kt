@@ -24,10 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
-import com.mnowo.offlineschoolmanager.core.AddSubjectBottomSheet
-import com.mnowo.offlineschoolmanager.core.AddSubjectEvent
-import com.mnowo.offlineschoolmanager.core.Screen
-import com.mnowo.offlineschoolmanager.core.rememberWindowInfo
+import com.mnowo.offlineschoolmanager.core.*
+import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -80,7 +78,19 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
                 onSubjectNameChanged = {
                     viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredSubject(it))
                 },
-                subjectError = viewModel.subjectErrorState.value
+                subjectError = viewModel.subjectErrorState.value,
+                color = viewModel.colorState.value,
+                onColorChangedClicked = {
+                    viewModel.onAddSubjectEvent(AddSubjectEvent.PickedColor)
+                },
+                roomName = viewModel.roomState.value.text,
+                onRoomNameChanged = {
+                    viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredRoom(it))
+                },
+                roomError = viewModel.roomErrorState.value,
+                onAddClicked = {
+                    viewModel.onAddSubjectEvent(AddSubjectEvent.AddSubject)
+                }
             )
         },
         sheetElevation = 5.dp
@@ -111,6 +121,17 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
                     )
                 }
 
+            }
+            if (viewModel.showColorDialog.value) {
+                PickColorDialog(
+                    fredoka = fredoka,
+                    onDismissClicked = {
+                        viewModel.onPickColorEvent(PickColorEvent.DismissDialog)
+                },
+                    onColorPicked = {
+                        viewModel.onPickColorEvent(PickColorEvent.ColorPicked(color = it))
+                    }
+                )
             }
         }
     }
