@@ -5,17 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
-import com.mnowo.offlineschoolmanager.core.AddSubjectEvent
-import com.mnowo.offlineschoolmanager.core.PickColorEvent
-import com.mnowo.offlineschoolmanager.core.Screen
-import com.mnowo.offlineschoolmanager.core.TextFieldState
-import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import org.w3c.dom.Text
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,23 +24,7 @@ class SubjectViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val _subjectState = mutableStateOf(TextFieldState())
-    val subjectState: State<TextFieldState> = _subjectState
 
-    private val _roomState = mutableStateOf(TextFieldState())
-    val roomState: State<TextFieldState> = _roomState
-
-    private val _colorState = mutableStateOf(value = Color.LightGray)
-    val colorState: State<Color> = _colorState
-
-    private val _subjectErrorState = mutableStateOf(false)
-    val subjectErrorState: State<Boolean> = _subjectErrorState
-
-    private val _roomErrorState = mutableStateOf(false)
-    val roomErrorState: State<Boolean> = _roomErrorState
-
-    private val _showColorDialog = mutableStateOf(value = false)
-    val showColorDialog: State<Boolean> = _showColorDialog
 
     fun onEvent(event: SubjectEvent) {
         when (event) {
@@ -58,34 +40,6 @@ class SubjectViewModel @Inject constructor(
         }
     }
 
-    fun onAddSubjectEvent(event: AddSubjectEvent) {
-        when (event) {
-            is AddSubjectEvent.EnteredSubject -> {
-                _subjectState.value = subjectState.value.copy(
-                    text = event.subject
-                )
-            }
-            is AddSubjectEvent.EnteredRoom -> {
-                _roomState.value = roomState.value.copy(
-                    text = event.room
-                )
-            }
-            is AddSubjectEvent.PickedColor -> {
-                _showColorDialog.value = true
-            }
-        }
-    }
-
-    fun onPickColorEvent(event: PickColorEvent) {
-        when (event) {
-            is PickColorEvent.DismissDialog -> {
-                _showColorDialog.value = false
-            }
-            is PickColorEvent.ColorPicked -> {
-                _colorState.value = event.color
-            }
-        }
-    }
 
 
     fun bottomNav(screen: Screen, currentScreen: Screen) {

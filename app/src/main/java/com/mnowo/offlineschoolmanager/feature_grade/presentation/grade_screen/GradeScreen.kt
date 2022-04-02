@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mnowo.offlineschoolmanager.core.rememberWindowInfo
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
 
 @Composable
 fun GradeScreen() {

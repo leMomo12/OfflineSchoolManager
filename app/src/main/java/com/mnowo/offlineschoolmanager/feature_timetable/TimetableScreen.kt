@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
-import com.mnowo.offlineschoolmanager.core.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableViewModel
 import kotlinx.coroutines.flow.collectLatest
 

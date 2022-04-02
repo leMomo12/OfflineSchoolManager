@@ -2,8 +2,8 @@ package com.mnowo.offlineschoolmanager.feature_todo.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
-import com.mnowo.offlineschoolmanager.core.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

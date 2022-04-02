@@ -1,4 +1,4 @@
-package com.mnowo.composesurveyapp.core.presentation.util
+package com.mnowo.offlineschoolmanager.core.feature_core.domain.models
 
 sealed class UiEvent {
 

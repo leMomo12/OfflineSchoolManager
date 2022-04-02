@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mnowo.offlineschoolmanager.*
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 
 @Composable
 fun Navigation(navController: NavHostController) {

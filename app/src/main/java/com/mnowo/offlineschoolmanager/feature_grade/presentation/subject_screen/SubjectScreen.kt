@@ -23,9 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.mnowo.composesurveyapp.core.presentation.util.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.*
-import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -74,23 +77,8 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
         sheetContent = {
             AddSubjectBottomSheet(
                 onCloseBottomSheet = closeSheet,
-                subjectName = viewModel.subjectState.value.text,
-                onSubjectNameChanged = {
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredSubject(it))
-                },
-                subjectError = viewModel.subjectErrorState.value,
-                color = viewModel.colorState.value,
-                onColorChangedClicked = {
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.PickedColor)
-                },
-                roomName = viewModel.roomState.value.text,
-                onRoomNameChanged = {
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredRoom(it))
-                },
-                roomError = viewModel.roomErrorState.value,
-                onAddClicked = {
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.AddSubject)
-                }
+                fredoka = fredoka,
+                scaffoldState = bottomState
             )
         },
         sheetElevation = 5.dp
@@ -121,17 +109,6 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
                     )
                 }
 
-            }
-            if (viewModel.showColorDialog.value) {
-                PickColorDialog(
-                    fredoka = fredoka,
-                    onDismissClicked = {
-                        viewModel.onPickColorEvent(PickColorEvent.DismissDialog)
-                },
-                    onColorPicked = {
-                        viewModel.onPickColorEvent(PickColorEvent.ColorPicked(color = it))
-                    }
-                )
             }
         }
     }

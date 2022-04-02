@@ -2,12 +2,14 @@ package com.mnowo.offlineschoolmanager.di
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import com.mnowo.offlineschoolmanager.core.Constants
-import com.mnowo.offlineschoolmanager.core.SchoolManagerDatabase
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
+import com.mnowo.offlineschoolmanager.core.feature_core.data.SchoolManagerDatabase
+import com.mnowo.offlineschoolmanager.core.feature_subject.data.SubjectDao
+import com.mnowo.offlineschoolmanager.core.feature_subject.data.SubjectRepositoryImpl
+import com.mnowo.offlineschoolmanager.core.feature_subject.domain.repository.SubjectRepository
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.data.repository.GradeRepositoryImpl
-import com.mnowo.offlineschoolmanager.feature_grade.domain.GradeRepository
+import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +20,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context) : Context {
+        return context
+    }
 
     @Provides
     @Singleton
@@ -43,4 +51,18 @@ object AppModule {
     @Provides
     @Singleton
     fun provideGradeDao(db: SchoolManagerDatabase) = db.gradeDao()
+
+    @Provides
+    @Singleton
+    fun provideSubjectDao(db: SchoolManagerDatabase) = db.subjectDao()
+
+    @Provides
+    @Singleton
+    fun provideSubjectRepository(
+        subjectDao: SubjectDao
+    ): SubjectRepository {
+        return SubjectRepositoryImpl(
+            dao = subjectDao
+        )
+    }
 }

@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.core
+package com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker
 
 import androidx.compose.ui.graphics.Color
 

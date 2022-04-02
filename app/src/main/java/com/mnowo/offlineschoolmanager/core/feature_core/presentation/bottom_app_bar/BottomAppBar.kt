@@ -1,22 +1,18 @@
 package com.mnowo.offlineschoolmanager
 
-import android.media.audiofx.Equalizer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.mnowo.offlineschoolmanager.core.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 
 @Composable
 fun BottomAppBar(

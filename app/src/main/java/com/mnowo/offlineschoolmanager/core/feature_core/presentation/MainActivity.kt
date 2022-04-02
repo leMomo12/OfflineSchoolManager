@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.core
+package com.mnowo.offlineschoolmanager.core.feature_core.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

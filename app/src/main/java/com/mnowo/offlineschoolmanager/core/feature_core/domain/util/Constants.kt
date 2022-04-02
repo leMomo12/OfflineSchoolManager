@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.core
+package com.mnowo.offlineschoolmanager.core.feature_core.domain.util
 
 object Constants {
 
