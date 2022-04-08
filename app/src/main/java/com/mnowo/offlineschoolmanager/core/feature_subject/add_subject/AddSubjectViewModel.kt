@@ -13,6 +13,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
 import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.SubjectResult
 import com.mnowo.offlineschoolmanager.core.feature_subject.domain.use_case.AddSubjectUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -51,11 +52,20 @@ class AddSubjectViewModel @Inject constructor(
     private val _subjectErrorState = mutableStateOf(false)
     val subjectErrorState: State<Boolean> = _subjectErrorState
 
+    private val _oralErrorState = mutableStateOf(false)
+    val oralErrorState: State<Boolean> = _oralErrorState
+
+    private val _writtenErrorState = mutableStateOf(false)
+    val writtenErrorState: State<Boolean> = _writtenErrorState
+
     private val _roomErrorState = mutableStateOf(false)
     val roomErrorState: State<Boolean> = _roomErrorState
 
     private val _showColorDialog = mutableStateOf(value = false)
     val showColorDialog: State<Boolean> = _showColorDialog
+
+    private val _mustAddUpTo100ErrorState = mutableStateOf<Boolean>(false)
+    val mustAddUpTo100ErrorState: State<Boolean> = _mustAddUpTo100ErrorState
 
     fun setBottomSheetState(state: Boolean) {
         _bottomSheetState.value = state
@@ -77,38 +87,60 @@ class AddSubjectViewModel @Inject constructor(
                 _showColorDialog.value = true
             }
             is AddSubjectEvent.AddSubject -> {
-                val color = colorState.value.toArgb()
-                val subject = Subject(
-                    id = 0,
-                    subjectName = subjectState.value.text,
-                    color = color,
-                    room = roomState.value.text,
-                    oralPercentage = oralPercentageState.value.text.toDouble(),
-                    writtenPercentage = writtenPercentageState.value.text.toDouble(),
-                    average = 0.0
-                )
                 viewModelScope.launch(Dispatchers.IO) {
-                    addSubjectUseCase.invoke(subject = subject).collect {
-                        when (it) {
-                            is Resource.Error -> {
-                                d("AddSubject", "Error")
-                                viewModelScope.launch {
-                                    _eventFlow.emit(
-                                        UiEvent.ShowSnackbar((it.message ?: R.string.unexpectedError) as String)
-                                    )
+                    removeAllErrors()
+                    val color = colorState.value.toArgb()
+                    if (oralPercentageState.value.text.trim()
+                            .isBlank() || writtenPercentageState.value.text.trim().isBlank()
+                    ) {
+                        _oralErrorState.value = true
+                        _writtenErrorState.value = true
+                    } else {
+                        val subject = Subject(
+                            id = 0,
+                            subjectName = subjectState.value.text,
+                            color = color,
+                            room = roomState.value.text,
+                            oralPercentage = oralPercentageState.value.text.toDouble(),
+                            writtenPercentage = writtenPercentageState.value.text.toDouble(),
+                            average = 0.0
+                        )
+                        addSubjectUseCase.invoke(subject = subject).collect {
+                            when (it) {
+                                is Resource.Error -> {
+                                    d("AddSubject", "Error")
+                                    viewModelScope.launch {
+                                        when (it.data) {
+                                            SubjectResult.DoesntAddUpTo100 -> {
+                                                _oralErrorState.value = true
+                                                _writtenErrorState.value = true
+                                                _mustAddUpTo100ErrorState.value = true
+                                            }
+                                            SubjectResult.ErrorOccurred -> {
+                                                _eventFlow.emit(
+                                                    UiEvent.ShowSnackbar(
+                                                        (it.message ?: R.string.unexpectedError) as String
+                                                    )
+                                                )
+                                                clearAfterAddSubjectEvent()
+                                            }
+                                            SubjectResult.EmptySubjectText -> {
+                                                _subjectErrorState.value = true
+                                            }
+                                        }
+                                    }
                                 }
-                                clearAfterAddSubjectEvent()
-                            }
-                            is Resource.Success -> {
-                                d("AddSubject", "Success")
-                                viewModelScope.launch {
-                                    delay(300)
-                                    clearAfterAddSubjectEvent()
-                                    _bottomSheetState.value = false
+                                is Resource.Success -> {
+                                    d("AddSubject", "Success")
+                                    viewModelScope.launch {
+                                        delay(300)
+                                        clearAfterAddSubjectEvent()
+                                        _bottomSheetState.value = false
+                                    }
                                 }
-                            }
-                            is Resource.Loading -> {
-                                d("AddSubject", "Loading")
+                                is Resource.Loading -> {
+                                    d("AddSubject", "Loading")
+                                }
                             }
                         }
                     }
@@ -133,6 +165,13 @@ class AddSubjectViewModel @Inject constructor(
         _roomState.value.clearText()
         _oralPercentageState.value.clearText()
         _writtenPercentageState.value.clearText()
+    }
+
+    private fun removeAllErrors() {
+        _subjectErrorState.value = false
+        _writtenErrorState.value = false
+        _oralErrorState.value = false
+        _mustAddUpTo100ErrorState.value = false
     }
 
     fun onPickColorEvent(event: PickColorEvent) {

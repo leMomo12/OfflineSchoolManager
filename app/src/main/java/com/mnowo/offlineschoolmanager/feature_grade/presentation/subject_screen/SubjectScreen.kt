@@ -2,8 +2,10 @@ package com.mnowo.offlineschoolmanager
 
 import android.util.Log.d
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -21,6 +23,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
+import androidx.core.graphics.toColor
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
@@ -29,6 +35,8 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
+import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -100,8 +108,11 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
                 item {
                     Spacer(modifier = Modifier.padding(vertical = 15.dp))
                 }
-                items(30) {
-                    SubjectListItem(fredoka = fredoka)
+                items(viewModel.subjectListState.value.listData) {
+                    SubjectListItem(
+                        fredoka = fredoka,
+                        data = it,
+                        onSubjectItemClicked = { viewModel.onEvent(SubjectEvent.AddSubject) })
                     Divider(
                         modifier = Modifier.fillMaxWidth(),
                         color = Color.LightGray,
@@ -136,7 +147,6 @@ fun SubjectTitle(fredoka: FontFamily, onOpenBottomSheet: () -> Unit) {
 
             IconButton(onClick = {
                 onOpenBottomSheet()
-                d("BottomSheet", "Open plaspals")
             }) {
                 Icon(Icons.Default.Add, contentDescription = "", modifier = Modifier.scale(1.2f))
             }
@@ -155,10 +165,13 @@ fun SubjectTitle(fredoka: FontFamily, onOpenBottomSheet: () -> Unit) {
 }
 
 @Composable
-fun SubjectListItem(fredoka: FontFamily) {
+fun SubjectListItem(fredoka: FontFamily, data: Subject, onSubjectItemClicked: (Int) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable {
+                onSubjectItemClicked(2)
+            }
             .padding(15.dp), verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -166,13 +179,19 @@ fun SubjectListItem(fredoka: FontFamily) {
                 .width(10.dp)
                 .height(30.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color.Blue)
+                .background(
+                    color = Color(
+                        red = data.color.red,
+                        green = data.color.green,
+                        blue = data.color.blue
+                    )
+                )
         )
         Spacer(modifier = Modifier.padding(horizontal = 15.dp))
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Mathematics", fontFamily = fredoka, fontWeight = FontWeight.Light)
+            Text(text = data.subjectName, fontFamily = fredoka, fontWeight = FontWeight.Light)
             Text(
-                text = "3.2",
+                text = data.average.toString(),
                 fontFamily = fredoka,
                 fontWeight = FontWeight.Light,
                 color = Color.Gray

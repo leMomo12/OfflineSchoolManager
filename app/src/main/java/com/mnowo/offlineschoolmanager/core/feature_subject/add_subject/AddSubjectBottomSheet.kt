@@ -169,7 +169,8 @@ fun AddSubjectBottomSheet(
                     .padding(top = 10.dp),
                 trailingIcon = {
                     Text(text = "%")
-                }
+                },
+                isError = viewModel.writtenErrorState.value
             )
 
             OutlinedTextField(
@@ -185,14 +186,19 @@ fun AddSubjectBottomSheet(
                     .padding(top = 10.dp),
                 trailingIcon = {
                     Text(text = "%")
-                }
+                },
+                isError = viewModel.oralErrorState.value
+            )
+            Text(
+                text = "Must exactly add up to 100",
+                color = if (viewModel.mustAddUpTo100ErrorState.value) {
+                    Color.Red
+                } else {
+                    Color.Gray
+                },
+                fontFamily = fredoka,
+                fontWeight = FontWeight.Light
             )
         }
-        Text(
-            text = "Must exactly add up to 100",
-            color = Color.Gray,
-            fontFamily = fredoka,
-            fontWeight = FontWeight.Light
-        )
     }
 }
