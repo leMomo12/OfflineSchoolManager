@@ -29,8 +29,10 @@ import androidx.core.graphics.red
 import androidx.core.graphics.toColor
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.navArgument
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.*
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
@@ -38,6 +40,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picke
 import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectViewModel
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -69,6 +72,11 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
         viewModel.eventFlow.collectLatest {
             when (it) {
                 is UiEvent.Navigate -> {
+                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                        Constants.GRADE_NAV_ARGUMENT,
+                        viewModel.onSubjectListClickedIndexState.value
+                    )
+
                     navController.navigate(it.route)
                 }
                 is UiEvent.ShowSnackbar -> {
@@ -112,7 +120,9 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
                     SubjectListItem(
                         fredoka = fredoka,
                         data = it,
-                        onSubjectItemClicked = { viewModel.onEvent(SubjectEvent.AddSubject) })
+                        onSubjectItemClicked = { index ->
+                            viewModel.onEvent(SubjectEvent.OnSubjectClicked(index))
+                        })
                     Divider(
                         modifier = Modifier.fillMaxWidth(),
                         color = Color.LightGray,
@@ -170,7 +180,7 @@ fun SubjectListItem(fredoka: FontFamily, data: Subject, onSubjectItemClicked: (I
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                onSubjectItemClicked(2)
+                onSubjectItemClicked(data.id)
             }
             .padding(15.dp), verticalAlignment = Alignment.CenterVertically
     ) {
