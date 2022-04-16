@@ -11,4 +11,8 @@ interface GradeRepository {
     fun getAllSubjects() : Flow<List<Subject>>
 
     fun getAllGrades(subjectId: Int) : Flow<List<Grade>>
+
+    fun updateAverage(newAverage: Double, subjectId: Int)
+
+    fun getSpecificSubject(subjectId: Int) : Subject
 }

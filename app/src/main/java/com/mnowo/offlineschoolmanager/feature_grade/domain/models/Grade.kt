@@ -9,7 +9,8 @@ data class Grade(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     var subjectId: Int,
+    var description: String,
     var grade: Double,
     var isWritten: Boolean,
-    var gradeColor: Int
+    var gradeColor: Int = 0
 )

@@ -6,4 +6,5 @@ data class TextFieldState(
     fun clearText() {
         text = ""
     }
+
 }

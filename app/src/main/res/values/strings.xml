@@ -4,4 +4,11 @@
     <string name="emptySubject">Please enter subject name</string>
     <string name="emptyPercentage">Percentage cannot be 0</string>
     <string name="oralAndWrittenPercentageArent100">Oral and written percentage must exactly be 100</string>
+    <string name="classTestDescription">Class test description</string>
+    <string name="grade">Grade</string>
+    <string name="written">Written</string>
+    <string name="Orally">Orally</string>
+    <string name="emptyClassTestDescription">Please enter class test description</string>
+    <string name="classTest">Class test</string>
+    <string name="oralGrade">Oral</string>
 </resources>

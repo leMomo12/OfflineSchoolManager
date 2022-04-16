@@ -5,9 +5,8 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_subject.domain.repository.SubjectRepository
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class GetAllGradesUseCase @Inject constructor(
@@ -15,11 +14,12 @@ class GetAllGradesUseCase @Inject constructor(
 ) {
 
     operator fun invoke(subjectId: Int): Flow<Resource<List<Grade>>> = flow {
-        val data = repository.getAllGrades(subjectId = subjectId).first()
 
         try {
-            emit(Resource.Loading<List<Grade>>(data = data))
-            emit(Resource.Success<List<Grade>>(data = data))
+            val data = repository.getAllGrades(subjectId = subjectId).collect() {
+                emit(Resource.Loading<List<Grade>>(data = it))
+                emit(Resource.Success<List<Grade>>(data = it))
+            }
         } catch (e: Exception) {
             emit(
                 Resource.Error<List<Grade>>(
@@ -27,5 +27,5 @@ class GetAllGradesUseCase @Inject constructor(
                 )
             )
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

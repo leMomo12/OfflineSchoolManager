@@ -62,10 +62,8 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
 
     val openSheet: () -> Unit = {
         scope.launch {
-            d("BottomSheet", "Open open")
             bottomState.bottomSheetState.expand()
         }
-
     }
 
     LaunchedEffect(key1 = true) {
@@ -109,7 +107,6 @@ fun SubjectScreen(navController: NavController, viewModel: SubjectViewModel = hi
             LazyColumn(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
                 item {
                     SubjectTitle(fredoka = fredoka, onOpenBottomSheet = {
-                        d("BottomSheet", "Open ")
                         openSheet()
                     })
                 }

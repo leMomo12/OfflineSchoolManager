@@ -16,9 +16,22 @@ interface GradeDao {
     fun addGrade(grade: Grade)
 
     @Query("SELECT * FROM ${Constants.SUBJECT_TABLE}")
-    fun getAllSubjects() : Flow<List<Subject>>
+    fun getAllSubjects(): Flow<List<Subject>>
 
     @Query("SELECT * FROM ${Constants.GRADE_TABLE} WHERE subjectId = :subjectId")
-    fun getAllGrades(subjectId: Int) : Flow<List<Grade>>
+    fun getAllGrades(subjectId: Int): Flow<List<Grade>>
+
+    @Query("UPDATE ${Constants.SUBJECT_TABLE} SET average = :newAverage WHERE id = :subjectId")
+    fun updateAverage(newAverage: Double, subjectId: Int)
+
+    @Query("SELECT * FROM ${Constants.SUBJECT_TABLE} WHERE id = :subjectId")
+    fun getSpecificSubject(subjectId: Int): Subject
+
+
+    @Query("SELECT SUM(grade) FROM ${Constants.GRADE_TABLE} WHERE subjectId = :subjectId AND isWritten = 1")
+    fun sumOfWrittenGrade(subjectId: Int) : Double
+
+    @Query("SELECT SUM(grade) FROM ${Constants.GRADE_TABLE} WHERE subjectId = :subjectId AND isWritten = 0")
+    fun sumOfOralGrade(subjectId: Int) : Double
 
 }

@@ -21,7 +21,9 @@ fun Navigation(navController: NavHostController) {
             TimetableScreen(navController = navController)
         }
 
-        composable(Screen.SubjectScreen.route) {
+        composable(
+            Screen.SubjectScreen.route,
+            ) {
             SubjectScreen(navController = navController)
         }
 

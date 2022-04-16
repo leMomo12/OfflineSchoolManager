@@ -24,5 +24,13 @@ class GradeRepositoryImpl @Inject constructor(
         return gradeDao.getAllGrades(subjectId = subjectId)
     }
 
+    override fun updateAverage(newAverage: Double, subjectId: Int) {
+        return gradeDao.updateAverage(newAverage = newAverage, subjectId = subjectId)
+    }
+
+    override fun getSpecificSubject(subjectId: Int) : Subject {
+        return gradeDao.getSpecificSubject(subjectId = subjectId)
+    }
+
 
 }
