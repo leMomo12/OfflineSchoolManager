@@ -15,4 +15,12 @@ interface GradeRepository {
     fun updateAverage(newAverage: Double, subjectId: Int)
 
     fun getSpecificSubject(subjectId: Int) : Subject
+
+    fun sumOfWrittenGrade(subjectId: Int): Double
+
+    fun countOfWrittenGrade(subjectId: Int): Int
+
+    fun sumOfOralGrade(subjectId: Int): Double
+
+    fun countOfOralGrade(subjectId: Int): Int
 }

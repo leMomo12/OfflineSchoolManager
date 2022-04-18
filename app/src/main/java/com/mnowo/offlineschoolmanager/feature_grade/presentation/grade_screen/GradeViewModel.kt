@@ -15,11 +15,13 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjec
 import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.AddGradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
+import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.AddGradeUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllGradesUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetSpecificSubjectUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.UpdateAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -30,8 +32,8 @@ class GradeViewModel @Inject constructor(
     private val getAllGradesUseCase: GetAllGradesUseCase,
     private val addGradeUseCase: AddGradeUseCase,
     private val updateAverageUseCase: UpdateAverageUseCase,
-    private val getSpecificSubjectUseCase: GetSpecificSubjectUseCase,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    private val repository: GradeRepository
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -60,19 +62,6 @@ class GradeViewModel @Inject constructor(
 
     private val _isWrittenState = mutableStateOf<Boolean>(true)
     val isWrittenState: State<Boolean> = _isWrittenState
-
-    private val _subjectState = mutableStateOf<Subject>(
-        Subject(
-            -1,
-            "",
-            0,
-            "0",
-            50.0,
-            50.0,
-            0.0
-        )
-    )
-    val subjectState: State<Subject> = _subjectState
 
     fun setBottomSheetState(value: Boolean) {
         _bottomSheetState.value = value
@@ -107,9 +96,9 @@ class GradeViewModel @Inject constructor(
                                     removeAllErrors()
                                     _bottomSheetState.value = false
 
-                                    getSpecificSubjectUseCase.invoke(subjectId = subjectId.value)
-                                        .collect() { subject ->
-                                            _subjectState.value = subject
+                                    updateAverageUseCase.invoke(subjectId = subjectId.value)
+                                        .collect() {
+
                                         }
                                 }
                             }
@@ -177,15 +166,14 @@ class GradeViewModel @Inject constructor(
         }
     }
 
-    fun clearAfterAddGradeEvent() {
+    private fun clearAfterAddGradeEvent() {
         _classTestDescriptionState.value.clearText()
         _gradeState.value.clearText()
         _isWrittenState.value = true
     }
 
-    fun removeAllErrors() {
+    private fun removeAllErrors() {
         _classTestDescriptionErrorState.value = false
         _gradeErrorState.value = false
     }
-
 }

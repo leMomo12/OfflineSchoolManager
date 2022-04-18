@@ -32,5 +32,21 @@ class GradeRepositoryImpl @Inject constructor(
         return gradeDao.getSpecificSubject(subjectId = subjectId)
     }
 
+    override fun sumOfWrittenGrade(subjectId: Int): Double {
+        return gradeDao.sumOfWrittenGrade(subjectId = subjectId)
+    }
+
+    override fun countOfWrittenGrade(subjectId: Int): Int {
+        return gradeDao.countOfWrittenGrade(subjectId = subjectId)
+    }
+
+    override fun sumOfOralGrade(subjectId: Int): Double {
+        return gradeDao.sumOfOralGrade(subjectId = subjectId)
+    }
+
+    override fun countOfOralGrade(subjectId: Int): Int {
+        return gradeDao.countOfOralGrade(subjectId = subjectId)
+    }
+
 
 }
