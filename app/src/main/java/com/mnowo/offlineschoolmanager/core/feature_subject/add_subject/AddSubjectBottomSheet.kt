@@ -7,23 +7,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Subject
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
@@ -96,13 +96,13 @@ fun AddSubjectBottomSheet(
         ) {
             Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
             Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-            Text(text = "Back", color = LightBlue)
+            Text(text = stringResource(id = R.string.back), color = LightBlue)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(
                     onClick = { viewModel.onAddSubjectEvent(AddSubjectEvent.AddSubject) },
                     border = BorderStroke(1.dp, color = LightBlue)
                 ) {
-                    Text(text = "Add", color = LightBlue)
+                    Text(text = stringResource(id = R.string.add), color = LightBlue)
                 }
             }
         }
@@ -119,8 +119,9 @@ fun AddSubjectBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.subjectErrorState.value,
                 value = viewModel.subjectState.value.text,
-                label = { Text(text = "Subject name") },
+                label = { Text(text = stringResource(id = R.string.subjectName)) },
                 onValueChange = {
+                    if(viewModel.subjectState.value.text.length <= 20)
                     viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredSubject(it))
                 },
                 singleLine = true
@@ -142,22 +143,23 @@ fun AddSubjectBottomSheet(
                     onClick = { viewModel.onAddSubjectEvent(AddSubjectEvent.PickedColor) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Pick color")
+                    Text(text = stringResource(id = R.string.pickColor))
                 }
             }
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 isError = viewModel.roomErrorState.value,
                 value = viewModel.roomState.value.text,
-                label = { Text(text = "Room") },
+                label = { Text(text = stringResource(id = R.string.room)) },
                 onValueChange = {
+                    if(viewModel.roomState.value.text.length <= 10)
                     viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredRoom(it))
                 },
                 singleLine = true
             )
 
             OutlinedTextField(
-                label = { Text(text = "Written percentage") },
+                label = { Text(text = stringResource(id = R.string.writtenPercentage)) },
                 value = viewModel.writtenPercentageState.value.text,
                 onValueChange = {
                     viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredWrittenPercentage(it))
@@ -174,7 +176,7 @@ fun AddSubjectBottomSheet(
             )
 
             OutlinedTextField(
-                label = { Text(text = "Oral percentage") },
+                label = { Text(text = stringResource(id = R.string.oralPercentage)) },
                 value = viewModel.oralPercentageState.value.text,
                 onValueChange = {
                     viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredOralPercentage(it))
@@ -190,7 +192,7 @@ fun AddSubjectBottomSheet(
                 isError = viewModel.oralErrorState.value
             )
             Text(
-                text = "Must exactly add up to 100",
+                text = stringResource(id = R.string.mustExactlyAddUpTo100),
                 color = if (viewModel.mustAddUpTo100ErrorState.value) {
                     Color.Red
                 } else {

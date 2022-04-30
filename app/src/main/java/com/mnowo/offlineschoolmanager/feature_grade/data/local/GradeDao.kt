@@ -1,9 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_grade.data.local
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
@@ -39,4 +36,9 @@ interface GradeDao {
     @Query("SELECT COUNT(*) FROM ${Constants.GRADE_TABLE} WHERE subjectId = :subjectId AND isWritten = 0")
     fun countOfOralGrade(subjectId: Int): Int
 
+    @Query("DELETE FROM ${Constants.GRADE_TABLE} WHERE id = :gradeId")
+    suspend fun deleteSpecificGrade(gradeId: Int): Int
+
+    @Update
+    suspend fun updateGrade(grade: Grade)
 }

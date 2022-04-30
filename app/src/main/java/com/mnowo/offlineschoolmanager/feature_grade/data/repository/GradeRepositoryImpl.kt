@@ -48,5 +48,13 @@ class GradeRepositoryImpl @Inject constructor(
         return gradeDao.countOfOralGrade(subjectId = subjectId)
     }
 
+    override suspend fun deleteSpecificGrade(gradeId: Int): Int {
+        return gradeDao.deleteSpecificGrade(gradeId = gradeId)
+    }
+
+    override suspend fun updateGrade(grade: Grade) {
+        return gradeDao.updateGrade(grade = grade)
+    }
+
 
 }

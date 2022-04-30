@@ -7,6 +7,9 @@ sealed class GradeEvent {
     data class EnteredClassTestDescription(val description: String) : GradeEvent()
     data class EnteredGrade(val grade: String) : GradeEvent()
     data class EnteredIsWritten(val isWritten: Boolean) : GradeEvent()
+    object DeleteSpecificGrade : GradeEvent()
+    object GetSpecificSubject : GradeEvent()
     object LoadGrades : GradeEvent()
     object AddGrade: GradeEvent()
+    object UpdateGrade: GradeEvent()
 }

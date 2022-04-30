@@ -1,5 +1,10 @@
 package com.mnowo.offlineschoolmanager
 
+import android.util.Log.d
+import androidx.compose.animation.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,9 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +41,8 @@ import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.AddSubjectBottomSheet
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.DeleteDialog
+import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen.AddGradeBottomSheet
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen.GradeEvent
@@ -73,6 +78,7 @@ fun GradeScreen(
     LaunchedEffect(key1 = true) {
         viewModel.setSubjectId(subjectId)
         viewModel.onEvent(GradeEvent.LoadGrades)
+        viewModel.onEvent(GradeEvent.GetSpecificSubject)
         viewModel.eventFlow.collectLatest {
             when (it) {
                 is UiEvent.Navigate -> {
@@ -95,7 +101,8 @@ fun GradeScreen(
             AddGradeBottomSheet(
                 onCloseBottomSheet = closeSheet,
                 fredoka = fredoka,
-                scaffoldState = bottomState
+                scaffoldState = bottomState,
+
             )
         },
     ) {
@@ -111,19 +118,30 @@ fun GradeScreen(
                     Spacer(modifier = Modifier.padding(vertical = 15.dp))
                 }
                 items(viewModel.gradeListState.value.listData) {
-                    GradeListItem(fredoka = fredoka, data = it)
+                    GradeListItem(
+                        fredoka = fredoka,
+                        data = it,
+                        viewModel = viewModel,
+                        onOpenBottomSheet = openSheet
+                    )
                     Divider(
                         modifier = Modifier.fillMaxWidth(),
                         color = Color.LightGray,
                         thickness = 0.8.dp
                     )
                 }
-
+            }
+            if (viewModel.deleteDialogState.value) {
+                DeleteDialog(
+                    onDismissRequest = { viewModel.setDeleteDialogState(false) },
+                    onDeleteClicked = { viewModel.onEvent(GradeEvent.DeleteSpecificGrade) }
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun GradeTitle(fredoka: FontFamily, viewModel: GradeViewModel, onOpenBottomSheet: () -> Unit) {
     Row(
@@ -132,12 +150,13 @@ fun GradeTitle(fredoka: FontFamily, viewModel: GradeViewModel, onOpenBottomSheet
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Mathematics",
+            text = viewModel.subjectNameState.value,
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
             fontSize = 32.sp,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 1
+            maxLines = 1,
+            modifier = Modifier.fillMaxWidth(0.7f)
         )
 
         Row(
@@ -145,31 +164,91 @@ fun GradeTitle(fredoka: FontFamily, viewModel: GradeViewModel, onOpenBottomSheet
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (!viewModel.deleteState.value && !viewModel.editState.value) {
+                IconButton(onClick = { onOpenBottomSheet() }) {
+                    Icon(
+                        Icons.Rounded.Add,
+                        contentDescription = "",
+                        modifier = Modifier.scale(1.2f)
+                    )
+                }
 
-            IconButton(onClick = { onOpenBottomSheet() }) {
-                Icon(Icons.Rounded.Add, contentDescription = "", modifier = Modifier.scale(1.2f))
+                IconButton(onClick = { viewModel.setDropDownMenuState(!viewModel.dropDownMenuState.value) }) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "",
+                        modifier = Modifier.scale(1.2f)
+                    )
+                }
+                DropdownMenu(
+                    expanded = viewModel.dropDownMenuState.value,
+                    onDismissRequest = { viewModel.setDropDownMenuState(false) },
+                    modifier = Modifier.clip(
+                        RoundedCornerShape(8.dp)
+                    )
+                ) {
+                    DropdownMenuItem(onClick = { viewModel.setEditState(true) }) {
+                        Row {
+                            Icon(Icons.Default.Edit, contentDescription = "")
+                            Text(
+                                text = stringResource(id = R.string.edit),
+                                fontFamily = fredoka,
+                                modifier = Modifier.padding(start = 5.dp)
+                            )
+                        }
+                    }
+                    DropdownMenuItem(onClick = { viewModel.setDeleteState(true) }) {
+                        Row {
+                            Icon(Icons.Default.Delete, contentDescription = "")
+                            Text(
+                                text = stringResource(id = R.string.delete),
+                                fontFamily = fredoka,
+                                modifier = Modifier.padding(start = 5.dp)
+                            )
+                        }
+                    }
+                }
+            } else {
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(animationSpec = tween(1000, easing = LinearEasing)),
+                    exit = fadeOut()
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.setDeleteState(false)
+                            viewModel.setEditState(false)
+                            viewModel.setDropDownMenuState(false)
+                        },
+                        border = BorderStroke(1.4.dp, color = LightBlue),
+                        shape = RoundedCornerShape(32.dp),
+                        modifier = Modifier.padding(end = 15.dp)
+                    ) {
+                        Text(text = "Cancel", fontFamily = fredoka, color = LightBlue)
+                    }
+                }
             }
 
-            IconButton(onClick = { }) {
-                Icon(
-                    Icons.Default.MoreVert,
-                    contentDescription = "",
-                    modifier = Modifier.scale(1.2f)
-                )
-            }
         }
 
 
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun GradeListItem(fredoka: FontFamily, data: Grade) {
+fun GradeListItem(
+    fredoka: FontFamily,
+    data: Grade,
+    viewModel: GradeViewModel,
+    onOpenBottomSheet: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp), verticalAlignment = CenterVertically
+            .padding(15.dp), verticalAlignment = Alignment.CenterVertically
     ) {
+
         Box(
             modifier = Modifier
                 .size(40.dp)
@@ -199,18 +278,45 @@ fun GradeListItem(fredoka: FontFamily, data: Grade) {
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.fillMaxWidth(0.6f)
             )
-            Text(
-                text = if (data.isWritten)
-                    stringResource(id = R.string.classTest)
-                else stringResource(
-                    id = R.string.oralGrade
-                ),
-                fontFamily = fredoka,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.Light,
-                color = Color.Gray
-            )
+            if (!viewModel.editState.value && !viewModel.deleteState.value) {
+                Text(
+                    text = if (data.isWritten)
+                        stringResource(id = R.string.classTest)
+                    else stringResource(
+                        id = R.string.oralGrade
+                    ),
+                    fontFamily = fredoka,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Light,
+                    color = Color.Gray
+                )
+            } else {
+                AnimatedVisibility(
+                    visible = viewModel.deleteState.value,
+                    enter = fadeIn(animationSpec = tween(10000))
+                ) {
+                    OutlinedButton(onClick = {
+                        viewModel.setDeleteGradeIdState(data.id)
+                        viewModel.setDeleteDialogState(true)
+                    }, shape = CircleShape) {
+                        Icon(Icons.Default.Clear, contentDescription = "")
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = !viewModel.deleteState.value,
+                    enter = fadeIn(animationSpec = tween(1000))
+                ) {
+                    IconButton(onClick = {
+                        viewModel.setSpecificGradeState(data)
+                        onOpenBottomSheet()
+                    }) {
+                        Icon(Icons.Default.Edit, contentDescription = "")
+                    }
+                }
+
+            }
         }
     }
 }

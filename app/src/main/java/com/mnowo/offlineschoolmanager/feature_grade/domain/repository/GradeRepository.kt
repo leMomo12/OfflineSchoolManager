@@ -23,4 +23,8 @@ interface GradeRepository {
     fun sumOfOralGrade(subjectId: Int): Double
 
     fun countOfOralGrade(subjectId: Int): Int
+
+    suspend fun deleteSpecificGrade(gradeId: Int): Int
+
+    suspend fun updateGrade(grade: Grade)
 }

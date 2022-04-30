@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -18,18 +17,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnowo.offlineschoolmanager.R
-import com.mnowo.offlineschoolmanager.core.PickColorDialog
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
-import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectViewModel
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
-import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -38,7 +31,7 @@ fun AddGradeBottomSheet(
     viewModel: GradeViewModel = hiltViewModel(),
     onCloseBottomSheet: () -> Unit,
     fredoka: FontFamily,
-    scaffoldState: BottomSheetScaffoldState
+    scaffoldState: BottomSheetScaffoldState,
 ) {
 
     LaunchedEffect(key1 = true) {
@@ -84,13 +77,13 @@ fun AddGradeBottomSheet(
         ) {
             Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
             Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-            Text(text = "Back", color = LightBlue)
+            Text(text = stringResource(id = R.string.back), color = LightBlue)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(
                     onClick = { viewModel.onEvent(GradeEvent.AddGrade) },
                     border = BorderStroke(1.dp, color = LightBlue)
                 ) {
-                    Text(text = "Add", color = LightBlue)
+                    Text(stringResource(id = R.string.save), color = LightBlue)
                 }
             }
         }
@@ -146,11 +139,13 @@ fun AddGradeBottomSheet(
                         text = stringResource(id = R.string.Orally),
                         fontFamily = fredoka,
                     )
-                    RadioButton(selected = !viewModel.isWrittenState.value, onClick = {
-                        if (viewModel.isWrittenState.value) {
-                            viewModel.onEvent(GradeEvent.EnteredIsWritten(false))
-                        }
-                    })
+                    RadioButton(
+                        selected = !viewModel.isWrittenState.value,
+                        onClick = {
+                            if (viewModel.isWrittenState.value) {
+                                viewModel.onEvent(GradeEvent.EnteredIsWritten(false))
+                            }
+                        })
                 }
             }
 

@@ -7,7 +7,7 @@ object CalculateGradeColor {
 
     fun calculateGradeColor(grade: Double): Int {
         when {
-            grade > 0 && grade <= 1 -> {
+            grade > 0.75 && grade <= 1 -> {
                 return gradeOne.toArgb()
             }
             grade > 1 && grade <= 1.5 -> {

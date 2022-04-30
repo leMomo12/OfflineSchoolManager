@@ -3,25 +3,22 @@ package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case
 import android.content.Context
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
-import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
+import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.CalculateGradeColor
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.GradeValidation
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class AddGradeUseCase @Inject constructor(
-    private val gradeRepository: GradeRepository,
-    private val context: Context
+class UpdateGradeUseCase @Inject constructor(
+    private val repository: GradeRepository,
+    val context: Context
 ) {
 
-    operator fun invoke(grade: Grade): Flow<Resource<GradeResult>> = flow {
-
+    operator fun invoke(grade: Grade): Flow<Resource<GradeResult>> = flow<Resource<GradeResult>> {
         when (val validationResult = GradeValidation.validateGrade(grade = grade)) {
             is GradeResult.EmptyDescription -> {
                 emit(
@@ -52,7 +49,7 @@ class AddGradeUseCase @Inject constructor(
                 return@flow
             }
             is GradeResult.Success -> {
-                gradeRepository.addGrade(
+                repository.updateGrade(
                     grade = grade.copy(
                         gradeColor = validationResult.gradeColor!!,
                         grade = validationResult.roundedGrade!!

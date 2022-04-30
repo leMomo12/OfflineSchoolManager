@@ -1,6 +1,5 @@
 package com.mnowo.offlineschoolmanager
 
-import android.util.Log.d
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,21 +26,16 @@ import androidx.compose.ui.unit.sp
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
-import androidx.core.graphics.toColor
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.navArgument
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.*
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
-import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
 import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -140,7 +135,7 @@ fun SubjectTitle(fredoka: FontFamily, onOpenBottomSheet: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Subjects",
+            text = stringResource(id = R.string.subjects),
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
             fontSize = 32.sp

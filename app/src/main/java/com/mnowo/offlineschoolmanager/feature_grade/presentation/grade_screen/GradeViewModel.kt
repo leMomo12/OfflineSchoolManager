@@ -1,28 +1,17 @@
 package com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen
 
-import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
-import com.mnowo.offlineschoolmanager.feature_grade.domain.models.AddGradeResult
+import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
-import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.AddGradeUseCase
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllGradesUseCase
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetSpecificSubjectUseCase
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.UpdateAverageUseCase
+import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,8 +21,8 @@ class GradeViewModel @Inject constructor(
     private val getAllGradesUseCase: GetAllGradesUseCase,
     private val addGradeUseCase: AddGradeUseCase,
     private val updateAverageUseCase: UpdateAverageUseCase,
-    savedStateHandle: SavedStateHandle,
-    private val repository: GradeRepository
+    private val getSpecificSubjectUseCase: GetSpecificSubjectUseCase,
+    private val deleteSpecificGradeUseCase: DeleteSpecificGradeUseCase
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -51,17 +40,62 @@ class GradeViewModel @Inject constructor(
     private val _classTestDescriptionErrorState = mutableStateOf(false)
     val classTestDescriptionErrorState: State<Boolean> = _classTestDescriptionErrorState
 
-    private val _gradeState = mutableStateOf<TextFieldState>(TextFieldState())
+    private val _gradeState = mutableStateOf(TextFieldState())
     val gradeState: State<TextFieldState> = _gradeState
 
-    private val _gradeErrorState = mutableStateOf<Boolean>(false)
+    private val _gradeErrorState = mutableStateOf(false)
     val gradeErrorState: State<Boolean> = _gradeErrorState
 
-    private val _bottomSheetState = mutableStateOf<Boolean>(false)
+    private val _bottomSheetState = mutableStateOf(false)
     val bottomSheetState: State<Boolean> = _bottomSheetState
 
-    private val _isWrittenState = mutableStateOf<Boolean>(true)
+    private val _isWrittenState = mutableStateOf(true)
     val isWrittenState: State<Boolean> = _isWrittenState
+
+    private val _subjectNameState = mutableStateOf("")
+    val subjectNameState: State<String> = _subjectNameState
+
+    private val _dropDownMenuState = mutableStateOf(false)
+    val dropDownMenuState: State<Boolean> = _dropDownMenuState
+
+    private val _editState = mutableStateOf(false)
+    val editState: State<Boolean> = _editState
+
+    private val _deleteState = mutableStateOf(false)
+    val deleteState: State<Boolean> = _deleteState
+
+    private val _deleteDialogState = mutableStateOf(false)
+    val deleteDialogState: State<Boolean> = _deleteDialogState
+
+    private val _deleteGradeIdState = mutableStateOf(-1)
+    val deleteGradeIdState: State<Int> = _deleteGradeIdState
+
+    private val _specificGradeState = mutableStateOf<Grade?>(null)
+    val specificGradeState: State<Grade?> = _specificGradeState
+
+    fun setSpecificGradeState(value: Grade?) {
+        _specificGradeState.value = value
+    }
+
+    fun setDeleteGradeIdState(value: Int) {
+        _deleteGradeIdState.value = value
+    }
+
+    fun setDeleteDialogState(value: Boolean) {
+        _deleteDialogState.value = value
+    }
+
+    fun setDeleteState(value: Boolean) {
+        _deleteState.value = value
+    }
+
+    fun setEditState(value: Boolean) {
+        _editState.value = value
+    }
+
+    fun setDropDownMenuState(value: Boolean) {
+        _dropDownMenuState.value = value
+    }
 
     fun setBottomSheetState(value: Boolean) {
         _bottomSheetState.value = value
@@ -97,21 +131,19 @@ class GradeViewModel @Inject constructor(
                                     _bottomSheetState.value = false
 
                                     updateAverageUseCase.invoke(subjectId = subjectId.value)
-                                        .collect() {
-
-                                        }
+                                        .collect()
                                 }
                             }
                             is Resource.Error -> {
                                 viewModelScope.launch {
                                     when (it.data) {
-                                        is AddGradeResult.EmptyDescription -> {
+                                        is GradeResult.EmptyDescription -> {
                                             _classTestDescriptionErrorState.value = true
                                         }
-                                        is AddGradeResult.GradeOutOffRange -> {
+                                        is GradeResult.GradeOutOffRange -> {
                                             _gradeErrorState.value = true
                                         }
-                                        is AddGradeResult.Exception -> {
+                                        is GradeResult.Exception -> {
                                             _eventFlow.emit(
                                                 UiEvent.ShowSnackbar(
                                                     uiText = it.message.toString()
@@ -120,9 +152,6 @@ class GradeViewModel @Inject constructor(
                                         }
                                     }
                                 }
-                            }
-                            is Resource.Loading -> {
-
                             }
                         }
 
@@ -136,10 +165,13 @@ class GradeViewModel @Inject constructor(
                     getAllGradesUseCase.invoke(subjectId = subjectId.value).collect() {
                         when (it) {
                             is Resource.Error -> {
-
-                            }
-                            is Resource.Success -> {
-
+                                it.message?.let { message ->
+                                    _eventFlow.emit(
+                                        UiEvent.ShowSnackbar(
+                                            uiText = message
+                                        )
+                                    )
+                                }
                             }
                             is Resource.Loading -> {
                                 it.data?.let { item ->
@@ -147,6 +179,13 @@ class GradeViewModel @Inject constructor(
                                 }
                             }
                         }
+                    }
+                }
+            }
+            is GradeEvent.GetSpecificSubject -> {
+                viewModelScope.launch {
+                    getSpecificSubjectUseCase.invoke(subjectId = subjectId.value).collect() {
+                        _subjectNameState.value = it.subjectName
                     }
                 }
             }
@@ -163,16 +202,39 @@ class GradeViewModel @Inject constructor(
             is GradeEvent.EnteredIsWritten -> {
                 _isWrittenState.value = event.isWritten
             }
+            is GradeEvent.DeleteSpecificGrade -> {
+                viewModelScope.launch {
+                    deleteSpecificGradeUseCase.invoke(gradeId = deleteGradeIdState.value)
+                        .collect() {
+                            when (it) {
+                                is Resource.Success -> {
+                                    updateAverageUseCase.invoke(subjectId = subjectId.value)
+                                        .collect()
+                                    _deleteDialogState.value = false
+                                }
+                                is Resource.Error -> {
+                                    it.message?.let { string ->
+                                        _eventFlow.emit(
+                                            UiEvent.ShowSnackbar(
+                                                uiText = string
+                                            )
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                }
+            }
         }
     }
 
-    private fun clearAfterAddGradeEvent() {
+    fun clearAfterAddGradeEvent() {
         _classTestDescriptionState.value.clearText()
         _gradeState.value.clearText()
         _isWrittenState.value = true
     }
 
-    private fun removeAllErrors() {
+    fun removeAllErrors() {
         _classTestDescriptionErrorState.value = false
         _gradeErrorState.value = false
     }
