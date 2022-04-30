@@ -22,7 +22,8 @@ class GradeViewModel @Inject constructor(
     private val addGradeUseCase: AddGradeUseCase,
     private val updateAverageUseCase: UpdateAverageUseCase,
     private val getSpecificSubjectUseCase: GetSpecificSubjectUseCase,
-    private val deleteSpecificGradeUseCase: DeleteSpecificGradeUseCase
+    private val deleteSpecificGradeUseCase: DeleteSpecificGradeUseCase,
+    private val updateGradeUseCase: UpdateGradeUseCase
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -72,6 +73,14 @@ class GradeViewModel @Inject constructor(
 
     private val _specificGradeState = mutableStateOf<Grade?>(null)
     val specificGradeState: State<Grade?> = _specificGradeState
+
+    // Important for the TextFields in the GradeBottomSheet to get specific edit value
+    private val _editTextFieldState = mutableStateOf<Boolean>(false)
+    val editTextFieldState: State<Boolean> = _editTextFieldState
+
+    fun setEditTextFieldState(value: Boolean) {
+        _editTextFieldState.value = value
+    }
 
     fun setSpecificGradeState(value: Grade?) {
         _specificGradeState.value = value
@@ -125,33 +134,13 @@ class GradeViewModel @Inject constructor(
                     addGradeUseCase.invoke(grade = grade).onEach { it ->
                         when (it) {
                             is Resource.Success -> {
-                                viewModelScope.launch {
-                                    clearAfterAddGradeEvent()
-                                    removeAllErrors()
-                                    _bottomSheetState.value = false
-
-                                    updateAverageUseCase.invoke(subjectId = subjectId.value)
-                                        .collect()
-                                }
+                                addOrEditGradeSuccess()
                             }
                             is Resource.Error -> {
-                                viewModelScope.launch {
-                                    when (it.data) {
-                                        is GradeResult.EmptyDescription -> {
-                                            _classTestDescriptionErrorState.value = true
-                                        }
-                                        is GradeResult.GradeOutOffRange -> {
-                                            _gradeErrorState.value = true
-                                        }
-                                        is GradeResult.Exception -> {
-                                            _eventFlow.emit(
-                                                UiEvent.ShowSnackbar(
-                                                    uiText = it.message.toString()
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
+                                addOrEditGradeError(
+                                    errorMessage = it.message,
+                                    gradeResult = it.data
+                                )
                             }
                         }
 
@@ -225,16 +214,80 @@ class GradeViewModel @Inject constructor(
                         }
                 }
             }
+            is GradeEvent.UpdateGrade -> {
+                viewModelScope.launch {
+                    if (gradeState.value.text.trim().isNotBlank()) {
+                        specificGradeState.value?.let {
+                            updateGradeUseCase.invoke(
+                                grade = Grade(
+                                    id = it.id,
+                                    subjectId = it.subjectId,
+                                    description = classTestDescriptionState.value.text,
+                                    grade = gradeState.value.text.toDouble(),
+                                    isWritten = isWrittenState.value,
+                                )
+                            ).collect() { result ->
+                                when (result) {
+                                    is Resource.Success -> {
+                                        addOrEditGradeSuccess()
+                                    }
+                                    is Resource.Loading -> {}
+                                    is Resource.Error -> {
+                                        addOrEditGradeError(
+                                            errorMessage = result.message,
+                                            gradeResult = result.data
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
-    fun clearAfterAddGradeEvent() {
+    // When adding or edit a grade failed
+    private fun addOrEditGradeError(errorMessage: String?, gradeResult: GradeResult?) {
+        viewModelScope.launch {
+            when (gradeResult) {
+                is GradeResult.EmptyDescription -> {
+                    _classTestDescriptionErrorState.value = true
+                }
+                is GradeResult.GradeOutOffRange -> {
+                    _gradeErrorState.value = true
+                }
+                is GradeResult.Exception -> {
+                    _eventFlow.emit(
+                        UiEvent.ShowSnackbar(
+                            uiText = errorMessage ?: "Unexpected Error occurred"
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    // When adding or edit a grade is successful
+    private fun addOrEditGradeSuccess() {
+        viewModelScope.launch {
+            clearAfterAddGradeEvent()
+            removeAllErrors()
+            _bottomSheetState.value = false
+
+            updateAverageUseCase.invoke(subjectId = subjectId.value)
+                .collect()
+        }
+    }
+
+    private fun clearAfterAddGradeEvent() {
         _classTestDescriptionState.value.clearText()
         _gradeState.value.clearText()
         _isWrittenState.value = true
+        _specificGradeState.value = null
     }
 
-    fun removeAllErrors() {
+    private fun removeAllErrors() {
         _classTestDescriptionErrorState.value = false
         _gradeErrorState.value = false
     }

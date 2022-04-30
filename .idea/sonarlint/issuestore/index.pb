@@ -57,8 +57,6 @@ Zapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/util/
 Xapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/util/Screen.kt,c\3\c367c28e8d513c0466e4fa78983e217e9628c3bb
 ã
 [app/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/util/Constants.kt,e\1\e12015fe5c6f409f1ef118f13e50d909ee19f6af
-ö
-japp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/subject_screen/SubjectEvent.kt,0\5\056cb67c3ba0c7b00eab8927f825648e94ece085
 û
 napp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/subject_screen/SubjectViewModel.kt,0\6\065fe6e2471912df3362f854f80ad501c3b8e312
 ç

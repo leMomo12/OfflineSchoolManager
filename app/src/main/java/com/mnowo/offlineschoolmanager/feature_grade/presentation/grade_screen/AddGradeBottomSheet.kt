@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen
 
+import android.util.Log.d
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -51,6 +52,22 @@ fun AddGradeBottomSheet(
         onCloseBottomSheet()
     }
 
+    // Setting TextField value to specificGradeState when editState is true
+    if (viewModel.editTextFieldState.value) {
+        viewModel.setEditTextFieldState(false)
+        viewModel.onEvent(GradeEvent.EnteredClassTestDescription(
+            description = viewModel.specificGradeState.value?.description ?: "")
+        )
+
+        viewModel.onEvent(GradeEvent.EnteredGrade(
+            grade = viewModel.specificGradeState.value?.grade.toString())
+        )
+
+        viewModel.onEvent(GradeEvent.EnteredIsWritten(
+            isWritten = viewModel.specificGradeState.value?.isWritten ?: true)
+        )
+    }
+
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -80,10 +97,24 @@ fun AddGradeBottomSheet(
             Text(text = stringResource(id = R.string.back), color = LightBlue)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(
-                    onClick = { viewModel.onEvent(GradeEvent.AddGrade) },
+                    onClick = {
+                        if(viewModel.editState.value) {
+                            viewModel.onEvent(GradeEvent.UpdateGrade)
+                        } else {
+                            viewModel.onEvent(GradeEvent.AddGrade)
+                        }
+                              },
                     border = BorderStroke(1.dp, color = LightBlue)
                 ) {
-                    Text(stringResource(id = R.string.save), color = LightBlue)
+                    Text(
+                        text =
+                        if (viewModel.editState.value) {
+                            stringResource(id = R.string.edit)
+                        } else {
+                            stringResource(id = R.string.save)
+                        },
+                        color = LightBlue
+                    )
                 }
             }
         }
@@ -145,7 +176,8 @@ fun AddGradeBottomSheet(
                             if (viewModel.isWrittenState.value) {
                                 viewModel.onEvent(GradeEvent.EnteredIsWritten(false))
                             }
-                        })
+                        }
+                    )
                 }
             }
 

@@ -310,6 +310,7 @@ fun GradeListItem(
                 ) {
                     IconButton(onClick = {
                         viewModel.setSpecificGradeState(data)
+                        viewModel.setEditTextFieldState(true)
                         onOpenBottomSheet()
                     }) {
                         Icon(Icons.Default.Edit, contentDescription = "")
