@@ -2,7 +2,6 @@ package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case
 
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.repository.SubjectRepository
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
 import kotlinx.coroutines.Dispatchers

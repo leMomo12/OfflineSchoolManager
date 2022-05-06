@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.core.feature_subject.domain.models
+package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models
 
 sealed class SubjectResult {
     object EmptySubjectText : SubjectResult()

@@ -1,6 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_grade.domain.repository
 
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import kotlinx.coroutines.flow.Flow
 
@@ -27,4 +27,8 @@ interface GradeRepository {
     suspend fun deleteSpecificGrade(gradeId: Int): Int
 
     suspend fun updateGrade(grade: Grade)
+
+    suspend fun deleteSubject(subjectId: Int)
+
+    suspend fun deleteAllSubjectSpecificGrades(subjectId: Int)
 }

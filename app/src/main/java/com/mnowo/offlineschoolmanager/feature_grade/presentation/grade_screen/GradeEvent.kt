@@ -12,4 +12,5 @@ sealed class GradeEvent {
     object LoadGrades : GradeEvent()
     object AddGrade: GradeEvent()
     object UpdateGrade: GradeEvent()
+    object NavBackToSubjectScreen: GradeEvent()
 }

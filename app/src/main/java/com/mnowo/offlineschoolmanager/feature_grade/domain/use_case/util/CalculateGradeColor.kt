@@ -37,7 +37,7 @@ object CalculateGradeColor {
             grade > 5 && grade <= 5.5 -> {
                 return gradeFiveSix.toArgb()
             }
-            grade > 5.5 && grade <= 6 -> {
+            grade > 5.5 && grade <= 6.5 -> {
                 return gradeSix.toArgb()
             }
         }

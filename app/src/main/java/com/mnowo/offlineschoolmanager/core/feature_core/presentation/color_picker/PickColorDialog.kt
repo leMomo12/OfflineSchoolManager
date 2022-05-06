@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.mnowo.offlineschoolmanager.core.theme.colorPickerList
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,8 +35,7 @@ fun PickColorDialog(
     onDismissClicked: () -> Unit,
     onColorPicked: (Color) -> Unit
 ) {
-    val colorList =
-        listOf(Color.Blue, Color.Cyan, Color.Red, Color.Magenta, Color.Yellow, Color.LightGray)
+    val colorList = colorPickerList
 
     Dialog(onDismissRequest = { onDismissClicked() }) {
         Card(

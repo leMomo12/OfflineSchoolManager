@@ -1,7 +1,7 @@
 package com.mnowo.offlineschoolmanager.feature_grade.data.repository
 
 
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
@@ -56,5 +56,11 @@ class GradeRepositoryImpl @Inject constructor(
         return gradeDao.updateGrade(grade = grade)
     }
 
+    override suspend fun deleteSubject(subjectId: Int) {
+        return gradeDao.deleteSubject(subjectId = subjectId)
+    }
 
+    override suspend fun deleteAllSubjectSpecificGrades(subjectId: Int) {
+        return gradeDao.deleteAllSubjectSpecificGrades(subjectId = subjectId)
+    }
 }

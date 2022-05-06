@@ -21,3 +21,23 @@ val gradeFive = Color(119, 77, 32, 255)
 val gradeFiveSix = Color(128, 65, 31, 255)
 val gradeSix = Color(117, 36, 21, 255)
 
+
+val colorPickerList = listOf<Color>(
+    Color(211, 47, 47, 166),
+    Color(194, 24, 91, 166),
+    Color(123, 31, 162, 166),
+    Color(81, 45, 168, 166),
+    Color(48, 63, 159, 166),
+    Color(25, 118, 210, 166),
+    Color(2, 136, 209, 166),
+    Color(0, 151, 167, 166),
+    Color(0, 121, 107, 166),
+    Color(56, 142, 60, 166),
+    Color(104, 159, 56, 166),
+    Color(175, 180, 43, 166),
+    Color(251, 192, 45, 166),
+    Color(255, 160, 0, 166),
+    Color(245, 124, 0, 166),
+    Color(230, 74, 25, 166),
+)
+

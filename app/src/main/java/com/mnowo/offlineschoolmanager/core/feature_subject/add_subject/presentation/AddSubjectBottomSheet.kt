@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.core
+package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation
 
 
 import androidx.compose.foundation.BorderStroke
@@ -22,12 +22,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnowo.offlineschoolmanager.R
+import com.mnowo.offlineschoolmanager.core.PickColorDialog
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectEvent
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.AddSubjectViewModel
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import kotlinx.coroutines.flow.collectLatest
 
@@ -70,6 +72,43 @@ fun AddSubjectBottomSheet(
         )
     }
 
+    if (viewModel.editTextFieldState.value) {
+        viewModel.setEditTextFieldState(false)
+
+        viewModel.onAddSubjectEvent(
+            AddSubjectEvent.EnteredSubject(
+                viewModel.specificSubjectState.value?.subjectName ?: ""
+            )
+        )
+        viewModel.onAddSubjectEvent(
+            AddSubjectEvent.EnteredRoom(
+                viewModel.specificSubjectState.value?.room ?: ""
+            )
+        )
+        viewModel.onAddSubjectEvent(
+            AddSubjectEvent.EnteredWrittenPercentage(
+                viewModel.specificSubjectState.value?.writtenPercentage.toString()
+            )
+        )
+        viewModel.onAddSubjectEvent(
+            AddSubjectEvent.EnteredOralPercentage(
+                viewModel.specificSubjectState.value?.oralPercentage.toString()
+            )
+        )
+        viewModel.specificSubjectState.value?.color?.let {
+            val color = Color(
+                it.red,
+                it.green,
+                it.blue
+            )
+            viewModel.onPickColorEvent(
+                PickColorEvent.ColorPicked(
+                    color = color
+                )
+            )
+        }
+    }
+
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -102,7 +141,14 @@ fun AddSubjectBottomSheet(
                     onClick = { viewModel.onAddSubjectEvent(AddSubjectEvent.AddSubject) },
                     border = BorderStroke(1.dp, color = LightBlue)
                 ) {
-                    Text(text = stringResource(id = R.string.add), color = LightBlue)
+                    Text(
+                        text = if (!viewModel.editState.value) {
+                            stringResource(id = R.string.add)
+                        } else {
+                            stringResource(id = R.string.save)
+                        },
+                        color = LightBlue
+                    )
                 }
             }
         }
@@ -121,8 +167,8 @@ fun AddSubjectBottomSheet(
                 value = viewModel.subjectState.value.text,
                 label = { Text(text = stringResource(id = R.string.subjectName)) },
                 onValueChange = {
-                    if(viewModel.subjectState.value.text.length <= 20)
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredSubject(it))
+                    if (viewModel.subjectState.value.text.length <= 20)
+                        viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredSubject(it))
                 },
                 singleLine = true
             )
@@ -152,8 +198,8 @@ fun AddSubjectBottomSheet(
                 value = viewModel.roomState.value.text,
                 label = { Text(text = stringResource(id = R.string.room)) },
                 onValueChange = {
-                    if(viewModel.roomState.value.text.length <= 10)
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredRoom(it))
+                    if (viewModel.roomState.value.text.length <= 10)
+                        viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredRoom(it))
                 },
                 singleLine = true
             )

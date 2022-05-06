@@ -2,7 +2,7 @@ package com.mnowo.offlineschoolmanager.feature_grade.data.local
 
 import androidx.room.*
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import kotlinx.coroutines.flow.Flow
 
@@ -41,4 +41,10 @@ interface GradeDao {
 
     @Update
     suspend fun updateGrade(grade: Grade)
+
+    @Query("DELETE FROM ${Constants.SUBJECT_TABLE} WHERE id = :subjectId")
+    suspend fun deleteSubject(subjectId: Int)
+
+    @Query("DELETE FROM ${Constants.GRADE_TABLE} WHERE subjectId = :subjectId")
+    suspend fun deleteAllSubjectSpecificGrades(subjectId: Int)
 }

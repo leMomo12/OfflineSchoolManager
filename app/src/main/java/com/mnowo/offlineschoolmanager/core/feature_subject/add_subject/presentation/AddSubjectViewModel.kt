@@ -1,5 +1,7 @@
-package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject
+package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation
 
+import android.content.Context
+import android.content.res.loader.ResourcesProvider
 import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -12,9 +14,9 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldS
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.SubjectResult
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.use_case.AddSubjectUseCase
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.SubjectResult
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.use_case.AddSubjectUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -27,6 +29,7 @@ import javax.inject.Inject
 class AddSubjectViewModel @Inject constructor(
     private val addSubjectUseCase: AddSubjectUseCase
 ) : ViewModel() {
+
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -66,6 +69,27 @@ class AddSubjectViewModel @Inject constructor(
 
     private val _mustAddUpTo100ErrorState = mutableStateOf<Boolean>(false)
     val mustAddUpTo100ErrorState: State<Boolean> = _mustAddUpTo100ErrorState
+
+    private val _specificSubjectState = mutableStateOf<Subject?>(null)
+    val specificSubjectState: State<Subject?> = _specificSubjectState
+
+    private val _editTextFieldState = mutableStateOf<Boolean>(false)
+    val editTextFieldState: State<Boolean> = _editTextFieldState
+
+    private val _editState = mutableStateOf<Boolean>(false)
+    val editState: State<Boolean> = _editState
+
+    fun setEditState(value: Boolean) {
+        _editState.value = value
+    }
+
+    fun setEditTextFieldState(value: Boolean) {
+        _editTextFieldState.value = value
+    }
+
+    fun setSpecificSubjectState(value: Subject?) {
+        _specificSubjectState.value = value
+    }
 
     fun setBottomSheetState(state: Boolean) {
         _bottomSheetState.value = state
@@ -119,7 +143,8 @@ class AddSubjectViewModel @Inject constructor(
                                             SubjectResult.ErrorOccurred -> {
                                                 _eventFlow.emit(
                                                     UiEvent.ShowSnackbar(
-                                                        (it.message ?: R.string.unexpectedError) as String
+                                                        (it.message
+                                                            ?: R.string.unexpectedError) as String
                                                     )
                                                 )
                                                 clearAfterAddSubjectEvent()

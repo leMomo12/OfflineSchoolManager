@@ -1,7 +1,7 @@
-package com.mnowo.offlineschoolmanager.core.feature_subject.data
+package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.data
 
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.repository.SubjectRepository
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.repository.SubjectRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

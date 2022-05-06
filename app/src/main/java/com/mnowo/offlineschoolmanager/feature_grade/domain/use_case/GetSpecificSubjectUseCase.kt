@@ -1,6 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case
 
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

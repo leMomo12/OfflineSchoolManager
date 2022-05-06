@@ -8,6 +8,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.*
@@ -244,6 +245,15 @@ class GradeViewModel @Inject constructor(
                     }
                 }
             }
+            is GradeEvent.NavBackToSubjectScreen -> {
+                viewModelScope.launch {
+                    _eventFlow.emit(
+                        UiEvent.Navigate(
+                            Screen.SubjectScreen.route
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -271,7 +281,7 @@ class GradeViewModel @Inject constructor(
     // When adding or edit a grade is successful
     private fun addOrEditGradeSuccess() {
         viewModelScope.launch {
-            clearAfterAddGradeEvent()
+            clearAfterGradeEvent()
             removeAllErrors()
             _bottomSheetState.value = false
 
@@ -280,14 +290,14 @@ class GradeViewModel @Inject constructor(
         }
     }
 
-    private fun clearAfterAddGradeEvent() {
+    fun clearAfterGradeEvent() {
         _classTestDescriptionState.value.clearText()
         _gradeState.value.clearText()
         _isWrittenState.value = true
         _specificGradeState.value = null
     }
 
-    private fun removeAllErrors() {
+    fun removeAllErrors() {
         _classTestDescriptionErrorState.value = false
         _gradeErrorState.value = false
     }

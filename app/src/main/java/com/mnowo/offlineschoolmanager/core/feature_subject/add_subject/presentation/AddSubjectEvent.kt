@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject
+package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation
 
 sealed class AddSubjectEvent {
     data class EnteredSubject(val subject: String) : AddSubjectEvent()

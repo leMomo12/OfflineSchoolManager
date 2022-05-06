@@ -1,6 +1,6 @@
-package com.mnowo.offlineschoolmanager.core.feature_subject.domain.repository
+package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.repository
 
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import kotlinx.coroutines.flow.Flow
 
 interface SubjectRepository {

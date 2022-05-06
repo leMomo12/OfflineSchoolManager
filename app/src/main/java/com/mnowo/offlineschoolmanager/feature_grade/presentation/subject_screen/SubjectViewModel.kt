@@ -1,25 +1,18 @@
 package com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen
 
-import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
-import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
-import com.mnowo.offlineschoolmanager.core.feature_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
+import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.DeleteSubjectUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
-import com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen.GradeEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,7 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SubjectViewModel @Inject constructor(
     private val getAllSubjectsUseCase: GetAllSubjectsUseCase,
-    savedStateHandle: SavedStateHandle,
+    private val deleteSubjectUseCase: DeleteSubjectUseCase,
     private val gradeRepository: GradeRepository
 ) : ViewModel() {
 
@@ -39,6 +32,41 @@ class SubjectViewModel @Inject constructor(
 
     private val _onSubjectListClickedIndexState = mutableStateOf<Int>(-1)
     val onSubjectListClickedIndexState: State<Int> = _onSubjectListClickedIndexState
+
+    private val _dropDownMenuState = mutableStateOf<Boolean>(false)
+    val dropDownMenuState: State<Boolean> = _dropDownMenuState
+
+    fun setDropDownMenuState(value: Boolean) {
+        _dropDownMenuState.value = value
+    }
+
+    private val _editState = mutableStateOf<Boolean>(false)
+    val editState: State<Boolean> = _editState
+
+    fun setEditState(value: Boolean) {
+        _editState.value = value
+    }
+
+    private val _deleteState = mutableStateOf<Boolean>(false)
+    val deleteState: State<Boolean> = _deleteState
+
+    fun setDeleteState(value: Boolean) {
+        _deleteState.value = value
+    }
+
+    private val _deleteDialogState = mutableStateOf<Boolean>(false)
+    val deleteDialogState: State<Boolean> = _deleteDialogState
+
+    fun setDeleteDialogState(value: Boolean) {
+        _deleteDialogState.value = value
+    }
+
+    private val _subjectIdState = mutableStateOf<Int>(-1)
+    val subjectIdState: State<Int> = _subjectIdState
+
+    fun setSubjectIdState(value: Int) {
+        _subjectIdState.value = value
+    }
 
     init {
         getAllSubjects()
@@ -73,13 +101,16 @@ class SubjectViewModel @Inject constructor(
                     )
                 }
             }
-            is SubjectEvent.More -> {
-
-            }
             is SubjectEvent.SubjectListData -> {
                 _subjectListState.value = subjectListState.value.copy(
                     listData = event.listData
                 )
+            }
+            is SubjectEvent.DeleteSubject -> {
+                viewModelScope.launch {
+                    deleteSubjectUseCase.invoke(subjectId = subjectIdState.value).collect()
+                }
+                setDeleteDialogState(false)
             }
         }
     }
