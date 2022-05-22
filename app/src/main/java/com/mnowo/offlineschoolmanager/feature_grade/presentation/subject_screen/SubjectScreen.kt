@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.util.Log.d
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
@@ -68,8 +69,15 @@ fun SubjectScreen(
 
     val openSheet: () -> Unit = {
         scope.launch {
+            addSubjectViewModel.clearAfterSubjectEvent()
+            addSubjectViewModel.removeAllErrors()
             bottomState.bottomSheetState.expand()
         }
+    }
+
+    if (bottomState.bottomSheetState.isCollapsed && !viewModel.editState.value) {
+        addSubjectViewModel.removeAllErrors()
+        addSubjectViewModel.setEditState(false)
     }
 
     LaunchedEffect(key1 = true) {
@@ -116,7 +124,8 @@ fun SubjectScreen(
                         fredoka = fredoka, onOpenBottomSheet = {
                             openSheet()
                         },
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        bottomSheetScaffoldState = bottomState
                     )
                 }
                 item {
@@ -155,8 +164,15 @@ fun SubjectScreen(
     }
 }
 
+
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SubjectTitle(fredoka: FontFamily, onOpenBottomSheet: () -> Unit, viewModel: SubjectViewModel) {
+fun SubjectTitle(
+    fredoka: FontFamily,
+    onOpenBottomSheet: () -> Unit,
+    viewModel: SubjectViewModel,
+    bottomSheetScaffoldState: BottomSheetScaffoldState
+) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth(),
@@ -174,6 +190,7 @@ fun SubjectTitle(fredoka: FontFamily, onOpenBottomSheet: () -> Unit, viewModel: 
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            d("editState", "${viewModel.editState.value}")
             if (!viewModel.editState.value && !viewModel.deleteState.value) {
                 IconButton(onClick = {
                     onOpenBottomSheet()
@@ -229,9 +246,14 @@ fun SubjectTitle(fredoka: FontFamily, onOpenBottomSheet: () -> Unit, viewModel: 
                     },
                     border = BorderStroke(1.4.dp, color = LightBlue),
                     shape = RoundedCornerShape(32.dp),
-                    modifier = Modifier.padding(end = 5.dp)
+                    modifier = Modifier.padding(end = 5.dp),
+                    enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
                 ) {
-                    Text(text = "Cancel", fontFamily = fredoka, color = LightBlue)
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        fontFamily = fredoka,
+                        color = LightBlue
+                    )
                 }
             }
         }

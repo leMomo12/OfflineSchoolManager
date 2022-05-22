@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.util.Log.d
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -61,15 +62,19 @@ fun GradeScreen(
         scope.launch {
             bottomState.bottomSheetState.collapse()
             viewModel.clearAfterGradeEvent()
+            viewModel.removeAllErrors()
         }
     }
 
-
     val openSheet: () -> Unit = {
         scope.launch {
-            viewModel.removeAllErrors()
             bottomState.bottomSheetState.expand()
         }
+    }
+
+    if(bottomState.bottomSheetState.isCollapsed && !viewModel.editState.value) {
+        viewModel.removeAllErrors()
+        viewModel.clearAfterGradeEvent()
     }
 
     LaunchedEffect(key1 = true) {
@@ -184,6 +189,7 @@ fun GradeTitle(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            d("editState", "${viewModel.editState.value}")
             if (!viewModel.deleteState.value && !viewModel.editState.value) {
                 IconButton(onClick = { onOpenBottomSheet() }) {
                     Icon(
@@ -240,7 +246,11 @@ fun GradeTitle(
                     modifier = Modifier.padding(end = 5.dp),
                     enabled = bottomSheetState.bottomSheetState.isCollapsed
                 ) {
-                    Text(text = "Cancel", fontFamily = fredoka, color = LightBlue)
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        fontFamily = fredoka,
+                        color = LightBlue
+                    )
                 }
             }
 
@@ -329,6 +339,7 @@ fun GradeListItem(
                     IconButton(onClick = {
                         viewModel.setSpecificGradeState(data)
                         viewModel.setEditTextFieldState(true)
+                        viewModel.setEditState(true)
                         onOpenBottomSheet()
                     }) {
                         Icon(Icons.Default.Edit, contentDescription = "")

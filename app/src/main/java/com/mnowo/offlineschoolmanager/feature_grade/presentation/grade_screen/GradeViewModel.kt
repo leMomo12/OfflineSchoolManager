@@ -294,7 +294,7 @@ class GradeViewModel @Inject constructor(
         _classTestDescriptionState.value.clearText()
         _gradeState.value.clearText()
         _isWrittenState.value = true
-        _specificGradeState.value = null
+        setSpecificGradeState(null)
     }
 
     fun removeAllErrors() {

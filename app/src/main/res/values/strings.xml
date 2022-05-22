@@ -19,9 +19,10 @@
     <string name="room">Room</string>
     <string name="writtenPercentage">Written percentage</string>
     <string name="oralPercentage">Oral percentage</string>
-    <string name="mustExactlyAddUpTo100">Must exactly add up to 100</string>
+    <string name="mustExactlyAddUpTo100">Must exactly add up to 100%</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="gradeOutOfRange">Grade must be between 0.75 and 6</string>
+    <string name="cancel">Cancel</string>
 </resources>

@@ -55,16 +55,22 @@ fun AddGradeBottomSheet(
     // Setting TextField value to specificGradeState when editState is true
     if (viewModel.editTextFieldState.value) {
         viewModel.setEditTextFieldState(false)
-        viewModel.onEvent(GradeEvent.EnteredClassTestDescription(
-            description = viewModel.specificGradeState.value?.description ?: "")
+        viewModel.onEvent(
+            GradeEvent.EnteredClassTestDescription(
+                description = viewModel.specificGradeState.value?.description ?: ""
+            )
         )
 
-        viewModel.onEvent(GradeEvent.EnteredGrade(
-            grade = viewModel.specificGradeState.value?.grade.toString())
+        viewModel.onEvent(
+            GradeEvent.EnteredGrade(
+                grade = viewModel.specificGradeState.value?.grade.toString()
+            )
         )
 
-        viewModel.onEvent(GradeEvent.EnteredIsWritten(
-            isWritten = viewModel.specificGradeState.value?.isWritten ?: true)
+        viewModel.onEvent(
+            GradeEvent.EnteredIsWritten(
+                isWritten = viewModel.specificGradeState.value?.isWritten ?: true
+            )
         )
     }
 
@@ -88,30 +94,29 @@ fun AddGradeBottomSheet(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .padding(top = 10.dp)
-                .clickable {
-                    onCloseBottomSheet()
-                }
         ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
-            Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-            Text(text = stringResource(id = R.string.back), color = LightBlue)
+            TextButton(onClick = { onCloseBottomSheet() }) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
+                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+                Text(text = stringResource(id = R.string.back), color = LightBlue)
+            }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(
                     onClick = {
-                        if(viewModel.editState.value) {
+                        if (viewModel.editState.value) {
                             viewModel.onEvent(GradeEvent.UpdateGrade)
                         } else {
                             viewModel.onEvent(GradeEvent.AddGrade)
                         }
-                              },
+                    },
                     border = BorderStroke(1.dp, color = LightBlue)
                 ) {
                     Text(
                         text =
                         if (viewModel.editState.value) {
-                            stringResource(id = R.string.edit)
-                        } else {
                             stringResource(id = R.string.save)
+                        } else {
+                            stringResource(id = R.string.add)
                         },
                         color = LightBlue
                     )

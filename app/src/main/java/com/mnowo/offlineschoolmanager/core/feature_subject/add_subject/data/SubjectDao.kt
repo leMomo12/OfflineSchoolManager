@@ -1,9 +1,6 @@
 package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.data
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import kotlinx.coroutines.flow.Flow
@@ -20,4 +17,6 @@ interface SubjectDao {
     @Query("DELETE FROM ${Constants.SUBJECT_TABLE} WHERE id = :id")
     suspend fun deleteSubject(id: Int)
 
+    @Update
+    suspend fun updateSubject(subject: Subject)
 }

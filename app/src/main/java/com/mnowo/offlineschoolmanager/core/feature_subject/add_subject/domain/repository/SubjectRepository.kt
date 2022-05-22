@@ -10,4 +10,6 @@ interface SubjectRepository {
     fun getAllSubjects() : Flow<List<Subject>>
 
     suspend fun deleteSubject(id: Int)
+
+    suspend fun updateSubject(subject: Subject)
 }

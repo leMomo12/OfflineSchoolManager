@@ -129,16 +129,21 @@ fun AddSubjectBottomSheet(
             horizontalArrangement = Arrangement.Start,
             modifier = Modifier
                 .padding(top = 10.dp)
-                .clickable {
-                    onCloseBottomSheet()
-                }
         ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
-            Spacer(modifier = Modifier.padding(horizontal = 3.dp))
-            Text(text = stringResource(id = R.string.back), color = LightBlue)
+            TextButton(onClick = { onCloseBottomSheet() }) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
+                Spacer(modifier = Modifier.padding(horizontal = 3.dp))
+                Text(text = stringResource(id = R.string.back), color = LightBlue)
+            }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(
-                    onClick = { viewModel.onAddSubjectEvent(AddSubjectEvent.AddSubject) },
+                    onClick = {
+                        if(viewModel.editState.value) {
+                            viewModel.onAddSubjectEvent(AddSubjectEvent.EditSubject)
+                        } else {
+                            viewModel.onAddSubjectEvent(AddSubjectEvent.AddSubject)
+                        }
+                    },
                     border = BorderStroke(1.dp, color = LightBlue)
                 ) {
                     Text(

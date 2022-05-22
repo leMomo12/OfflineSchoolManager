@@ -6,6 +6,7 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.data.Subj
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
+import javax.inject.Inject
 
 @Database(entities = [Subject::class, Grade::class], version = 6, exportSchema = false)
 abstract class SchoolManagerDatabase : RoomDatabase() {

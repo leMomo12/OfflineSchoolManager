@@ -47,4 +47,5 @@ interface GradeDao {
 
     @Query("DELETE FROM ${Constants.GRADE_TABLE} WHERE subjectId = :subjectId")
     suspend fun deleteAllSubjectSpecificGrades(subjectId: Int)
+
 }

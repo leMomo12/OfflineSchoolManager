@@ -7,4 +7,5 @@ sealed class AddSubjectEvent {
     data class EnteredWrittenPercentage(val percentage: String) : AddSubjectEvent()
     object PickedColor: AddSubjectEvent()
     object AddSubject : AddSubjectEvent()
+    object EditSubject : AddSubjectEvent()
 }

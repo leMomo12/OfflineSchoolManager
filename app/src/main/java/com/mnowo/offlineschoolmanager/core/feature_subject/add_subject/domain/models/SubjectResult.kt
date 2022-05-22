@@ -3,6 +3,6 @@ package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.m
 sealed class SubjectResult {
     object EmptySubjectText : SubjectResult()
     object DoesntAddUpTo100: SubjectResult()
-    object ErrorOccurred : SubjectResult()
+    data class ErrorOccurred(val message: String?) : SubjectResult()
     object Success : SubjectResult()
 }

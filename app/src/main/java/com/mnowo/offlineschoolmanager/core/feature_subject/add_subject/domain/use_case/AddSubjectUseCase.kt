@@ -46,7 +46,7 @@ class AddSubjectUseCase @Inject constructor(
             emit(
                 Resource.Error<SubjectResult>(
                     message = (e.localizedMessage ?: R.string.unexpectedError).toString(),
-                    data = SubjectResult.ErrorOccurred
+                    data = SubjectResult.ErrorOccurred(message = null)
                 )
             )
         }

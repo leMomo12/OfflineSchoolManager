@@ -9,7 +9,6 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
-import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.DeleteSubjectUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,8 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SubjectViewModel @Inject constructor(
     private val getAllSubjectsUseCase: GetAllSubjectsUseCase,
-    private val deleteSubjectUseCase: DeleteSubjectUseCase,
-    private val gradeRepository: GradeRepository
+    private val deleteSubjectUseCase: DeleteSubjectUseCase
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()

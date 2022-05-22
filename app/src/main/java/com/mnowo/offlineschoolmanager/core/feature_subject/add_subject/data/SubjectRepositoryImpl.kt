@@ -21,4 +21,8 @@ class SubjectRepositoryImpl @Inject constructor(
         return dao.deleteSubject(id = id)
     }
 
+    override suspend fun updateSubject(subject: Subject) {
+        return dao.updateSubject(subject = subject)
+    }
+
 }
