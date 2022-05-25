@@ -15,7 +15,7 @@ class GetAllGradesUseCase @Inject constructor(
     operator fun invoke(subjectId: Int): Flow<Resource<List<Grade>>> = flow {
 
         try {
-            val data = repository.getAllGrades(subjectId = subjectId).collect() {
+            repository.getAllGrades(subjectId = subjectId).collect() {
                 emit(Resource.Loading<List<Grade>>(data = it))
                 emit(Resource.Success<List<Grade>>(data = it))
             }

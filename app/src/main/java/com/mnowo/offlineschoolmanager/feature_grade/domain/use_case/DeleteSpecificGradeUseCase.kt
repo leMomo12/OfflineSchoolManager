@@ -13,12 +13,11 @@ import javax.inject.Inject
 
 class DeleteSpecificGradeUseCase @Inject constructor(
     private val repository: GradeRepository,
-    private val context: Context
 ) {
     operator fun invoke(gradeId: Int): Flow<Resource<Boolean>> = flow<Resource<Boolean>> {
         when (repository.deleteSpecificGrade(gradeId = gradeId)) {
             0 -> {
-                emit(Resource.Error<Boolean>(message = context.getString(R.string.unexpectedError)))
+                emit(Resource.Error<Boolean>(message = "An unexpected error occurred"))
             }
             1 -> {
                 emit(Resource.Success<Boolean>(data = true))

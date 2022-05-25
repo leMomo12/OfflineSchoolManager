@@ -129,10 +129,11 @@ class GradeViewModel @Inject constructor(
                         0,
                         subjectId = subjectId.value,
                         description = classTestDescriptionState.value.text,
-                        grade = gradeState.value.text.toDouble(),
+                        grade = gradeState.value.text.replace(oldChar = ',', newChar = '.')
+                            .toDouble(),
                         isWritten = isWrittenState.value
                     )
-                    addGradeUseCase.invoke(grade = grade).onEach { it ->
+                    addGradeUseCase.invoke(grade = grade).onEach {
                         when (it) {
                             is Resource.Success -> {
                                 addOrEditGradeSuccess()
@@ -224,7 +225,10 @@ class GradeViewModel @Inject constructor(
                                     id = it.id,
                                     subjectId = it.subjectId,
                                     description = classTestDescriptionState.value.text,
-                                    grade = gradeState.value.text.toDouble(),
+                                    grade = gradeState.value.text.replace(
+                                        oldChar = ',',
+                                        newChar = '.'
+                                    ).toDouble(),
                                     isWritten = isWrittenState.value,
                                 )
                             ).collect() { result ->

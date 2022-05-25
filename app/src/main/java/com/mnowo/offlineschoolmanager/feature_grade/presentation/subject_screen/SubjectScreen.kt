@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -42,8 +43,10 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.mo
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectViewModel
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectViewModel
+import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -194,11 +197,12 @@ fun SubjectTitle(
             if (!viewModel.editState.value && !viewModel.deleteState.value) {
                 IconButton(onClick = {
                     onOpenBottomSheet()
-                }) {
+                }, modifier = Modifier.testTag(GradeTestTags.ADD_BUTTON)) {
                     Icon(
                         Icons.Default.Add,
-                        contentDescription = "",
-                        modifier = Modifier.scale(1.2f)
+                        contentDescription = "ADD_BUTTON",
+                        modifier = Modifier
+                            .scale(1.2f)
                     )
                 }
 
@@ -206,14 +210,18 @@ fun SubjectTitle(
                     Icon(
                         Icons.Default.MoreVert,
                         contentDescription = "",
-                        modifier = Modifier.scale(1.2f)
+                        modifier = Modifier
+                            .scale(1.2f)
+                            .testTag(GradeTestTags.MORE_BUTTON)
                     )
                     DropdownMenu(
                         expanded = viewModel.dropDownMenuState.value,
                         onDismissRequest = { viewModel.setDropDownMenuState(false) },
-                        modifier = Modifier.clip(
-                            RoundedCornerShape(8.dp)
-                        )
+                        modifier = Modifier
+                            .clip(
+                                RoundedCornerShape(8.dp)
+                            )
+                            .testTag(GradeTestTags.DROPDOWN_MENU)
                     ) {
                         DropdownMenuItem(onClick = { viewModel.setEditState(true) }) {
                             Row {
@@ -221,7 +229,9 @@ fun SubjectTitle(
                                 Text(
                                     text = stringResource(id = R.string.edit),
                                     fontFamily = fredoka,
-                                    modifier = Modifier.padding(start = 5.dp)
+                                    modifier = Modifier
+                                        .padding(start = 5.dp)
+                                        .testTag(GradeTestTags.EDIT_MENU_ITEM)
                                 )
                             }
                         }
@@ -231,7 +241,9 @@ fun SubjectTitle(
                                 Text(
                                     text = stringResource(id = R.string.delete),
                                     fontFamily = fredoka,
-                                    modifier = Modifier.padding(start = 5.dp)
+                                    modifier = Modifier
+                                        .padding(start = 5.dp)
+                                        .testTag(GradeTestTags.DELETE_MENU_ITEM)
                                 )
                             }
                         }
@@ -246,7 +258,9 @@ fun SubjectTitle(
                     },
                     border = BorderStroke(1.4.dp, color = LightBlue),
                     shape = RoundedCornerShape(32.dp),
-                    modifier = Modifier.padding(end = 5.dp),
+                    modifier = Modifier
+                        .padding(end = 5.dp)
+                        .testTag(GradeTestTags.CANCEL_BUTTON),
                     enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
                 ) {
                     Text(
@@ -280,7 +294,8 @@ fun SubjectListItem(
                     onSubjectItemClicked(data.id)
                 }
             }
-            .padding(15.dp), verticalAlignment = Alignment.CenterVertically
+            .padding(15.dp)
+            .testTag(GradeTestTags.LIST_ROW), verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
@@ -294,6 +309,7 @@ fun SubjectListItem(
                         blue = data.color.blue
                     )
                 )
+                .testTag(GradeTestTags.COLOR_BOX)
         )
         Spacer(modifier = Modifier.padding(horizontal = 15.dp))
 
@@ -305,23 +321,30 @@ fun SubjectListItem(
                 text = data.subjectName,
                 fontFamily = fredoka,
                 fontWeight = FontWeight.Light,
-                modifier = Modifier.align(CenterVertically)
+                modifier = Modifier
+                    .align(CenterVertically)
+                    .testTag(GradeTestTags.SUBJECT_TEXT)
             )
             if (!viewModel.deleteState.value && !viewModel.editState.value) {
                 Text(
                     text = data.average.toString(),
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Light,
-                    color = Color.Gray
+                    color = Color.Gray,
+                    modifier = Modifier.testTag(GradeTestTags.AVERAGE_TEXT)
                 )
             } else {
                 AnimatedVisibility(
                     visible = viewModel.deleteState.value,
                 ) {
-                    OutlinedButton(onClick = {
-                        viewModel.setSubjectIdState(data.id)
-                        viewModel.setDeleteDialogState(true)
-                    }, shape = CircleShape) {
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.setSubjectIdState(data.id)
+                            viewModel.setDeleteDialogState(true)
+                        },
+                        shape = CircleShape,
+                        modifier = Modifier.testTag(GradeTestTags.DELETE_BUTTON)
+                    ) {
                         Icon(Icons.Default.Clear, contentDescription = "")
                     }
                 }
@@ -334,7 +357,7 @@ fun SubjectListItem(
                         addSubjectViewModel.setEditState(true)
                         addSubjectViewModel.setEditTextFieldState(true)
                         onOpenBottomSheet()
-                    }) {
+                    }, modifier = Modifier.testTag(GradeTestTags.EDIT_BUTTON)) {
                         Icon(Icons.Default.Edit, contentDescription = "")
                     }
                 }

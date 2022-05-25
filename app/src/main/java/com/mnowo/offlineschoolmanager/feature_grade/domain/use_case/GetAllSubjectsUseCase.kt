@@ -16,7 +16,7 @@ class GetAllSubjectsUseCase @Inject constructor(
     operator fun invoke(): Flow<Resource<List<Subject>>> = flow {
 
         try {
-            val data = repository.getAllSubjects().collect() {
+            repository.getAllSubjects().collect() {
                 emit(Resource.Loading<List<Subject>>(data = it))
                 emit(Resource.Success<List<Subject>>(data = it))
             }

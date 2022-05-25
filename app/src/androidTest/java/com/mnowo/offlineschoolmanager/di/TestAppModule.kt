@@ -24,12 +24,45 @@ object TestAppModule {
 
     @Provides
     @Singleton
-    @Named("test_db")
     fun provideInMemoryDatabase(@ApplicationContext context: Context): SchoolManagerDatabase {
         return Room.inMemoryDatabaseBuilder(
             context,
             SchoolManagerDatabase::class.java
         ).allowMainThreadQueries()
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideContext(@ApplicationContext context: Context): Context {
+        return context
+    }
+
+    @Provides
+    @Singleton
+    fun provideGradeRepository(
+        gradeDao: GradeDao
+    ): GradeRepository {
+        return GradeRepositoryImpl(
+            gradeDao = gradeDao
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideGradeDao(db: SchoolManagerDatabase) = db.gradeDao()
+
+    @Provides
+    @Singleton
+    fun provideSubjectDao(db: SchoolManagerDatabase) = db.subjectDao()
+
+    @Provides
+    @Singleton
+    fun provideSubjectRepository(
+        subjectDao: SubjectDao
+    ): SubjectRepository {
+        return SubjectRepositoryImpl(
+            dao = subjectDao
+        )
     }
 }

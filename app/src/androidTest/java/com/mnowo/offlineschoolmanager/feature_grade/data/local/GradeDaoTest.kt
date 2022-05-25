@@ -76,6 +76,27 @@ class GradeDaoTest {
     }
 
     @Test
+    fun getAllSubjects() = runBlocking {
+        val subject = Subject(
+            1,
+            "German",
+            234,
+            "4234",
+            50.0,
+            50.0,
+            3.25
+        )
+        subjectDao.addSubject(subject)
+
+        val job = launch(Dispatchers.IO) {
+            val res = gradeDao.getAllSubjects().first()
+            Truth.assertThat(res).contains(subject)
+        }
+        job.join()
+        job.cancel()
+    }
+
+    @Test
     fun updateAverage() = runBlocking {
         val subject = Subject(
             1,
@@ -195,7 +216,8 @@ class GradeDaoTest {
 
     @Test
     fun deleteSubject() = runBlocking {
-        val subject = Subject(1,
+        val subject = Subject(
+            1,
             "Hello",
             234,
             "234",
@@ -230,7 +252,7 @@ class GradeDaoTest {
             Truth.assertThat(res).contains(grade)
             Truth.assertThat(res).contains(grade2)
         }
-        job.join()
+        delay(300)
         job.cancel()
     }
 }

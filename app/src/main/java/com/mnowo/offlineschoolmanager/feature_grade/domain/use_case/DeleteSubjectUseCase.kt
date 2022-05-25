@@ -1,17 +1,19 @@
 package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case
 
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
+import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 class DeleteSubjectUseCase @Inject constructor(
-  private val gradeDao: GradeDao
+  private val gradeRepository: GradeRepository
 ) {
 
     operator fun invoke(subjectId: Int) = flow<Boolean> {
-        gradeDao.deleteSubject(subjectId = subjectId)
-        gradeDao.deleteAllSubjectSpecificGrades(subjectId = subjectId)
+        gradeRepository.deleteSubject(subjectId = subjectId)
+        gradeRepository.deleteAllSubjectSpecificGrades(subjectId = subjectId)
+        emit(true)
     }.flowOn(Dispatchers.IO)
 }
