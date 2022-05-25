@@ -72,7 +72,7 @@ class SubjectScreenTest {
 
     @Test
     fun performListItemClick() {
-
+        // test
     }
 
     @Test
