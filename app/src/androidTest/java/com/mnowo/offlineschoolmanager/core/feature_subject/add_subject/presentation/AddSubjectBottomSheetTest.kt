@@ -1,5 +1,6 @@
-package com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen
+package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.navigation.compose.NavHost
@@ -13,25 +14,22 @@ import com.mnowo.offlineschoolmanager.core.feature_core.presentation.MainActivit
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.util.AddSubjectTestTags
 import com.mnowo.offlineschoolmanager.core.theme.OfflineSchoolManagerTheme
 import com.mnowo.offlineschoolmanager.di.AppModule
-import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import okhttp3.internal.wait
 import org.junit.Assert.*
 
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.lang.AssertionError
 
 @HiltAndroidTest
 @UninstallModules(AppModule::class)
 @MediumTest
-class SubjectScreenTest {
+class AddSubjectBottomSheetTest {
 
     @get:Rule(order = 0)
     val hiltRule = HiltAndroidRule(this)
@@ -61,68 +59,70 @@ class SubjectScreenTest {
     }
 
     @Test
-    fun performAddNewSubjectButton() {
-        composeRule.onNodeWithTag(GradeTestTags.ADD_BUTTON).assertExists()
-        composeRule.onNodeWithTag(GradeTestTags.ADD_BUTTON).performClick()
+    fun addTextWhenAddingSubject() {
+        composeRule.onNodeWithTag(testTag = GradeTestTags.ADD_BUTTON).performClick()
 
-        composeRule.onNodeWithTag(AddSubjectTestTags.ADD_UP_TO_100_TEXT)
-            .assertExists()
-            .assertIsDisplayed()
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.ADD_BUTTON).assertTextEquals("Add")
     }
 
     @Test
-    fun performMoreButton() {
-        composeRule.onNodeWithTag(testTag = GradeTestTags.MORE_BUTTON).performClick()
-
-        composeRule.onNodeWithTag(testTag = GradeTestTags.DROPDOWN_MENU).assertIsEnabled()
-            .assertExists()
-        composeRule.onNodeWithTag(testTag = GradeTestTags.DELETE_MENU_ITEM).assertIsDisplayed()
-        composeRule.onNodeWithTag(testTag = GradeTestTags.EDIT_MENU_ITEM).assertIsDisplayed()
-    }
-
-    @Test
-    fun performListItemClick() {
-        addSubject()
-
-        composeRule.onNodeWithTag(testTag = GradeTestTags.LIST_ROW).performClick()
-        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.ADD_UP_TO_100_TEXT)
-            .assertExists()
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun performEditMenuItem()  {
-        addSubject()
-
-        composeRule.onNodeWithTag(GradeTestTags.MORE_BUTTON).performClick()
-        composeRule.onNodeWithTag(GradeTestTags.EDIT_MENU_ITEM).performClick()
-        composeRule.onNodeWithTag(GradeTestTags.EDIT_BUTTON).assertExists().assertIsDisplayed()
-        composeRule.onNodeWithTag(GradeTestTags.CANCEL_BUTTON).performClick()
-    }
-
-    @Test
-    fun performDeleteButton() {
-        addSubject()
-
-        composeRule.onNodeWithTag(GradeTestTags.MORE_BUTTON).performClick()
-        composeRule.onNodeWithTag(GradeTestTags.DELETE_MENU_ITEM).performClick()
-        composeRule.onNodeWithTag(GradeTestTags.DELETE_BUTTON).assertExists().assertIsDisplayed()
-        composeRule.onNodeWithTag(GradeTestTags.CANCEL_BUTTON).performClick()
-    }
-
-    @Test
-    fun cancelButtonIsDisabledWhenEditingSubject() {
+    fun saveTextWhenEditingSubject() {
         addSubject()
 
         composeRule.onNodeWithTag(testTag = GradeTestTags.MORE_BUTTON).performClick()
         composeRule.onNodeWithTag(testTag = GradeTestTags.EDIT_MENU_ITEM).performClick()
         composeRule.onNodeWithTag(testTag = GradeTestTags.EDIT_BUTTON).performClick()
 
-        try {
-            composeRule.onNodeWithTag(testTag = GradeTestTags.CANCEL_BUTTON).assertIsNotEnabled()
-        } catch (e: AssertionError) {
-            println("Error: ${e.localizedMessage}")
-        }
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.ADD_BUTTON).assertTextEquals("Save")
+    }
+
+    @Test
+    fun textFieldsHaveInformationWhenEditSubject() {
+        addSubject()
+
+        composeRule.onNodeWithTag(testTag = GradeTestTags.MORE_BUTTON).performClick()
+        composeRule.onNodeWithTag(testTag = GradeTestTags.EDIT_MENU_ITEM).performClick()
+        composeRule.onNodeWithTag(testTag = GradeTestTags.EDIT_BUTTON).performClick()
+
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.SUBJECT_TEXT_FIELD)
+            .assert(
+                hasText("German")
+            )
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.ROOM_TEXT_FIELD)
+            .assertTextContains("123")
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.WRITTEN_PERCENTAGE_TEXT_FIELD)
+            .assert(
+                hasText("50.0")
+            )
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.ORAL_PERCENTAGE_TEXT_FIELD)
+            .assert(hasText("50.0"))
+
+    }
+
+    @Test
+    fun inputText() {
+        composeRule.onNodeWithTag(testTag = GradeTestTags.ADD_BUTTON).performClick()
+
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.SUBJECT_TEXT_FIELD)
+            .performTextInput("German")
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.SUBJECT_TEXT_FIELD).assertValueEquals("German")
+
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.ROOM_TEXT_FIELD)
+            .performTextInput("Abcd")
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.SUBJECT_TEXT_FIELD).assert(hasText("Abcd"))
+
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.WRITTEN_PERCENTAGE_TEXT_FIELD)
+            .performTextInput("50")
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.SUBJECT_TEXT_FIELD).assert(hasText("50"))
+
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.ORAL_PERCENTAGE_TEXT_FIELD)
+            .performTextInput("50")
+        composeRule.onNodeWithTag(testTag = AddSubjectTestTags.SUBJECT_TEXT_FIELD).assert(hasText("50"))
+    }
+
+    @Test
+    fun pickColor() {
+
     }
 
     private fun addSubject() {

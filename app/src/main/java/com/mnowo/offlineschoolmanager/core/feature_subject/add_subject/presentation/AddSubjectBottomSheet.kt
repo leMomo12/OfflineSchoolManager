@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +31,7 @@ import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.PickColorDialog
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.util.AddSubjectTestTags
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import kotlinx.coroutines.flow.collectLatest
 
@@ -130,7 +132,10 @@ fun AddSubjectBottomSheet(
             modifier = Modifier
                 .padding(top = 10.dp)
         ) {
-            TextButton(onClick = { onCloseBottomSheet() }) {
+            TextButton(
+                onClick = { onCloseBottomSheet() },
+                modifier = Modifier.testTag(AddSubjectTestTags.BACK_BUTTON)
+            ) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
                 Spacer(modifier = Modifier.padding(horizontal = 3.dp))
                 Text(text = stringResource(id = R.string.back), color = LightBlue)
@@ -138,13 +143,14 @@ fun AddSubjectBottomSheet(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(
                     onClick = {
-                        if(viewModel.editState.value) {
+                        if (viewModel.editState.value) {
                             viewModel.onAddSubjectEvent(AddSubjectEvent.EditSubject)
                         } else {
                             viewModel.onAddSubjectEvent(AddSubjectEvent.AddSubject)
                         }
                     },
-                    border = BorderStroke(1.dp, color = LightBlue)
+                    border = BorderStroke(1.dp, color = LightBlue),
+                    modifier = Modifier.testTag(AddSubjectTestTags.ADD_BUTTON)
                 ) {
                     Text(
                         text = if (!viewModel.editState.value) {
@@ -167,7 +173,9 @@ fun AddSubjectBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(AddSubjectTestTags.SUBJECT_TEXT_FIELD),
                 isError = viewModel.subjectErrorState.value,
                 value = viewModel.subjectState.value.text,
                 label = { Text(text = stringResource(id = R.string.subjectName)) },
@@ -188,17 +196,18 @@ fun AddSubjectBottomSheet(
                         .size(30.dp)
                         .clip(CircleShape)
                         .background(color = viewModel.colorState.value)
+                        .testTag(AddSubjectTestTags.COLOR_BOX)
                 )
                 Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                 OutlinedButton(
                     onClick = { viewModel.onAddSubjectEvent(AddSubjectEvent.PickedColor) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().testTag(AddSubjectTestTags.PICK_COLOR_BUTTON)
                 ) {
                     Text(text = stringResource(id = R.string.pickColor))
                 }
             }
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag(AddSubjectTestTags.ROOM_TEXT_FIELD),
                 isError = viewModel.roomErrorState.value,
                 value = viewModel.roomState.value.text,
                 label = { Text(text = stringResource(id = R.string.room)) },
@@ -219,7 +228,8 @@ fun AddSubjectBottomSheet(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .padding(top = 10.dp)
+                    .testTag(AddSubjectTestTags.WRITTEN_PERCENTAGE_TEXT_FIELD),
                 trailingIcon = {
                     Text(text = "%")
                 },
@@ -236,7 +246,8 @@ fun AddSubjectBottomSheet(
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .padding(top = 10.dp)
+                    .testTag(AddSubjectTestTags.ORAL_PERCENTAGE_TEXT_FIELD),
                 trailingIcon = {
                     Text(text = "%")
                 },
@@ -250,7 +261,8 @@ fun AddSubjectBottomSheet(
                     Color.Gray
                 },
                 fontFamily = fredoka,
-                fontWeight = FontWeight.Light
+                fontWeight = FontWeight.Light,
+                modifier = Modifier.testTag(AddSubjectTestTags.ADD_UP_TO_100_TEXT)
             )
         }
     }

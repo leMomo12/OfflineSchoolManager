@@ -206,13 +206,17 @@ fun SubjectTitle(
                     )
                 }
 
-                IconButton(onClick = { viewModel.setDropDownMenuState(!viewModel.dropDownMenuState.value) }) {
+                IconButton(
+                    onClick = {
+                        viewModel.setDropDownMenuState(!viewModel.dropDownMenuState.value)
+                    },
+                    modifier = Modifier.testTag(GradeTestTags.MORE_BUTTON)
+                ) {
                     Icon(
                         Icons.Default.MoreVert,
                         contentDescription = "",
                         modifier = Modifier
                             .scale(1.2f)
-                            .testTag(GradeTestTags.MORE_BUTTON)
                     )
                     DropdownMenu(
                         expanded = viewModel.dropDownMenuState.value,
@@ -223,7 +227,10 @@ fun SubjectTitle(
                             )
                             .testTag(GradeTestTags.DROPDOWN_MENU)
                     ) {
-                        DropdownMenuItem(onClick = { viewModel.setEditState(true) }) {
+                        DropdownMenuItem(
+                            onClick = { viewModel.setEditState(true) },
+                            modifier = Modifier.testTag(GradeTestTags.EDIT_MENU_ITEM)
+                        ) {
                             Row {
                                 Icon(Icons.Default.Edit, contentDescription = "")
                                 Text(
@@ -231,11 +238,13 @@ fun SubjectTitle(
                                     fontFamily = fredoka,
                                     modifier = Modifier
                                         .padding(start = 5.dp)
-                                        .testTag(GradeTestTags.EDIT_MENU_ITEM)
                                 )
                             }
                         }
-                        DropdownMenuItem(onClick = { viewModel.setDeleteState(true) }) {
+                        DropdownMenuItem(
+                            onClick = { viewModel.setDeleteState(true) },
+                            modifier = Modifier.testTag(GradeTestTags.DELETE_MENU_ITEM)
+                        ) {
                             Row {
                                 Icon(Icons.Default.Delete, contentDescription = "")
                                 Text(
@@ -243,7 +252,6 @@ fun SubjectTitle(
                                     fontFamily = fredoka,
                                     modifier = Modifier
                                         .padding(start = 5.dp)
-                                        .testTag(GradeTestTags.DELETE_MENU_ITEM)
                                 )
                             }
                         }
@@ -259,9 +267,9 @@ fun SubjectTitle(
                     border = BorderStroke(1.4.dp, color = LightBlue),
                     shape = RoundedCornerShape(32.dp),
                     modifier = Modifier
-                        .padding(end = 5.dp)
-                        .testTag(GradeTestTags.CANCEL_BUTTON),
-                    enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
+                        .testTag(GradeTestTags.CANCEL_BUTTON)
+                        .padding(end = 5.dp),
+                    enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed,
                 ) {
                     Text(
                         text = stringResource(id = R.string.cancel),
@@ -295,7 +303,8 @@ fun SubjectListItem(
                 }
             }
             .padding(15.dp)
-            .testTag(GradeTestTags.LIST_ROW), verticalAlignment = Alignment.CenterVertically
+            .testTag(GradeTestTags.LIST_ROW),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier

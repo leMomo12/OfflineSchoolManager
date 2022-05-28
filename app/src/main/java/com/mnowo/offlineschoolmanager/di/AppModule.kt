@@ -10,6 +10,9 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.re
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.data.repository.GradeRepositoryImpl
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
+import com.mnowo.offlineschoolmanager.feature_todo.data.local.ToDoDao
+import com.mnowo.offlineschoolmanager.feature_todo.data.repository.ToDoRepositoryImpl
+import com.mnowo.offlineschoolmanager.feature_todo.domain.repository.ToDoRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +26,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideContext(@ApplicationContext context: Context) : Context {
+    fun provideContext(@ApplicationContext context: Context): Context {
         return context
     }
 
@@ -65,4 +68,18 @@ object AppModule {
             dao = subjectDao
         )
     }
+
+    @Provides
+    @Singleton
+    fun provideToDoRepository(
+        toDoDao: ToDoDao
+    ): ToDoRepository {
+        return ToDoRepositoryImpl(
+            toDoDao = toDoDao
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun provideToDoDao(db: SchoolManagerDatabase) = db.toDoDao()
 }
