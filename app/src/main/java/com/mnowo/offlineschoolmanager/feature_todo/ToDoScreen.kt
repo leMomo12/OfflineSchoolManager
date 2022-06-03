@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -90,7 +91,7 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
         }) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
-                    ToDoTitle(fredoka = fredoka)
+                    ToDoTitle(fredoka = fredoka, openSheet = openSheet)
                 }
                 item {
                     ToDoStaggeredGrid(staggeredText = staggeredText, fredoka = fredoka)
@@ -113,13 +114,13 @@ fun ToDoTitle(fredoka: FontFamily, openSheet: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = " To Do's",
+            text = stringResource(R.string.toDoS),
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
             fontSize = 32.sp
         )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            IconButton(onClick = { }) {
+            IconButton(onClick = { openSheet() }) {
                 Icon(Icons.Rounded.Add, contentDescription = "", modifier = Modifier.scale(1.2f))
             }
             IconButton(onClick = { openSheet() }) {
