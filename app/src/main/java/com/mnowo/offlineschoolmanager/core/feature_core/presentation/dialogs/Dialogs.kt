@@ -7,20 +7,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddCircleOutline
+import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
+import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
 
 @Composable
@@ -65,6 +72,7 @@ fun DeleteDialog(onDismissRequest: () -> Unit, onDeleteClicked: () -> Unit) {
 fun SubjectPickerDialog(
     onSubjectPicked: (Subject) -> Unit,
     onDismissRequest: () -> Unit,
+    onAddNewSubjectClicked: () -> Unit,
     fredoka: FontFamily,
     subjectsList: List<Subject>
 ) {
@@ -79,15 +87,32 @@ fun SubjectPickerDialog(
                     .fillMaxSize()
                     .padding(10.dp)
             ) {
-                Text(text = "Select Date", fontFamily = fredoka, fontWeight = FontWeight.Medium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Pick subject",
+                        fontFamily = fredoka,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 25.sp
+                    )
+                    IconButton(onClick = { onDismissRequest() }) {
+                        Icon(Icons.Outlined.Cancel, contentDescription = "")
+                    }
+                }
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
-                Text(
-                    text = "a",
-                    color = Color.Transparent,
-                    modifier = Modifier.padding(bottom = 5.dp)
-                )
-                Divider()
                 LazyColumn {
+                    item {
+                        PickSubjectNewSubjectItem(
+                            onAddNewSubjectClicked = {
+                                onAddNewSubjectClicked()
+                                onDismissRequest()
+                            },
+                            fredoka = fredoka
+                        )
+                    }
                     items(subjectsList) {
                         PickSubjectItem(
                             data = it,
@@ -96,9 +121,6 @@ fun SubjectPickerDialog(
                                 onSubjectPicked(subject)
                             }
                         )
-                    }
-                    item {
-                        // Add new Subject item
                     }
                 }
             }
@@ -142,6 +164,22 @@ fun PickSubjectItem(data: Subject, fredoka: FontFamily, onSubjectPicked: (Subjec
 }
 
 @Composable
-fun PickSubjectNewSubjectItem() {
-
+fun PickSubjectNewSubjectItem(onAddNewSubjectClicked: () -> Unit, fredoka: FontFamily) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onAddNewSubjectClicked()
+            }
+            .padding(15.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(Icons.Outlined.AddCircleOutline, contentDescription = "", tint = LightBlue)
+        Spacer(modifier = Modifier.padding(horizontal = 10.dp))
+        Text(
+            text = stringResource(R.string.addNewSubject),
+            fontFamily = fredoka,
+            fontWeight = FontWeight.Normal
+        )
+    }
 }

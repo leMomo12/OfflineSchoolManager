@@ -127,8 +127,14 @@ class AddSubjectViewModel @Inject constructor(
                             subjectName = subjectState.value.text,
                             color = color,
                             room = roomState.value.text,
-                            oralPercentage = oralPercentageState.value.text.toDouble(),
-                            writtenPercentage = writtenPercentageState.value.text.toDouble(),
+                            oralPercentage = oralPercentageState.value.text.replace(
+                                ',',
+                                '.'
+                            ).toDouble(),
+                            writtenPercentage = writtenPercentageState.value.text.replace(
+                                ',',
+                                '.'
+                            ).toDouble(),
                             average = 0.0
                         )
                         addSubjectUseCase.invoke(subject = subject).collect {

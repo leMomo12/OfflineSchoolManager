@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.util.Log.d
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -7,10 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -27,6 +25,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoBottomSheet
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -49,6 +48,7 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
     )
 
+
     val closeSheet: () -> Unit = {
         scope.launch {
             bottomState.bottomSheetState.collapse()
@@ -57,9 +57,11 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
 
     val openSheet: () -> Unit = {
         scope.launch {
-            bottomState.bottomSheetState.expand()
+
+                bottomState.bottomSheetState.expand()
         }
     }
+
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest {
@@ -74,24 +76,27 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
         }
     }
 
+
+
     BottomSheetScaffold(
+        scaffoldState = bottomState,
         sheetPeekHeight = 0.dp,
         sheetShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
-        scaffoldState = bottomState,
         sheetContent = {
-            ToDoBottomSheet(onCloseBottomSheet = {})
+                ToDoBottomSheet(onCloseBottomSheet = { closeSheet() }, viewModel = viewModel)
         },
         sheetElevation = 5.dp
     ) {
         Scaffold(
             bottomBar = {
-            BottomAppBar(toDo = true, onClick = {
-                viewModel.bottomNav(it, currentScreen = Screen.ToDoScreen)
-            })
-        }) {
+                BottomAppBar(toDo = true, onClick = {
+                    viewModel.bottomNav(it, currentScreen = Screen.ToDoScreen)
+                })
+            }
+        ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
-                    ToDoTitle(fredoka = fredoka, openSheet = openSheet)
+                    ToDoTitle(fredoka = fredoka, openSheet = { openSheet() })
                 }
                 item {
                     ToDoStaggeredGrid(staggeredText = staggeredText, fredoka = fredoka)
@@ -123,7 +128,7 @@ fun ToDoTitle(fredoka: FontFamily, openSheet: () -> Unit) {
             IconButton(onClick = { openSheet() }) {
                 Icon(Icons.Rounded.Add, contentDescription = "", modifier = Modifier.scale(1.2f))
             }
-            IconButton(onClick = { openSheet() }) {
+            IconButton(onClick = { }) {
                 Icon(
                     Icons.Rounded.MoreVert,
                     contentDescription = "",

@@ -40,18 +40,14 @@ import kotlinx.coroutines.flow.collectLatest
 fun AddSubjectBottomSheet(
     viewModel: AddSubjectViewModel = hiltViewModel(),
     onCloseBottomSheet: () -> Unit,
-    fredoka: FontFamily,
-    scaffoldState: BottomSheetScaffoldState
+    fredoka: FontFamily
 ) {
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest {
-
             when (it) {
                 is UiEvent.ShowSnackbar -> {
-                    scaffoldState.snackbarHostState.showSnackbar(
-                        message = it.uiText, duration = SnackbarDuration.Short
-                    )
+
                 }
             }
         }

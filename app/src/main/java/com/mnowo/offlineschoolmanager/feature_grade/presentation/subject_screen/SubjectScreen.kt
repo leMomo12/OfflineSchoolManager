@@ -108,8 +108,7 @@ fun SubjectScreen(
         sheetContent = {
             AddSubjectBottomSheet(
                 onCloseBottomSheet = closeSheet,
-                fredoka = fredoka,
-                scaffoldState = bottomState
+                fredoka = fredoka
             )
         },
         sheetElevation = 5.dp

@@ -9,6 +9,7 @@ import java.util.*
 data class ToDo(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
+    var title: String,
     var description: String,
     var until: Date,
     var isChecked: Boolean,

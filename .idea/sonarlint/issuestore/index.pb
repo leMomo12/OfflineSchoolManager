@@ -29,8 +29,6 @@ napp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/presentation
 Xapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/util/Screen.kt,c\3\c367c28e8d513c0466e4fa78983e217e9628c3bb
 ç
 ]app/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/models/ListState.kt,0\9\09da3a43bcf5f5115c1cf1506f9f943e2cbe488f
-q
-Aapp/src/main/java/com/mnowo/offlineschoolmanager/core/ui/Theme.kt,d\f\dff35e9aba9000010b8d9f1f713617ee72c7d8b3
 í
 bapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/models/TextFieldState.kt,1\8\1822e46831f2366fa34436bc2fcd376677a192e8
 í
@@ -63,8 +61,6 @@ lapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/gra
 capp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/domain/repository/GradeRepository.kt,1\6\1693e9d9f2643281b871e349c98961320070cafa
 ï
 eapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/data/repository/GradeRepositoryImpl.kt,0\6\06474517729128c7c1901ff3b4e1435a5aaae1da
-ó
-gapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/grade_screen/GradeScreen.kt,1\2\12bfe54b475b6f858d042856c0d91948052e607c
 y
 Iapp/src/androidTest/java/com/mnowo/offlineschoolmanager/HiltTestRunner.kt,f\9\f9132bc551b51ab814858f904a928bcaf975be71
 Ç
@@ -165,7 +161,3 @@ Sapp/src/main/java/com/mnowo/offlineschoolmanager/feature_todo/data/local/ToDoDa
 [app/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/util/Constants.kt,e\1\e12015fe5c6f409f1ef118f13e50d909ee19f6af
 ë
 aapp/src/main/java/com/mnowo/offlineschoolmanager/feature_todo/domain/repository/ToDoRepository.kt,d\d\dd73081bf0532955ffee7f154b41d749fc4308fd
-q
-Aapp/src/main/java/com/mnowo/offlineschoolmanager/core/ui/Color.kt,e\5\e59125f8a111495bec533e651258f0608ab9434c
-•
-uapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_subject/add_subject/presentation/AddSubjectViewModel.kt,2\1\21add815d74e2876b32b55a43c75a63638257656
