@@ -18,6 +18,7 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.mo
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.SubjectResult
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.use_case.AddSubjectUseCase
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.use_case.UpdateSubjectUseCase
+import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.UpdateAverageUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -29,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AddSubjectViewModel @Inject constructor(
     private val addSubjectUseCase: AddSubjectUseCase,
-    private val updateSubjectUseCase: UpdateSubjectUseCase
+    private val updateSubjectUseCase: UpdateSubjectUseCase,
+    private val updateAverageUseCase: UpdateAverageUseCase
 ) : ViewModel() {
 
 
@@ -153,9 +155,9 @@ class AddSubjectViewModel @Inject constructor(
                         _oralErrorState.value = true
                         _writtenErrorState.value = true
                     } else {
-                        specificSubjectState.value?.id.let {
+                        specificSubjectState.value?.let {
                             val subject = Subject(
-                                id = specificSubjectState.value!!.id,
+                                id = it.id,
                                 subjectName = subjectState.value.text,
                                 color = color,
                                 room = roomState.value.text,
@@ -167,12 +169,13 @@ class AddSubjectViewModel @Inject constructor(
                                     ',',
                                     '.'
                                 ).toDouble(),
-                                average = 0.0
+                                average = it.average
                             )
 
                             updateSubjectUseCase.invoke(subject = subject).collect() {
                                 addAndUpdateUseCaseResult(result = it)
                             }
+                            updateAverageUseCase.invoke(subjectId = it.id).collect() {}
                         }
                     }
                 }

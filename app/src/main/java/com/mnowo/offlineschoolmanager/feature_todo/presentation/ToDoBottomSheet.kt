@@ -1,8 +1,7 @@
 package com.mnowo.offlineschoolmanager.feature_todo.presentation
 
-import android.text.format.DateFormat.format
+import android.util.Log.d
 import android.widget.CalendarView
-import android.widget.DatePicker
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,9 +10,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AccessTime
-import androidx.compose.material.icons.rounded.AccessTime
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.outlined.School
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,20 +21,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.SubjectPickerDialog
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.util.AddSubjectTestTags
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import com.mnowo.offlineschoolmanager.rememberFredoka
 import kotlinx.coroutines.launch
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -60,6 +58,7 @@ fun ToDoBottomSheet(
             bottomState.animateTo(targetValue = ModalBottomSheetValue.Expanded)
         }
     }
+
 
     ModalBottomSheetLayout(
         sheetState = bottomState,
@@ -102,8 +101,7 @@ fun ToDoBottomSheet(
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     OutlinedButton(
-                        onClick = {
-                        },
+                        onClick = { viewModel.onEvent(ToDoEvent.AddToDoEvent) },
                         border = BorderStroke(1.dp, color = LightBlue),
                         modifier = Modifier.testTag(AddSubjectTestTags.ADD_BUTTON)
                     ) {
@@ -130,11 +128,14 @@ fun ToDoBottomSheet(
                 OutlinedTextField(
                     value = viewModel.titleState.value.text,
                     onValueChange = {
-                        viewModel.onEvent(ToDoEvent.EnteredTitle(it))
+                        if (it.length <= 25) {
+                            viewModel.onEvent(ToDoEvent.EnteredTitle(it))
+                        }
                     },
                     label = {
                         Text(text = "Enter title")
-                    }
+                    },
+                    singleLine = true
                 )
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 OutlinedTextField(
@@ -144,11 +145,12 @@ fun ToDoBottomSheet(
                     },
                     label = {
                         Text(text = "Enter description")
-                    }
+                    },
+                    maxLines = 6
                 )
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
                 Text(
-                    text = "Current date: ${viewModel.formatDateToString()}",
+                    text = "Current date: ${FormatDate.formatDateToString(viewModel.datePickerDateState.value)}",
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Normal
                 )
@@ -169,20 +171,20 @@ fun ToDoBottomSheet(
                 DatePicker(viewModel = viewModel, fredoka = fredoka, onDateSelected = {
                     viewModel.onEvent(ToDoEvent.EnteredDate(it))
                 })
-
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
 
-
-
                 Text(
-                    text = "Current subject: ",
+                    text = "Current subject: ${viewModel.pickedSubjectState.value.subjectName}",
                     fontFamily = fredoka,
-                    fontWeight = FontWeight.Normal
+                    fontWeight = FontWeight.Normal,
                 )
                 Spacer(modifier = Modifier.padding(vertical = 5.dp))
-                OutlinedButton(onClick = {
-                    viewModel.onEvent(ToDoEvent.ChangeSubjectPickerDialogState(isActive = true))
-                }, modifier = Modifier.fillMaxWidth(0.6f)) {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.onEvent(ToDoEvent.ChangeSubjectPickerDialogState(isActive = true))
+                    },
+                    modifier = Modifier.fillMaxWidth(0.6f)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -190,13 +192,14 @@ fun ToDoBottomSheet(
                     ) {
                         Text(text = "Pick subject", fontFamily = fredoka)
                         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
-                        Icon(Icons.Outlined.AccessTime, contentDescription = "")
+                        Icon(Icons.Outlined.School, contentDescription = "")
                     }
                 }
                 if (viewModel.subjectPickerDialogState.value) {
                     SubjectPickerDialog(
                         onSubjectPicked = {
                             viewModel.onEvent(ToDoEvent.ChangePickedSubject(it))
+                            d("Subject", "SubjectColor: ${it.color}")
                             viewModel.onEvent(
                                 ToDoEvent.ChangeSubjectPickerDialogState(
                                     false
@@ -211,17 +214,7 @@ fun ToDoBottomSheet(
                             )
                         },
                         fredoka = fredoka,
-                        subjectsList = listOf(
-                            Subject(1, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(2, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(3, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(1, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(2, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(3, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(1, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(2, "German", -2423423, "234", 50.0, 50.0, 2.45),
-                            Subject(3, "German", -2423423, "234", 50.0, 50.0, 2.45)
-                        ),
+                        subjectsList = viewModel.subjectList.value.listData,
                         onAddNewSubjectClicked = {
                             openSheet()
                         }
@@ -246,12 +239,29 @@ fun DatePicker(viewModel: ToDoViewModel, fredoka: FontFamily, onDateSelected: (D
                         .fillMaxSize()
                         .padding(10.dp)
                 ) {
-                    Text(text = "Select Date", fontFamily = fredoka, fontWeight = FontWeight.Medium)
-                    Spacer(modifier = Modifier.padding(vertical = 10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Select Date",
+                            fontFamily = fredoka,
+                            fontWeight = FontWeight.Medium
+                        )
+                        OutlinedButton(onClick = {
+                            viewModel.onEvent(
+                                ToDoEvent.ChangeDatePickerState(
+                                    false
+                                )
+                            )
+                        }) {
+                            Text(text = "Apply")
+                        }
+                    }
                     Text(
-                        text = viewModel.formatDateToString(),
+                        text = FormatDate.formatDateToString(viewModel.datePickerDateState.value),
                         fontFamily = fredoka,
-                        modifier = Modifier.padding(bottom = 5.dp)
+                        modifier = Modifier.padding(bottom = 5.dp, top = 5.dp)
                     )
                     Divider()
                     AndroidView(
@@ -274,9 +284,6 @@ fun DatePicker(viewModel: ToDoViewModel, fredoka: FontFamily, onDateSelected: (D
                         horizontalArrangement = Arrangement.End
                     ) {
                         Spacer(modifier = Modifier.padding(horizontal = 5.dp))
-                        Button(onClick = { viewModel.onEvent(ToDoEvent.ChangeDatePickerState(false)) }) {
-                            Text(text = "Apply")
-                        }
                     }
                 }
             }

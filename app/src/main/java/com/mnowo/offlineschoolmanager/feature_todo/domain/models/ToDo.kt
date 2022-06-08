@@ -11,7 +11,7 @@ data class ToDo(
     var id: Int,
     var title: String,
     var description: String,
-    var until: Date,
+    var until: Long,
     var isChecked: Boolean,
     var subjectId: Int
 )

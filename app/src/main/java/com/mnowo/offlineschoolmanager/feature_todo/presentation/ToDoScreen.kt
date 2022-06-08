@@ -1,6 +1,7 @@
 package com.mnowo.offlineschoolmanager
 
 import android.util.Log.d
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,7 +12,9 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -23,7 +26,10 @@ import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
+import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoBottomSheet
+import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -58,7 +64,7 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
     val openSheet: () -> Unit = {
         scope.launch {
 
-                bottomState.bottomSheetState.expand()
+            bottomState.bottomSheetState.expand()
         }
     }
 
@@ -83,7 +89,7 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
         sheetPeekHeight = 0.dp,
         sheetShape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
         sheetContent = {
-                ToDoBottomSheet(onCloseBottomSheet = { closeSheet() }, viewModel = viewModel)
+            ToDoBottomSheet(onCloseBottomSheet = { closeSheet() }, viewModel = viewModel)
         },
         sheetElevation = 5.dp
     ) {
@@ -99,7 +105,11 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
                     ToDoTitle(fredoka = fredoka, openSheet = { openSheet() })
                 }
                 item {
-                    ToDoStaggeredGrid(staggeredText = staggeredText, fredoka = fredoka)
+                    ToDoStaggeredGrid(
+                        listData = viewModel.toDoList.value.listData,
+                        fredoka = fredoka,
+                        viewModel = viewModel
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.padding(vertical = 60.dp))
@@ -140,7 +150,7 @@ fun ToDoTitle(fredoka: FontFamily, openSheet: () -> Unit) {
 }
 
 @Composable
-fun ToDoStaggeredGrid(staggeredText: List<String>, fredoka: FontFamily) {
+fun ToDoStaggeredGrid(listData: List<ToDo>, fredoka: FontFamily, viewModel: ToDoViewModel) {
     Column(
         modifier = Modifier
             .padding(5.dp)
@@ -149,22 +159,20 @@ fun ToDoStaggeredGrid(staggeredText: List<String>, fredoka: FontFamily) {
             numColumns = 2, //put the how many column you want
             modifier = Modifier.padding(5.dp)
         ) {
-            staggeredText.forEach { text ->
-                val rnd = Random()
-                val color: Int = android.graphics.Color.argb(
-                    255,
-                    rnd.nextInt(256),
-                    rnd.nextInt(256),
-                    rnd.nextInt(256)
-                )
-                var state = mutableStateOf(false)
-                Card(
+            listData.forEach { item ->
+                val colorState = remember {
+                    derivedStateOf {
+                        val intColor =
+                            viewModel.subjectList.value.listData.filter { it.id == item.subjectId }[0].color
+                        Color(intColor)
+                    }
+                }
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp),
-                    backgroundColor = Color(color = color),
-                    elevation = 10.dp,
-                    shape = RoundedCornerShape(10.dp)
+                        .padding(5.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(color = colorState.value)
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Row(
@@ -174,15 +182,32 @@ fun ToDoStaggeredGrid(staggeredText: List<String>, fredoka: FontFamily) {
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Checkbox(checked = state.value, onCheckedChange = { })
+                            Checkbox(
+                                checked = item.isChecked,
+                                onCheckedChange = {
+                                    viewModel.onEvent(
+                                        ToDoEvent.OnCheckboxChanged(
+                                            toDoId = item.id,
+                                            newValue = !item.isChecked
+                                        )
+                                    )
+                                }
+                            )
+                            Spacer(modifier = Modifier.padding(horizontal = 5.dp))
                             Text(
-                                text = "Until: 16.12.2022",
+                                text = "Until: ${FormatDate.formatLongToSpring(item.until)}",
                                 fontFamily = fredoka,
                                 fontWeight = FontWeight.Light
                             )
                         }
                         Text(
-                            text = text,
+                            text = item.title,
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                            fontFamily = fredoka,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = item.description,
                             modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                             fontFamily = fredoka
                         )

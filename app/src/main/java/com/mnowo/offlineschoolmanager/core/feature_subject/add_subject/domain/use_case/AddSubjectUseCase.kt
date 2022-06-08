@@ -43,6 +43,7 @@ class AddSubjectUseCase @Inject constructor(
             repo.addSubject(subject = subject)
             emit(Resource.Success<SubjectResult>(data = SubjectResult.Success))
         } catch (e: Exception) {
+            d("Error", "Error: ${e.localizedMessage}  ,,,, ${e.stackTrace}")
             emit(
                 Resource.Error<SubjectResult>(
                     message = (e.localizedMessage ?: R.string.unexpectedError).toString(),

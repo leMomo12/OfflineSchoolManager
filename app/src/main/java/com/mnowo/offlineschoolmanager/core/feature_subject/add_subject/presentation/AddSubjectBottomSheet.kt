@@ -176,7 +176,7 @@ fun AddSubjectBottomSheet(
                 value = viewModel.subjectState.value.text,
                 label = { Text(text = stringResource(id = R.string.subjectName)) },
                 onValueChange = {
-                    if (viewModel.subjectState.value.text.length <= 20)
+                    if (it.length <= 15)
                         viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredSubject(it))
                 },
                 singleLine = true
