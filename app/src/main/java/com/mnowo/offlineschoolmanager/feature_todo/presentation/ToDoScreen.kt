@@ -162,9 +162,13 @@ fun ToDoStaggeredGrid(listData: List<ToDo>, fredoka: FontFamily, viewModel: ToDo
             listData.forEach { item ->
                 val colorState = remember {
                     derivedStateOf {
-                        val intColor =
-                            viewModel.subjectList.value.listData.filter { it.id == item.subjectId }[0].color
-                        Color(intColor)
+                        if (viewModel.subjectList.value.listData.isNotEmpty()) {
+                            val intColor =
+                                viewModel.subjectList.value.listData.filter { it.id == item.subjectId }[0].color
+                            return@derivedStateOf Color(intColor)
+                        } else {
+                            return@derivedStateOf Color.LightGray
+                        }
                     }
                 }
                 Box(

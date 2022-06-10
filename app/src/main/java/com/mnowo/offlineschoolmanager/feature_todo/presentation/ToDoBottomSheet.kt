@@ -2,6 +2,7 @@ package com.mnowo.offlineschoolmanager.feature_todo.presentation
 
 import android.util.Log.d
 import android.widget.CalendarView
+import android.widget.DatePicker
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -59,6 +60,11 @@ fun ToDoBottomSheet(
         }
     }
 
+
+    if (!viewModel.bottomSheetState.value) {
+        viewModel.onEvent(ToDoEvent.ChangeBottomSheetState(true))
+        onCloseBottomSheet()
+    }
 
     ModalBottomSheetLayout(
         sheetState = bottomState,
@@ -135,7 +141,8 @@ fun ToDoBottomSheet(
                     label = {
                         Text(text = "Enter title")
                     },
-                    singleLine = true
+                    singleLine = true,
+                    isError = viewModel.titleErrorState.value
                 )
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 OutlinedTextField(
@@ -146,7 +153,8 @@ fun ToDoBottomSheet(
                     label = {
                         Text(text = "Enter description")
                     },
-                    maxLines = 6
+                    maxLines = 6,
+                    isError = viewModel.descriptionErrorState.value
                 )
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
                 Text(
@@ -155,9 +163,13 @@ fun ToDoBottomSheet(
                     fontWeight = FontWeight.Normal
                 )
                 Spacer(modifier = Modifier.padding(vertical = 5.dp))
-                OutlinedButton(onClick = {
-                    viewModel.onEvent(ToDoEvent.ChangeDatePickerState(isActive = true))
-                }, modifier = Modifier.fillMaxWidth(0.6f)) {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.onEvent(ToDoEvent.ChangeDatePickerState(isActive = true))
+                    },
+                    modifier = Modifier.fillMaxWidth(0.6f),
+                    border = BorderStroke(1.dp, Color.LightGray)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -183,7 +195,8 @@ fun ToDoBottomSheet(
                     onClick = {
                         viewModel.onEvent(ToDoEvent.ChangeSubjectPickerDialogState(isActive = true))
                     },
-                    modifier = Modifier.fillMaxWidth(0.6f)
+                    modifier = Modifier.fillMaxWidth(0.6f),
+                    border = BorderStroke(1.dp, viewModel.pickSubjectColorState.value)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),

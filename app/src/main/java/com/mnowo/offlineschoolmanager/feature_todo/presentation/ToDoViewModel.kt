@@ -2,6 +2,8 @@ package com.mnowo.offlineschoolmanager.feature_todo.presentation
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
@@ -14,6 +16,7 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.mo
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
+import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDoResult
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.AddToDoUseCase
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.GetAllToDosUseCase
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.UpdateIsCheckedUseCase
@@ -62,6 +65,30 @@ class ToDoViewModel @Inject constructor(
     private val _pickedSubjectState =
         mutableStateOf<Subject>(Subject(-1, "", 0, "123", 50.0, 50.0, 1.0))
     val pickedSubjectState: State<Subject> = _pickedSubjectState
+
+    private val _bottomSheetState = mutableStateOf<Boolean>(value = false)
+    val bottomSheetState: State<Boolean> = _bottomSheetState
+
+    private val _titleErrorState = mutableStateOf<Boolean>(false)
+    val titleErrorState: State<Boolean> = _titleErrorState
+
+    private val _descriptionErrorState = mutableStateOf<Boolean>(false)
+    val descriptionErrorState: State<Boolean> = _descriptionErrorState
+
+    private val _pickSubjectColorState = mutableStateOf<Color>(Color.LightGray)
+    val pickSubjectColorState: State<Color> = _pickSubjectColorState
+
+    fun setTitleErrorState(value: Boolean) {
+        _titleErrorState.value = value
+    }
+
+    fun setDescriptionErrorState(value: Boolean) {
+        _descriptionErrorState.value = value
+    }
+
+    fun setPickSubjectColorState(value: Color) {
+        _pickSubjectColorState.value = value
+    }
 
     init {
         getAllToDos()
@@ -118,8 +145,13 @@ class ToDoViewModel @Inject constructor(
                     updateIsCheckedUseCase.invoke(toDoId = event.toDoId, newValue = event.newValue)
                 }
             }
+            is ToDoEvent.ChangeBottomSheetState -> {
+                _bottomSheetState.value = event.shows
+            }
+
             is ToDoEvent.AddToDoEvent -> {
                 viewModelScope.launch {
+                    removeAllErrors()
                     val toDo = ToDo(
                         id = 0,
                         title = titleState.value.text,
@@ -129,7 +161,14 @@ class ToDoViewModel @Inject constructor(
                         subjectId = pickedSubjectState.value.id
                     )
                     addToDoUseCase.invoke(toDo = toDo).collect() {
-
+                        when (it) {
+                            is Resource.Success -> {
+                                addOrEditToDoSuccess()
+                            }
+                            is Resource.Error -> {
+                                addOrEditToDoError(errorMessage = it.message, toDoResult = it.data)
+                            }
+                        }
                     }
                 }
             }
@@ -162,5 +201,43 @@ class ToDoViewModel @Inject constructor(
                 is Resource.Error -> {}
             }
         }
+    }
+
+    private fun addOrEditToDoSuccess() = viewModelScope.launch {
+        clearAfterToDoEvent()
+        removeAllErrors()
+
+        onEvent(ToDoEvent.ChangeBottomSheetState(false))
+    }
+
+    private fun addOrEditToDoError(errorMessage: String?, toDoResult: ToDoResult?) =
+        viewModelScope.launch {
+            when (toDoResult) {
+                is ToDoResult.Success -> {}
+                is ToDoResult.SubjectNotPicked -> {
+                    setPickSubjectColorState(Color.Red)
+                }
+                is ToDoResult.EmptyTitle -> {
+                    setTitleErrorState(true)
+                }
+                is ToDoResult.DateNotPicked -> {}
+                is ToDoResult.EmptyDescription -> {
+                    setDescriptionErrorState(true)
+                }
+            }
+        }
+
+    private fun clearAfterToDoEvent() {
+        _titleState.value.clearText()
+        _descriptionState.value.clearText()
+        _datePickerDateState.value = Calendar.getInstance().time
+        _pickedSubjectState.value =
+            Subject(-1, "", 0, "123", 50.0, 50.0, 1.0)
+    }
+
+    private fun removeAllErrors() {
+        setTitleErrorState(false)
+        setDescriptionErrorState(false)
+        setPickSubjectColorState(Color.LightGray)
     }
 }
