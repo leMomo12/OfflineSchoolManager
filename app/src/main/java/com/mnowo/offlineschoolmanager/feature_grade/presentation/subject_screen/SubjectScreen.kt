@@ -178,7 +178,6 @@ fun SubjectTitle(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = stringResource(id = R.string.subjects),
@@ -194,9 +193,13 @@ fun SubjectTitle(
         ) {
             d("editState", "${viewModel.editState.value}")
             if (!viewModel.editState.value && !viewModel.deleteState.value) {
-                IconButton(onClick = {
-                    onOpenBottomSheet()
-                }, modifier = Modifier.testTag(GradeTestTags.ADD_BUTTON)) {
+                IconButton(
+                    onClick = {
+                        onOpenBottomSheet()
+                    },
+                    modifier = Modifier.testTag(GradeTestTags.ADD_BUTTON),
+                    enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
+                ) {
                     Icon(
                         Icons.Default.Add,
                         contentDescription = "ADD_BUTTON",
@@ -209,7 +212,8 @@ fun SubjectTitle(
                     onClick = {
                         viewModel.setDropDownMenuState(!viewModel.dropDownMenuState.value)
                     },
-                    modifier = Modifier.testTag(GradeTestTags.MORE_BUTTON)
+                    modifier = Modifier.testTag(GradeTestTags.MORE_BUTTON),
+                    enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
                 ) {
                     Icon(
                         Icons.Default.MoreVert,
@@ -224,11 +228,12 @@ fun SubjectTitle(
                             .clip(
                                 RoundedCornerShape(8.dp)
                             )
-                            .testTag(GradeTestTags.DROPDOWN_MENU)
+                            .testTag(GradeTestTags.DROPDOWN_MENU),
                     ) {
                         DropdownMenuItem(
                             onClick = { viewModel.setEditState(true) },
-                            modifier = Modifier.testTag(GradeTestTags.EDIT_MENU_ITEM)
+                            modifier = Modifier.testTag(GradeTestTags.EDIT_MENU_ITEM),
+                            enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
                         ) {
                             Row {
                                 Icon(Icons.Default.Edit, contentDescription = "")
@@ -242,7 +247,8 @@ fun SubjectTitle(
                         }
                         DropdownMenuItem(
                             onClick = { viewModel.setDeleteState(true) },
-                            modifier = Modifier.testTag(GradeTestTags.DELETE_MENU_ITEM)
+                            modifier = Modifier.testTag(GradeTestTags.DELETE_MENU_ITEM),
+                            enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
                         ) {
                             Row {
                                 Icon(Icons.Default.Delete, contentDescription = "")

@@ -23,5 +23,13 @@ class ToDoRepositoryImpl @Inject constructor(
         return toDoDao.updateIsChecked(toDoId = toDoId, newValue = newValue)
     }
 
+    override suspend fun deleteToDo(toDoId: Int) {
+        return toDoDao.deleteToDo(toDoId = toDoId)
+    }
+
+    override suspend fun updateToDo(toDo: ToDo) {
+        return toDoDao.updateToDo(toDo = toDo)
+    }
+
 
 }

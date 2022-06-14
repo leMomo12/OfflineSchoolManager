@@ -16,4 +16,8 @@ object FormatDate {
         val format = SimpleDateFormat(Constants.TODO_LONG_TO_STRING_FORMAT, Locale.US)
         return format.format(date)
     }
-}
+
+    fun formatLongToDate(time: Long): Date {
+        return Date(time)
+    }
+ }

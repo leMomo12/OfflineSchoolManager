@@ -11,4 +11,8 @@ interface ToDoRepository {
     fun getAllToDos() : Flow<List<ToDo>>
 
     suspend fun updateIsChecked(toDoId: Int, newValue: Boolean)
+
+    suspend fun deleteToDo(toDoId: Int)
+
+    suspend fun updateToDo(toDo: ToDo)
 }

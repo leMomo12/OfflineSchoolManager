@@ -72,7 +72,7 @@ fun GradeScreen(
         }
     }
 
-    if(bottomState.bottomSheetState.isCollapsed && !viewModel.editState.value) {
+    if (bottomState.bottomSheetState.isCollapsed && !viewModel.editState.value) {
         viewModel.removeAllErrors()
         viewModel.clearAfterGradeEvent()
     }
@@ -191,7 +191,10 @@ fun GradeTitle(
         ) {
             d("editState", "${viewModel.editState.value}")
             if (!viewModel.deleteState.value && !viewModel.editState.value) {
-                IconButton(onClick = { onOpenBottomSheet() }) {
+                IconButton(
+                    onClick = { onOpenBottomSheet() },
+                    enabled = bottomSheetState.bottomSheetState.isCollapsed
+                ) {
                     Icon(
                         Icons.Rounded.Add,
                         contentDescription = "",
@@ -199,7 +202,10 @@ fun GradeTitle(
                     )
                 }
 
-                IconButton(onClick = { viewModel.setDropDownMenuState(!viewModel.dropDownMenuState.value) }) {
+                IconButton(
+                    onClick = { viewModel.setDropDownMenuState(!viewModel.dropDownMenuState.value) },
+                    enabled = bottomSheetState.bottomSheetState.isCollapsed
+                ) {
                     Icon(
                         Icons.Default.MoreVert,
                         contentDescription = "",
@@ -212,7 +218,10 @@ fun GradeTitle(
                             RoundedCornerShape(8.dp)
                         )
                     ) {
-                        DropdownMenuItem(onClick = { viewModel.setEditState(true) }) {
+                        DropdownMenuItem(
+                            onClick = { viewModel.setEditState(true) },
+                            enabled = bottomSheetState.bottomSheetState.isCollapsed
+                        ) {
                             Row {
                                 Icon(Icons.Default.Edit, contentDescription = "")
                                 Text(
@@ -222,7 +231,10 @@ fun GradeTitle(
                                 )
                             }
                         }
-                        DropdownMenuItem(onClick = { viewModel.setDeleteState(true) }) {
+                        DropdownMenuItem(
+                            onClick = { viewModel.setDeleteState(true) },
+                            enabled = bottomSheetState.bottomSheetState.isCollapsed
+                        ) {
                             Row {
                                 Icon(Icons.Default.Delete, contentDescription = "")
                                 Text(

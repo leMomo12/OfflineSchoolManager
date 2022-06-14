@@ -1,9 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_todo.data.local
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
@@ -20,5 +17,11 @@ interface ToDoDao {
 
     @Query("UPDATE ${Constants.TODO_TABLE} SET isChecked = :newValue WHERE id = :toDoId")
     suspend fun updateIsChecked(toDoId: Int, newValue: Boolean)
+
+    @Query("DELETE FROM ${Constants.TODO_TABLE} WHERE id = :toDoId")
+    suspend fun deleteToDo(toDoId: Int)
+
+    @Update
+    suspend fun updateToDo(toDo: ToDo)
 
 }

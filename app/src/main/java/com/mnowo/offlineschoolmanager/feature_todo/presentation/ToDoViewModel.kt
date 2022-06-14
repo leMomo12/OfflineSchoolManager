@@ -1,5 +1,7 @@
 package com.mnowo.offlineschoolmanager.feature_todo.presentation
 
+import android.util.Log.d
+import android.util.Log.i
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,9 +19,7 @@ import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjec
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDoResult
-import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.AddToDoUseCase
-import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.GetAllToDosUseCase
-import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.UpdateIsCheckedUseCase
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,7 +34,9 @@ class ToDoViewModel @Inject constructor(
     private val getAllSubjectsUseCase: GetAllSubjectsUseCase,
     private val addToDoUseCase: AddToDoUseCase,
     private val getAllToDosUseCase: GetAllToDosUseCase,
-    private val updateIsCheckedUseCase: UpdateIsCheckedUseCase
+    private val updateIsCheckedUseCase: UpdateIsCheckedUseCase,
+    private val deleteToDoUseCase: DeleteToDoUseCase,
+    private val updateToDoUseCase: UpdateToDoUseCase
 ) : ViewModel() {
 
     private val _subjectList = mutableStateOf<ListState<Subject>>(ListState())
@@ -77,6 +79,35 @@ class ToDoViewModel @Inject constructor(
 
     private val _pickSubjectColorState = mutableStateOf<Color>(Color.LightGray)
     val pickSubjectColorState: State<Color> = _pickSubjectColorState
+
+    private val _dropDownMenuState = mutableStateOf<Boolean>(false)
+    val dropDownMenuState: State<Boolean> = _dropDownMenuState
+
+    private val _editState = mutableStateOf<Boolean>(false)
+    val editState: State<Boolean> = _editState
+
+    private val _deleteState = mutableStateOf<Boolean>(false)
+    val deleteState: State<Boolean> = _deleteState
+
+    private val _deleteDialogState = mutableStateOf<Boolean>(false)
+    val deleteDialogState: State<Boolean> = _deleteDialogState
+
+    private val _deleteToDoIdState = mutableStateOf<Int>(-1)
+    val deleteToDoIdState: State<Int> = _deleteToDoIdState
+
+    private val _contentEditState = mutableStateOf<Boolean>(false)
+    val contentEditState: State<Boolean> = _contentEditState
+
+    private val _specificEditToDoState = mutableStateOf<ToDo?>(null)
+    val specificEditToDoState: State<ToDo?> = _specificEditToDoState
+
+    fun setContentEditState(value: Boolean) {
+        _contentEditState.value = value
+    }
+
+    fun setDeleteToDoIdState(value: Int) {
+        _deleteToDoIdState.value = value
+    }
 
     fun setTitleErrorState(value: Boolean) {
         _titleErrorState.value = value
@@ -148,7 +179,51 @@ class ToDoViewModel @Inject constructor(
             is ToDoEvent.ChangeBottomSheetState -> {
                 _bottomSheetState.value = event.shows
             }
+            is ToDoEvent.ChangeDropDownMenuState -> {
+                _dropDownMenuState.value = event.value
+            }
+            is ToDoEvent.ChangeEditState -> {
+                _editState.value = event.value
+            }
+            is ToDoEvent.ChangeDeleteState -> {
+                _deleteState.value = event.value
+            }
+            is ToDoEvent.ChangeDeleteDialogState -> {
+                _deleteDialogState.value = event.value
+            }
+            is ToDoEvent.ChangeSpecificEditToDoState -> {
+                _specificEditToDoState.value = event.value
+            }
+            is ToDoEvent.EditToDo -> {
+                viewModelScope.launch {
+                    specificEditToDoState.value?.let {
+                        val toDo = ToDo(
+                            id = it.id,
+                            title = titleState.value.text,
+                            description = descriptionState.value.text,
+                            until = datePickerDateState.value.time,
+                            isChecked = it.isChecked,
+                            subjectId = pickedSubjectState.value.id
+                        )
 
+                        updateToDoUseCase.invoke(toDo = toDo).collect() { result ->
+                            when (result) {
+                                is Resource.Success -> {
+                                    addOrEditToDoSuccess()
+                                }
+                                is Resource.Error -> {
+                                    addOrEditToDoError(toDoResult = result.data)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            is ToDoEvent.DeleteToDo -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    deleteToDoUseCase.invoke(toDoId = _deleteToDoIdState.value)
+                }
+            }
             is ToDoEvent.AddToDoEvent -> {
                 viewModelScope.launch {
                     removeAllErrors()
@@ -166,7 +241,7 @@ class ToDoViewModel @Inject constructor(
                                 addOrEditToDoSuccess()
                             }
                             is Resource.Error -> {
-                                addOrEditToDoError(errorMessage = it.message, toDoResult = it.data)
+                                addOrEditToDoError(toDoResult = it.data)
                             }
                         }
                     }
@@ -210,7 +285,7 @@ class ToDoViewModel @Inject constructor(
         onEvent(ToDoEvent.ChangeBottomSheetState(false))
     }
 
-    private fun addOrEditToDoError(errorMessage: String?, toDoResult: ToDoResult?) =
+    private fun addOrEditToDoError(toDoResult: ToDoResult?) =
         viewModelScope.launch {
             when (toDoResult) {
                 is ToDoResult.Success -> {}
@@ -220,7 +295,6 @@ class ToDoViewModel @Inject constructor(
                 is ToDoResult.EmptyTitle -> {
                     setTitleErrorState(true)
                 }
-                is ToDoResult.DateNotPicked -> {}
                 is ToDoResult.EmptyDescription -> {
                     setDescriptionErrorState(true)
                 }

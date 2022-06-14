@@ -15,6 +15,13 @@ sealed class ToDoEvent {
     data class OnToDoDataReceived(var data: List<ToDo>) : ToDoEvent()
     data class OnCheckboxChanged(var toDoId: Int, var newValue: Boolean) : ToDoEvent()
     data class ChangeBottomSheetState(var shows: Boolean) : ToDoEvent()
+    data class ChangeDropDownMenuState(var value: Boolean) : ToDoEvent()
+    data class ChangeEditState(var value: Boolean) : ToDoEvent()
+    data class ChangeDeleteState(var value: Boolean) : ToDoEvent()
+    data class ChangeDeleteDialogState(var value: Boolean) : ToDoEvent()
+    data class ChangeSpecificEditToDoState(var value: ToDo) : ToDoEvent()
+    object EditToDo : ToDoEvent()
+    object DeleteToDo : ToDoEvent()
     object AddToDoEvent : ToDoEvent()
 
 }

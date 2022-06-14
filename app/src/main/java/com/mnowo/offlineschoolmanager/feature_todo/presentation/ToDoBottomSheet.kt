@@ -60,6 +60,18 @@ fun ToDoBottomSheet(
         }
     }
 
+    if (viewModel.contentEditState.value) {
+        viewModel.setContentEditState(value = false)
+
+        viewModel.specificEditToDoState.value?.let { toDo ->
+            viewModel.onEvent(ToDoEvent.EnteredTitle(toDo.title))
+            viewModel.onEvent(ToDoEvent.EnteredDescription(toDo.description))
+            viewModel.onEvent(ToDoEvent.EnteredDate(FormatDate.formatLongToDate(toDo.until)))
+            val subject = viewModel.subjectList.value.listData.filter { it.id == toDo.subjectId }[0]
+            viewModel.onEvent(ToDoEvent.ChangePickedSubject(subject = subject))
+        }
+
+    }
 
     if (!viewModel.bottomSheetState.value) {
         viewModel.onEvent(ToDoEvent.ChangeBottomSheetState(true))
@@ -107,12 +119,18 @@ fun ToDoBottomSheet(
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     OutlinedButton(
-                        onClick = { viewModel.onEvent(ToDoEvent.AddToDoEvent) },
+                        onClick = {
+                            if (!viewModel.editState.value) {
+                                viewModel.onEvent(ToDoEvent.AddToDoEvent)
+                            } else {
+                                viewModel.onEvent(ToDoEvent.EditToDo)
+                            }
+                        },
                         border = BorderStroke(1.dp, color = LightBlue),
                         modifier = Modifier.testTag(AddSubjectTestTags.ADD_BUTTON)
                     ) {
                         Text(
-                            text = if (true) {
+                            text = if (!viewModel.editState.value) {
                                 stringResource(id = R.string.add)
                             } else {
                                 stringResource(id = R.string.save)

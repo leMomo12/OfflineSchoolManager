@@ -10,9 +10,7 @@ object ToDoValidation {
             ToDoResult.EmptyTitle
         } else if (toDo.description.trim().isBlank()) {
             ToDoResult.EmptyDescription
-        } else if (toDo.until == 0L) {
-            ToDoResult.DateNotPicked
-        } else if (toDo.subjectId == -1) {
+        }  else if (toDo.subjectId == -1) {
             ToDoResult.SubjectNotPicked
         } else {
             ToDoResult.Success

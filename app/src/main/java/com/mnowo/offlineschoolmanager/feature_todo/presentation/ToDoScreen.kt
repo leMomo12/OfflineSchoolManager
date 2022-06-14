@@ -1,12 +1,21 @@
 package com.mnowo.offlineschoolmanager
 
 import android.util.Log.d
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.*
@@ -16,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -25,7 +35,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.DeleteDialog
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
+import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoBottomSheet
@@ -42,18 +55,6 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
     val fredoka = rememberFredoka()
     val bottomState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
-    val staggeredText = listOf(
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries",
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s when an unknown printer took a galley of type",
-        "Lorem Ipsum is simply dummy text",
-        "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here'",
-        "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
-        "The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from \"de Finibus Bonorum et Malorum\" by Cicero are also reproduced in their exact original form",
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s",
-    )
-
 
     val closeSheet: () -> Unit = {
         scope.launch {
@@ -63,7 +64,6 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
 
     val openSheet: () -> Unit = {
         scope.launch {
-
             bottomState.bottomSheetState.expand()
         }
     }
@@ -81,8 +81,6 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
             }
         }
     }
-
-
 
     BottomSheetScaffold(
         scaffoldState = bottomState,
@@ -102,13 +100,19 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
-                    ToDoTitle(fredoka = fredoka, openSheet = { openSheet() })
+                    ToDoTitle(
+                        fredoka = fredoka,
+                        openSheet = { openSheet() },
+                        viewModel = viewModel,
+                        bottomSheetScaffoldState = bottomState
+                    )
                 }
                 item {
                     ToDoStaggeredGrid(
                         listData = viewModel.toDoList.value.listData,
                         fredoka = fredoka,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        openSheet = { openSheet() }
                     )
                 }
                 item {
@@ -119,14 +123,19 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ToDoTitle(fredoka: FontFamily, openSheet: () -> Unit) {
+fun ToDoTitle(
+    fredoka: FontFamily,
+    openSheet: () -> Unit,
+    viewModel: ToDoViewModel,
+    bottomSheetScaffoldState: BottomSheetScaffoldState
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = stringResource(R.string.toDoS),
@@ -135,22 +144,107 @@ fun ToDoTitle(fredoka: FontFamily, openSheet: () -> Unit) {
             fontSize = 32.sp
         )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            IconButton(onClick = { openSheet() }) {
-                Icon(Icons.Rounded.Add, contentDescription = "", modifier = Modifier.scale(1.2f))
-            }
-            IconButton(onClick = { }) {
-                Icon(
-                    Icons.Rounded.MoreVert,
-                    contentDescription = "",
-                    modifier = Modifier.scale(1.2f)
-                )
+            if (!viewModel.editState.value && !viewModel.deleteState.value) {
+                IconButton(
+                    onClick = { openSheet() },
+                    enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
+                ) {
+                    Icon(
+                        Icons.Rounded.Add,
+                        contentDescription = "",
+                        modifier = Modifier.scale(1.2f)
+                    )
+                }
+                IconButton(onClick = {
+                    viewModel.onEvent(ToDoEvent.ChangeDropDownMenuState(!viewModel.dropDownMenuState.value))
+                }, enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed) {
+                    Icon(
+                        Icons.Rounded.MoreVert,
+                        contentDescription = "",
+                        modifier = Modifier.scale(1.2f)
+                    )
+
+                    DropdownMenu(
+                        expanded = viewModel.dropDownMenuState.value,
+                        onDismissRequest = {
+                            viewModel.onEvent(
+                                ToDoEvent.ChangeDropDownMenuState(
+                                    false
+                                )
+                            )
+                        },
+                        modifier = Modifier
+                            .clip(
+                                RoundedCornerShape(8.dp)
+                            )
+                            .testTag(GradeTestTags.DROPDOWN_MENU)
+                    ) {
+                        DropdownMenuItem(
+                            onClick = { viewModel.onEvent(ToDoEvent.ChangeEditState(true)) },
+                            modifier = Modifier.testTag(GradeTestTags.EDIT_MENU_ITEM),
+                            enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
+                        ) {
+                            Row {
+                                Icon(Icons.Default.Edit, contentDescription = "")
+                                Text(
+                                    text = stringResource(id = R.string.edit),
+                                    fontFamily = fredoka,
+                                    modifier = Modifier
+                                        .padding(start = 5.dp)
+                                )
+                            }
+                        }
+                        DropdownMenuItem(
+                            onClick = { viewModel.onEvent(ToDoEvent.ChangeDeleteState(true)) },
+                            modifier = Modifier.testTag(GradeTestTags.DELETE_MENU_ITEM),
+                            enabled = bottomSheetScaffoldState.bottomSheetState.isCollapsed
+                        ) {
+                            Row {
+                                Icon(Icons.Default.Delete, contentDescription = "")
+                                Text(
+                                    text = stringResource(id = R.string.delete),
+                                    fontFamily = fredoka,
+                                    modifier = Modifier
+                                        .padding(start = 5.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                IconButton(onClick = { }, enabled = false) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "", tint = Color.Transparent)
+                }
+                OutlinedButton(
+                    onClick = {
+                        viewModel.onEvent(ToDoEvent.ChangeEditState(false))
+                        viewModel.onEvent(ToDoEvent.ChangeDeleteState(false))
+                        viewModel.onEvent(ToDoEvent.ChangeDropDownMenuState(false))
+                    },
+                    border = BorderStroke(1.4.dp, color = LightBlue),
+                    shape = RoundedCornerShape(32.dp),
+                    modifier = Modifier
+                        .testTag(GradeTestTags.CANCEL_BUTTON)
+                        .padding(end = 5.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        fontFamily = fredoka,
+                        color = LightBlue
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun ToDoStaggeredGrid(listData: List<ToDo>, fredoka: FontFamily, viewModel: ToDoViewModel) {
+fun ToDoStaggeredGrid(
+    listData: List<ToDo>,
+    fredoka: FontFamily,
+    viewModel: ToDoViewModel,
+    openSheet: () -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(5.dp)
@@ -160,6 +254,20 @@ fun ToDoStaggeredGrid(listData: List<ToDo>, fredoka: FontFamily, viewModel: ToDo
             modifier = Modifier.padding(5.dp)
         ) {
             listData.forEach { item ->
+
+                if (viewModel.deleteDialogState.value) {
+                    DeleteDialog(onDismissRequest = {
+                        viewModel.onEvent(
+                            ToDoEvent.ChangeDeleteDialogState(
+                                value = false
+                            )
+                        )
+                    }, onDeleteClicked = {
+                        d("ToDo", "onDeleteClicked: ${viewModel.deleteToDoIdState.value}")
+                        viewModel.onEvent(ToDoEvent.DeleteToDo)
+                    })
+                }
+
                 val colorState = remember {
                     derivedStateOf {
                         if (viewModel.subjectList.value.listData.isNotEmpty()) {
@@ -177,6 +285,12 @@ fun ToDoStaggeredGrid(listData: List<ToDo>, fredoka: FontFamily, viewModel: ToDo
                         .padding(5.dp)
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = colorState.value)
+                        .animateContentSize(
+                            animationSpec = tween(
+                                durationMillis = 600,
+                                easing = LinearOutSlowInEasing
+                            )
+                        )
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Row(
@@ -198,23 +312,84 @@ fun ToDoStaggeredGrid(listData: List<ToDo>, fredoka: FontFamily, viewModel: ToDo
                                 }
                             )
                             Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+
                             Text(
                                 text = "Until: ${FormatDate.formatLongToSpring(item.until)}",
                                 fontFamily = fredoka,
                                 fontWeight = FontWeight.Light
                             )
+
                         }
                         Text(
                             text = item.title,
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = 8.dp
+                            ),
                             fontFamily = fredoka,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = item.description,
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = 16.dp
+                            ),
                             fontFamily = fredoka
                         )
+
+                        when {
+                            viewModel.editState.value -> {
+                                Divider()
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.setContentEditState(value = true)
+                                            viewModel.onEvent(
+                                                ToDoEvent.ChangeSpecificEditToDoState(
+                                                    value = item
+                                                )
+                                            )
+                                            viewModel.onEvent(
+                                                ToDoEvent.ChangeEditState(
+                                                    value = true
+                                                )
+                                            )
+                                            openSheet()
+                                        },
+                                        modifier = Modifier
+                                    ) {
+                                        Icon(Icons.Default.Edit, contentDescription = "")
+                                    }
+                                }
+                            }
+                            viewModel.deleteState.value -> {
+                                Divider()
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            viewModel.setDeleteToDoIdState(value = item.id)
+                                            viewModel.onEvent(
+                                                ToDoEvent.ChangeDeleteDialogState(
+                                                    value = true
+                                                )
+                                            )
+                                        },
+                                        modifier = Modifier
+                                    ) {
+                                        Icon(Icons.Default.Delete, contentDescription = "")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
