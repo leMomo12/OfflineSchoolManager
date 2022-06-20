@@ -10,6 +10,9 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.re
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.data.repository.GradeRepositoryImpl
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
+import com.mnowo.offlineschoolmanager.feature_timetable.data.local.TimetableDao
+import com.mnowo.offlineschoolmanager.feature_timetable.data.repository.TimetableRepositoryImpl
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.repository.TimetableRepository
 import com.mnowo.offlineschoolmanager.feature_todo.data.local.ToDoDao
 import com.mnowo.offlineschoolmanager.feature_todo.data.repository.ToDoRepositoryImpl
 import com.mnowo.offlineschoolmanager.feature_todo.domain.repository.ToDoRepository
@@ -82,4 +85,17 @@ object AppModule {
     @Provides
     @Singleton
     fun provideToDoDao(db: SchoolManagerDatabase) = db.toDoDao()
+
+
+    @Provides
+    @Singleton
+    fun provideTimetableRepository(
+        timetableDao: TimetableDao
+    ): TimetableRepository {
+        return TimetableRepositoryImpl(timetableDao = timetableDao)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTimetableDao(db: SchoolManagerDatabase) = db.timetableDao()
 }

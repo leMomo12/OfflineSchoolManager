@@ -1,0 +1,3 @@
+package com.mnowo.offlineschoolmanager.feature_timetable.presentation
+
+sealed class TimetableEvent

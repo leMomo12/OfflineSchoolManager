@@ -27,4 +27,11 @@
     <string name="cancel">Cancel</string>
     <string name="toDoS">To Do\'s</string>
     <string name="addNewSubject">Add new subject</string>
+    <string name="enterTitle">Enter title</string>
+    <string name="enterDescription">Enter description</string>
+    <string name="pickDate">Pick date</string>
+    <string name="currentSubject">Current subject:</string>
+    <string name="pickSubject">Pick subject</string>
+    <string name="selectDate">Select Date</string>
+    <string name="apply">Apply</string>
 </resources>

@@ -157,7 +157,7 @@ fun ToDoBottomSheet(
                         }
                     },
                     label = {
-                        Text(text = "Enter title")
+                        Text(text = stringResource(R.string.enterTitle))
                     },
                     singleLine = true,
                     isError = viewModel.titleErrorState.value
@@ -169,7 +169,7 @@ fun ToDoBottomSheet(
                         viewModel.onEvent(ToDoEvent.EnteredDescription(it))
                     },
                     label = {
-                        Text(text = "Enter description")
+                        Text(text = stringResource(R.string.enterDescription))
                     },
                     maxLines = 6,
                     isError = viewModel.descriptionErrorState.value
@@ -193,7 +193,7 @@ fun ToDoBottomSheet(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Pick date", fontFamily = fredoka)
+                        Text(text = stringResource(R.string.pickDate), fontFamily = fredoka)
                         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
                         Icon(Icons.Outlined.AccessTime, contentDescription = "")
                     }
@@ -204,7 +204,7 @@ fun ToDoBottomSheet(
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
 
                 Text(
-                    text = "Current subject: ${viewModel.pickedSubjectState.value.subjectName}",
+                    text = "${stringResource(id = R.string.currentSubject)} ${viewModel.pickedSubjectState.value.subjectName}",
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Normal,
                 )
@@ -221,7 +221,7 @@ fun ToDoBottomSheet(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Pick subject", fontFamily = fredoka)
+                        Text(text = stringResource(R.string.pickSubject), fontFamily = fredoka)
                         Spacer(modifier = Modifier.padding(horizontal = 2.dp))
                         Icon(Icons.Outlined.School, contentDescription = "")
                     }
@@ -230,7 +230,6 @@ fun ToDoBottomSheet(
                     SubjectPickerDialog(
                         onSubjectPicked = {
                             viewModel.onEvent(ToDoEvent.ChangePickedSubject(it))
-                            d("Subject", "SubjectColor: ${it.color}")
                             viewModel.onEvent(
                                 ToDoEvent.ChangeSubjectPickerDialogState(
                                     false
@@ -275,7 +274,7 @@ fun DatePicker(viewModel: ToDoViewModel, fredoka: FontFamily, onDateSelected: (D
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Select Date",
+                            text = stringResource(R.string.selectDate),
                             fontFamily = fredoka,
                             fontWeight = FontWeight.Medium
                         )
@@ -286,7 +285,7 @@ fun DatePicker(viewModel: ToDoViewModel, fredoka: FontFamily, onDateSelected: (D
                                 )
                             )
                         }) {
-                            Text(text = "Apply")
+                            Text(text = stringResource(R.string.apply))
                         }
                     }
                     Text(
