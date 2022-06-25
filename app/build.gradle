@@ -116,4 +116,7 @@ dependencies {
     androidTestImplementation "io.mockk:mockk-android:1.10.5"
     androidTestImplementation 'androidx.test:runner:1.4.0'
 
+    // NumberPicker
+    implementation "com.chargemap.compose:numberpicker:1.0.3"
+
 }

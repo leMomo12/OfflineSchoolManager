@@ -29,45 +29,45 @@ fun BottomAppBar(
                 onClick(Screen.HomeScreen)
             }) {
                 if(home == true) {
-                    Icon(Icons.Rounded.Home, contentDescription = "")
+                    Icon(Icons.Rounded.Home, contentDescription = "", tint = Color.Black)
                 } else {
-                    Icon(Icons.Outlined.Home, contentDescription = "")
+                    Icon(Icons.Outlined.Home, contentDescription = "", tint = Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.TimetableScreen)
             }) {
                 if(timetable == true) {
-                    Icon(Icons.Rounded.AccessAlarm, contentDescription = "")
+                    Icon(Icons.Rounded.AccessAlarm, contentDescription = "", tint = Color.Black)
                 } else {
-                    Icon(Icons.Outlined.AccessAlarm, contentDescription = "")
+                    Icon(Icons.Outlined.AccessAlarm, contentDescription = "", tint = Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.SubjectScreen)
             }) {
                 if(gradeAverage == true) {
-                    Icon(Icons.Rounded.Equalizer, contentDescription = "")
+                    Icon(Icons.Rounded.School, contentDescription = "", tint = Color.Black)
                 } else {
-                    Icon(Icons.Outlined.Equalizer, contentDescription = "")
+                    Icon(Icons.Outlined.School, contentDescription = "", tint = Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.ToDoScreen)
             }) {
                 if(toDo == true) {
-                    Icon(Icons.Rounded.Edit, contentDescription = "")
+                    Icon(Icons.Rounded.Edit, contentDescription = "", tint = Color.Black)
                 } else {
-                    Icon(Icons.Outlined.Edit, contentDescription = "")
+                    Icon(Icons.Outlined.Edit, contentDescription = "", tint = Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.ExamScreen)
             }) {
                 if(exam == true) {
-                    Icon(Icons.Rounded.PlaylistAdd, contentDescription = "")
+                    Icon(Icons.Rounded.PlaylistAdd, contentDescription = "", tint = Color.Black)
                 } else {
-                    Icon(Icons.Outlined.PlaylistAdd, contentDescription = "")
+                    Icon(Icons.Outlined.PlaylistAdd, contentDescription = "", tint = Color.Black)
                 }
             }
         }

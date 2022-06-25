@@ -34,4 +34,8 @@
     <string name="pickSubject">Pick subject</string>
     <string name="selectDate">Select Date</string>
     <string name="apply">Apply</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="sureToDelete">Sure to delete?</string>
+    <string name="thisChangeCannotBeReset">This change cannot be reset</string>
 </resources>

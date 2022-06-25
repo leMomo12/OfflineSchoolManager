@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
@@ -11,6 +12,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.DeleteSubjectUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
+import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -19,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SubjectViewModel @Inject constructor(
     private val getAllSubjectsUseCase: GetAllSubjectsUseCase,
-    private val deleteSubjectUseCase: DeleteSubjectUseCase
+    private val deleteSubjectUseCase: DeleteSubjectUseCase,
+    private val helper: Helper
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -70,57 +73,46 @@ class SubjectViewModel @Inject constructor(
         getAllSubjects()
     }
 
-    fun getAllSubjects() {
-        viewModelScope.launch {
-            getAllSubjectsUseCase.invoke().collect() {
-                when (it) {
-                    is Resource.Success -> {
-                    }
-                    is Resource.Loading -> {
-                        it.data?.let { result ->
-                            onEvent(SubjectEvent.SubjectListData(result))
-                        }
-                    }
-                    is Resource.Error -> {
-
-                    }
-                }
-            }
-        }
+    fun getAllSubjects() = viewModelScope.launch {
+        helper.getAllSubjectUseCaseResultHandler(
+            onSuccess = {},
+            onLoading = {},
+            onError = {},
+            data = { onEvent(SubjectEvent.SubjectListData(listData = it)) })
     }
 
-    fun onEvent(event: SubjectEvent) {
-        when (event) {
-            is SubjectEvent.OnSubjectClicked -> {
-                viewModelScope.launch {
-                    _onSubjectListClickedIndexState.value = event.id
-                    _eventFlow.emit(
-                        UiEvent.Navigate(Screen.GradeScreen.route)
-                    )
-                }
-            }
-            is SubjectEvent.SubjectListData -> {
-                _subjectListState.value = subjectListState.value.copy(
-                    listData = event.listData
-                )
-            }
-            is SubjectEvent.DeleteSubject -> {
-                viewModelScope.launch {
-                    deleteSubjectUseCase.invoke(subjectId = subjectIdState.value).collect()
-                }
-                setDeleteDialogState(false)
-            }
-        }
-    }
-
-
-    fun bottomNav(screen: Screen, currentScreen: Screen) {
-        viewModelScope.launch {
-            if (screen != currentScreen) {
+fun onEvent(event: SubjectEvent) {
+    when (event) {
+        is SubjectEvent.OnSubjectClicked -> {
+            viewModelScope.launch {
+                _onSubjectListClickedIndexState.value = event.id
                 _eventFlow.emit(
-                    UiEvent.Navigate(screen.route)
+                    UiEvent.Navigate(Screen.GradeScreen.route)
                 )
             }
         }
+        is SubjectEvent.SubjectListData -> {
+            _subjectListState.value = subjectListState.value.copy(
+                listData = event.listData
+            )
+        }
+        is SubjectEvent.DeleteSubject -> {
+            viewModelScope.launch {
+                deleteSubjectUseCase.invoke(subjectId = subjectIdState.value).collect()
+            }
+            setDeleteDialogState(false)
+        }
     }
+}
+
+
+fun bottomNav(screen: Screen, currentScreen: Screen) {
+    viewModelScope.launch {
+        if (screen != currentScreen) {
+            _eventFlow.emit(
+                UiEvent.Navigate(screen.route)
+            )
+        }
+    }
+}
 }

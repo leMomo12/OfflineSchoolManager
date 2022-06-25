@@ -16,4 +16,5 @@ interface TimetableDao {
 
     @Query("SELECT * FROM ${Constants.TIMETABLE_TABLE}")
     fun getAllTimetableItems() : Flow<List<Timetable>>
+
 }

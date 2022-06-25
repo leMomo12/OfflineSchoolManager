@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,7 +30,6 @@ import androidx.core.graphics.red
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
-import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
 
 @Composable
 fun DeleteDialog(onDismissRequest: () -> Unit, onDeleteClicked: () -> Unit) {
@@ -37,11 +38,11 @@ fun DeleteDialog(onDismissRequest: () -> Unit, onDeleteClicked: () -> Unit) {
             onDismissRequest()
         },
         title = {
-            Text(text = "Sure to delete?")
+            Text(text = stringResource(R.string.sureToDelete))
         },
         text = {
             Column() {
-                Text(text = "This change cannot be reset")
+                Text(text = stringResource(R.string.thisChangeCannotBeReset))
             }
         },
         buttons = {
@@ -55,13 +56,13 @@ fun DeleteDialog(onDismissRequest: () -> Unit, onDeleteClicked: () -> Unit) {
                     onClick = { onDismissRequest() },
                     modifier = Modifier.fillMaxWidth(0.4f)
                 ) {
-                    Text(text = "No")
+                    Text(text = stringResource(R.string.no))
                 }
                 OutlinedButton(
                     onClick = { onDeleteClicked() },
                     modifier = Modifier.fillMaxWidth(0.6f)
                 ) {
-                    Text(text = "Yes")
+                    Text(text = stringResource(R.string.yes))
                 }
             }
         }, shape = RoundedCornerShape(16.dp)
@@ -93,14 +94,12 @@ fun SubjectPickerDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Pick subject",
+                        text = stringResource(id = R.string.pickSubject),
                         fontFamily = fredoka,
                         fontWeight = FontWeight.Medium,
                         fontSize = 25.sp
                     )
-                    IconButton(onClick = { onDismissRequest() }) {
-                        Icon(Icons.Outlined.Cancel, contentDescription = "")
-                    }
+                    CancelIconButton(onDismissRequest = { onDismissRequest() })
                 }
                 Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 LazyColumn {
@@ -181,5 +180,12 @@ fun PickSubjectNewSubjectItem(onAddNewSubjectClicked: () -> Unit, fredoka: FontF
             fontFamily = fredoka,
             fontWeight = FontWeight.Normal
         )
+    }
+}
+
+@Composable
+fun CancelIconButton(onDismissRequest: () -> Unit) {
+    IconButton(onClick = { onDismissRequest() }) {
+        Icon(Icons.Outlined.Cancel, contentDescription = "")
     }
 }

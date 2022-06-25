@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
@@ -36,7 +37,8 @@ class ToDoViewModel @Inject constructor(
     private val getAllToDosUseCase: GetAllToDosUseCase,
     private val updateIsCheckedUseCase: UpdateIsCheckedUseCase,
     private val deleteToDoUseCase: DeleteToDoUseCase,
-    private val updateToDoUseCase: UpdateToDoUseCase
+    private val updateToDoUseCase: UpdateToDoUseCase,
+    private val helper: Helper
 ) : ViewModel() {
 
     private val _subjectList = mutableStateOf<ListState<Subject>>(ListState())
@@ -251,17 +253,11 @@ class ToDoViewModel @Inject constructor(
     }
 
     private fun getAllSubjects() = viewModelScope.launch {
-        getAllSubjectsUseCase.invoke().collect() {
-            when (it) {
-                is Resource.Success -> {}
-                is Resource.Loading -> {
-                    it.data?.let { result ->
-                        onEvent(ToDoEvent.OnSubjectDataReceived(data = result))
-                    }
-                }
-                is Resource.Error -> {}
-            }
-        }
+        helper.getAllSubjectUseCaseResultHandler(
+            onSuccess = {},
+            onLoading = {},
+            onError = {},
+            data = { onEvent(ToDoEvent.OnSubjectDataReceived(data = it)) })
     }
 
     private fun getAllToDos() = viewModelScope.launch {
