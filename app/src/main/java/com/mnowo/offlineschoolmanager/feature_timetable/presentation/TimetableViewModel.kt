@@ -1,8 +1,13 @@
 package com.mnowo.offlineschoolmanager.feature_timetable.presentation
 
+import android.util.Log.d
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
@@ -10,6 +15,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,16 +48,14 @@ class TimetableViewModel @Inject constructor(
     private val _subjectListState = mutableStateOf<ListState<Subject>>(ListState())
     val subjectListState: State<ListState<Subject>> = _subjectListState
 
-    private val _pickedDayColorState = mutableStateOf<Array<Color>>(
-        arrayOf(
-            Color.LightGray,
-            Color.LightGray,
-            Color.LightGray,
-            Color.LightGray,
-            Color.LightGray,
-        )
+    private val _pickedDayColorState = mutableStateMapOf<Int, Color>(
+        Pair(0, Color.LightGray),
+        Pair(1, Color.LightGray),
+        Pair(2, Color.LightGray),
+        Pair(3, Color.LightGray),
+        Pair(4, Color.LightGray)
     )
-    val pickedDayColorState: State<Array<Color>> = _pickedDayColorState
+    val pickedDayColorState: SnapshotStateMap<Int, Color> = _pickedDayColorState
 
     fun bottomNav(screen: Screen, currentScreen: Screen) {
         viewModelScope.launch {
@@ -80,9 +84,16 @@ class TimetableViewModel @Inject constructor(
                 )
             }
             is TimetableEvent.OnPickedDayColorStateChanged -> {
-
+                dayColorChange(day = event.day)
             }
         }
+    }
+
+    private fun dayColorChange(day: Int) = viewModelScope.launch {
+        for(i in 0 until 5) {
+            pickedDayColorState[i] = Color.LightGray
+        }
+        pickedDayColorState[day] = LightBlue
     }
 
     fun getAllSubjects() = viewModelScope.launch {

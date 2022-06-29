@@ -1,7 +1,9 @@
 package com.mnowo.offlineschoolmanager.feature_timetable.presentation
 
+import android.util.Log.d
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -86,34 +90,46 @@ fun TimetableBottomSheet(
                     .fillMaxWidth()
                     .padding(top = 10.dp), horizontalArrangement = Arrangement.SpaceBetween
             ) {
+
+
                 TimetableOutlinedDayButton(
                     text = "M",
-                    borderColor = Color.LightGray,
-                    fredoka = fredoka
+                    borderColor = viewModel.pickedDayColorState.getValue(0),
+                    fredoka = fredoka,
+                    onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 0)) }
                 )
+
                 TimetableOutlinedDayButton(
                     text = "T",
-                    borderColor = Color.LightGray,
-                    fredoka = fredoka
+                    borderColor = viewModel.pickedDayColorState.getValue(1),
+                    fredoka = fredoka,
+                    onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 1)) }
                 )
                 TimetableOutlinedDayButton(
                     text = "W",
-                    borderColor = Color.LightGray,
-                    fredoka = fredoka
+                    borderColor = viewModel.pickedDayColorState.getValue(2),
+                    fredoka = fredoka,
+                    onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 2)) }
                 )
                 TimetableOutlinedDayButton(
                     text = "TH",
-                    borderColor = Color.LightGray,
-                    fredoka = fredoka
+                    borderColor = viewModel.pickedDayColorState.getValue(3),
+                    fredoka = fredoka,
+                    onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 3)) }
                 )
                 TimetableOutlinedDayButton(
                     text = "F",
-                    borderColor = Color.LightGray,
-                    fredoka = fredoka
+                    borderColor = viewModel.pickedDayColorState.getValue(4),
+                    fredoka = fredoka,
+                    onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 4)) }
                 )
             }
             Spacer(modifier = Modifier.padding(vertical = 20.dp))
-            Text(text = stringResource(id = R.string.currentSubject) + " ${viewModel.pickedSubjectState.value?.subjectName ?: ""}", fontFamily = fredoka, fontWeight = FontWeight.Medium)
+            Text(
+                text = stringResource(id = R.string.currentSubject) + " ${viewModel.pickedSubjectState.value?.subjectName ?: ""}",
+                fontFamily = fredoka,
+                fontWeight = FontWeight.Medium
+            )
             OutlinedButton(
                 onClick = {
                     viewModel.onEvent(TimetableEvent.OnSubjectDialogStateChanged(value = true))
@@ -161,12 +177,19 @@ fun TimetableBottomSheet(
 }
 
 @Composable
-fun TimetableOutlinedDayButton(text: String, borderColor: Color, fredoka: FontFamily) {
+fun TimetableOutlinedDayButton(
+    text: String,
+    borderColor: Color,
+    fredoka: FontFamily,
+    onClick: () -> Unit
+) {
+    d("BorderColor", "Color: $borderColor")
     OutlinedButton(
-        onClick = { },
+        onClick = { onClick() },
         shape = CircleShape,
         contentPadding = PaddingValues(0.dp),
-        modifier = Modifier.size(40.dp),
+        modifier = Modifier
+            .size(40.dp),
         border = BorderStroke(1.dp, color = borderColor)
     ) {
         Text(text = text, fontFamily = fredoka, fontWeight = FontWeight.Light)
