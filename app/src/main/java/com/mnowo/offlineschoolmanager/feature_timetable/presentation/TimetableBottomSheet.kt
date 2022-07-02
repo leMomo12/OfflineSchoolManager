@@ -64,7 +64,7 @@ fun TimetableBottomSheet(
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 OutlinedButton(
                     onClick = {
-
+                              viewModel.onEvent(TimetableEvent.AddTimetable)
                     },
                     border = BorderStroke(1.dp, color = LightBlue)
                 ) {
@@ -137,7 +137,7 @@ fun TimetableBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
                     .padding(top = 5.dp),
-                border = BorderStroke(1.dp, Color.LightGray)
+                border = BorderStroke(1.dp, viewModel.pickSubjectErrorState.value),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

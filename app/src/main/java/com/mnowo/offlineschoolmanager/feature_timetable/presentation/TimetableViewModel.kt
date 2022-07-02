@@ -13,12 +13,17 @@ import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Days
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.AddTimetableItemUseCase
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -26,7 +31,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TimetableViewModel @Inject constructor(
-    private val helper: Helper
+    private val helper: Helper,
+    private val addTimetableItemUseCase: AddTimetableItemUseCase
 ) : ViewModel() {
 
     init {
@@ -48,12 +54,15 @@ class TimetableViewModel @Inject constructor(
     private val _subjectListState = mutableStateOf<ListState<Subject>>(ListState())
     val subjectListState: State<ListState<Subject>> = _subjectListState
 
+    private val _pickSubjectErrorState = mutableStateOf<Color>(Color.LightGray)
+    val pickSubjectErrorState: State<Color> = _pickSubjectErrorState
+
     private val _pickedDayColorState = mutableStateMapOf<Int, Color>(
-        Pair(0, Color.LightGray),
-        Pair(1, Color.LightGray),
-        Pair(2, Color.LightGray),
-        Pair(3, Color.LightGray),
-        Pair(4, Color.LightGray)
+        0 to Color.LightGray,
+        1 to Color.LightGray,
+        2 to Color.LightGray,
+        3 to Color.LightGray,
+        4 to Color.LightGray
     )
     val pickedDayColorState: SnapshotStateMap<Int, Color> = _pickedDayColorState
 
@@ -86,14 +95,50 @@ class TimetableViewModel @Inject constructor(
             is TimetableEvent.OnPickedDayColorStateChanged -> {
                 dayColorChange(day = event.day)
             }
+            is TimetableEvent.SetPickSubjectError -> {
+                _pickSubjectErrorState.value = event.value
+            }
+            is TimetableEvent.AddTimetable -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val day = getDay()
+                    pickedSubjectState.value?.let { subject ->
+                        val timetable = Timetable(0, day, hourPickerState.value, subject.id)
+
+                        addTimetableItemUseCase.invoke(timetable = timetable).collect {
+                            when (it) {
+                                is Resource.Error -> {
+                                }
+                                is Resource.Success -> {
+
+                                }
+                            }
+                        }
+                    } ?: onEvent(TimetableEvent.SetPickSubjectError(value = Color.Red))
+                }
+            }
         }
     }
 
     private fun dayColorChange(day: Int) = viewModelScope.launch {
-        for(i in 0 until 5) {
+        for (i in 0 until 5) {
             pickedDayColorState[i] = Color.LightGray
         }
         pickedDayColorState[day] = LightBlue
+    }
+
+    private fun getDay(): Days {
+        for (intDay in 0 until 5) {
+            if (pickedDayColorState[intDay] == LightBlue) {
+                return when (intDay) {
+                    0 -> Days.MONDAY
+                    1 -> Days.TUESDAY
+                    2 -> Days.WEDNESDAY
+                    3 -> Days.THURSDAY
+                    else -> Days.FRIDAY
+                }
+            }
+        }
+        return Days.EXCEPTION
     }
 
     fun getAllSubjects() = viewModelScope.launch {

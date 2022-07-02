@@ -13,7 +13,6 @@ data class Timetable(
     @PrimaryKey(autoGenerate = true)
     var id: Int,
     var day: Days,
-    var startTime: Long,
-    var endTime: Long,
+    var hour: Int,
     var subjectId: Int
 )
