@@ -20,10 +20,13 @@ import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Days
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.TimetableResult
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.AddTimetableItemUseCase
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.GetAllTimetableItemsUseCase
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -32,15 +35,20 @@ import javax.inject.Inject
 @HiltViewModel
 class TimetableViewModel @Inject constructor(
     private val helper: Helper,
-    private val addTimetableItemUseCase: AddTimetableItemUseCase
+    private val addTimetableItemUseCase: AddTimetableItemUseCase,
+    private val getAllTimetableItemsUseCase: GetAllTimetableItemsUseCase
 ) : ViewModel() {
 
     init {
+        getAllTimetableItems()
         getAllSubjects()
     }
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+    private val _timetableListState = mutableStateOf<ListState<Timetable>>(ListState())
+    val timetableListState: State<ListState<Timetable>> = _timetableListState
 
     private val _hourPickerState = mutableStateOf<Int>(0)
     val hourPickerState: State<Int> = _hourPickerState
@@ -65,6 +73,9 @@ class TimetableViewModel @Inject constructor(
         4 to Color.LightGray
     )
     val pickedDayColorState: SnapshotStateMap<Int, Color> = _pickedDayColorState
+
+    private val _timetableBottomSheetState = mutableStateOf<Boolean>(false)
+    val timetableBottomSheetState: State<Boolean> = _timetableBottomSheetState
 
     fun bottomNav(screen: Screen, currentScreen: Screen) {
         viewModelScope.launch {
@@ -95,11 +106,20 @@ class TimetableViewModel @Inject constructor(
             is TimetableEvent.OnPickedDayColorStateChanged -> {
                 dayColorChange(day = event.day)
             }
+            is TimetableEvent.SetTimetableBottomSheet -> {
+                _timetableBottomSheetState.value = event.value
+            }
             is TimetableEvent.SetPickSubjectError -> {
                 _pickSubjectErrorState.value = event.value
             }
+            is TimetableEvent.SetTimetableList -> {
+                _timetableListState.value.copy(
+                    listData = event.listData
+                )
+            }
             is TimetableEvent.AddTimetable -> {
                 viewModelScope.launch(Dispatchers.IO) {
+                    removeAllErrors()
                     val day = getDay()
                     pickedSubjectState.value?.let { subject ->
                         val timetable = Timetable(0, day, hourPickerState.value, subject.id)
@@ -107,9 +127,13 @@ class TimetableViewModel @Inject constructor(
                         addTimetableItemUseCase.invoke(timetable = timetable).collect {
                             when (it) {
                                 is Resource.Error -> {
+                                    if (it.data == TimetableResult.EmptyDay) {
+                                        setDayErrorColor()
+                                    }
                                 }
                                 is Resource.Success -> {
-
+                                    onEvent(TimetableEvent.SetTimetableBottomSheet(false))
+                                    removeAllErrors()
                                 }
                             }
                         }
@@ -119,11 +143,29 @@ class TimetableViewModel @Inject constructor(
         }
     }
 
+    private fun getAllTimetableItems() = viewModelScope.launch {
+        getAllTimetableItemsUseCase.invoke().collect() {
+
+        }
+    }
+
     private fun dayColorChange(day: Int) = viewModelScope.launch {
         for (i in 0 until 5) {
             pickedDayColorState[i] = Color.LightGray
         }
         pickedDayColorState[day] = LightBlue
+    }
+
+    private fun setDayErrorColor() {
+        for (day in 0 until 5) {
+            pickedDayColorState[day] = Color.Red
+        }
+    }
+
+    private fun setAllDaysToDefaultColor() {
+        for (day in 0 until 5) {
+            pickedDayColorState[day] = Color.LightGray
+        }
     }
 
     private fun getDay(): Days {
@@ -148,5 +190,37 @@ class TimetableViewModel @Inject constructor(
             onError = {},
             data = { onEvent(TimetableEvent.OnSubjectDataReceived(listData = it)) }
         )
+    }
+
+    private fun removeAllErrors() {
+        _pickSubjectErrorState.value = Color.LightGray
+    }
+
+    private fun convertIntToDay(day: Int): Days {
+        return when (day) {
+            0 -> Days.MONDAY
+            1 -> Days.TUESDAY
+            2 -> Days.WEDNESDAY
+            3 -> Days.THURSDAY
+            else -> Days.FRIDAY
+        }
+    }
+
+    fun searchIfTimetableItemExists(hour: Int, intDay: Int): Timetable {
+        val day = convertIntToDay(day = intDay)
+        val timetable = Timetable(-1, day, hour, -1)
+        val item =
+            timetableListState.value.listData.filter { it -> (it.day == day) && (it.hour == hour) }
+
+        if (item.isEmpty()) {
+            return timetable
+        } else {
+            return timetable.copy(
+                id = item[0].id,
+                day = item[0].day,
+                hour = item[0].hour,
+                subjectId = item[0].subjectId
+            )
+        }
     }
 }

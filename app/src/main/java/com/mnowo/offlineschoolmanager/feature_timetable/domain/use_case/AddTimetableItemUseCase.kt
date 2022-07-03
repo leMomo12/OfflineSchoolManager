@@ -17,7 +17,7 @@ class AddTimetableItemUseCase @Inject constructor(
     operator fun invoke(timetable: Timetable) : Flow<Resource<TimetableResult>> = flow {
         when (val validation = ValidateTimetable.validateTimetable(timetable = timetable)) {
             is TimetableResult.EmptyDay -> {
-                emit(Resource.Error<TimetableResult>(message = ""))
+                emit(Resource.Error<TimetableResult>(message = "", data = TimetableResult.EmptyDay))
             }
             is TimetableResult.Success -> {
                 repository.addTimetableItem(timetable = timetable)

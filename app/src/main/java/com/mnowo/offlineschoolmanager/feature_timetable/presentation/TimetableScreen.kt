@@ -28,6 +28,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Days
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableBottomSheet
+import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableEvent
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableViewModel
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoBottomSheet
 import kotlinx.coroutines.flow.collectLatest
@@ -90,7 +91,8 @@ fun TimetableScreen(navController: NavController, viewModel: TimetableViewModel 
                     TimetableTitle(
                         fredoka = fredoka,
                         onOpenBottomSheet = { openSheet() },
-                        bottomSheetState = bottomState
+                        bottomSheetState = bottomState,
+                        viewModel = viewModel
                     )
                 }
                 item {
@@ -103,7 +105,8 @@ fun TimetableScreen(navController: NavController, viewModel: TimetableViewModel 
                     TimetableSubjectRow(
                         hour = it + 1,
                         scrollState = horizontalScrollState,
-                        fredoka = fredoka
+                        fredoka = fredoka,
+                        viewModel = viewModel
                     )
                 }
                 item {
@@ -121,7 +124,8 @@ fun TimetableScreen(navController: NavController, viewModel: TimetableViewModel 
 fun TimetableTitle(
     fredoka: FontFamily,
     onOpenBottomSheet: () -> Unit,
-    bottomSheetState: BottomSheetScaffoldState
+    bottomSheetState: BottomSheetScaffoldState,
+    viewModel: TimetableViewModel
 ) {
     Row(
         modifier = Modifier
@@ -136,7 +140,10 @@ fun TimetableTitle(
             fontSize = 32.sp
         )
         IconButton(
-            onClick = { onOpenBottomSheet() },
+            onClick = {
+                viewModel.onEvent(TimetableEvent.SetTimetableBottomSheet(true))
+                onOpenBottomSheet()
+            },
             enabled = bottomSheetState.bottomSheetState.isCollapsed
         ) {
             Icon(Icons.Default.Add, contentDescription = "", modifier = Modifier.scale(1.2f))
@@ -176,7 +183,12 @@ fun RowScope.TimetableDayText(text: String, fredoka: FontFamily, weight: Float) 
 }
 
 @Composable
-fun TimetableSubjectRow(hour: Int, scrollState: ScrollState, fredoka: FontFamily) {
+fun TimetableSubjectRow(
+    hour: Int,
+    scrollState: ScrollState,
+    fredoka: FontFamily,
+    viewModel: TimetableViewModel
+) {
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -184,12 +196,16 @@ fun TimetableSubjectRow(hour: Int, scrollState: ScrollState, fredoka: FontFamily
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TimetableHourText(hour = hour, weight = .1f, fredoka = fredoka)
-        TimetableSubjectItem(
-            color = Color.Green,
-            weight = .3f,
-            subject = "Mathematics",
-            room = "423"
-        )
+
+        for (day in 0 until 5) {
+            val timetable = viewModel.searchIfTimetableItemExists(hour = hour, intDay = day)
+            TimetableSubjectItem(
+                color = Color.LightGray,
+                weight = .3f,
+                subject = "Math",
+                room = "423"
+            )
+        }
         TimetableSubjectItem(color = Color.Yellow, weight = .3f, subject = "German", room = "4354")
         TimetableSubjectItem(color = Color.Cyan, weight = .3f, subject = "History", room = "654")
         TimetableSubjectItem(color = Color.Magenta, weight = .3f, subject = "English", room = "443")
