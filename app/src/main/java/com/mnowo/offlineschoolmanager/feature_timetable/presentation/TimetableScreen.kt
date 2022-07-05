@@ -21,6 +21,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
@@ -197,31 +200,29 @@ fun TimetableSubjectRow(
     ) {
         TimetableHourText(hour = hour, weight = .1f, fredoka = fredoka)
 
-        for (day in 0 until 5) {
-            val timetable = viewModel.searchIfTimetableItemExists(hour = hour, intDay = day)
-            TimetableSubjectItem(
-                color = Color.LightGray,
-                weight = .3f,
-                subject = "Math",
-                room = "423"
-            )
+        if (viewModel.timetableListState.value.listData.isNotEmpty()) {
+            for (day in 0 until 5) {
+                val timetable = viewModel.searchIfTimetableItemExists(hour = hour, intDay = day)
+                val subject = viewModel.searchForSubject(
+                    subjectId = timetable.subjectId,
+                    timetableId = timetable.id
+                )
+                TimetableSubjectItem(
+                    color = Color(subject.color.red, subject.color.green, subject.color.blue),
+                    weight = .3f,
+                    subject = subject.subjectName,
+                    room = subject.room ?: ""
+                )
+            }
+
         }
-        TimetableSubjectItem(color = Color.Yellow, weight = .3f, subject = "German", room = "4354")
-        TimetableSubjectItem(color = Color.Cyan, weight = .3f, subject = "History", room = "654")
-        TimetableSubjectItem(color = Color.Magenta, weight = .3f, subject = "English", room = "443")
-        TimetableSubjectItem(
-            color = Color.LightGray,
-            weight = .3f,
-            subject = "Economy",
-            room = "32"
-        )
     }
 }
 
 @Composable
 fun RowScope.TimetableHourText(hour: Int, weight: Float, fredoka: FontFamily) {
     Text(
-        text = "${hour.plus(6)}h",
+        text = hour.toString(),
         modifier = Modifier
             .weight(weight)
             .padding()

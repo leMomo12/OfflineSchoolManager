@@ -27,6 +27,7 @@ import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -38,11 +39,6 @@ class TimetableViewModel @Inject constructor(
     private val addTimetableItemUseCase: AddTimetableItemUseCase,
     private val getAllTimetableItemsUseCase: GetAllTimetableItemsUseCase
 ) : ViewModel() {
-
-    init {
-        getAllTimetableItems()
-        getAllSubjects()
-    }
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -87,6 +83,11 @@ class TimetableViewModel @Inject constructor(
         }
     }
 
+    init {
+        getAllTimetableItems()
+        getAllSubjects()
+    }
+
     fun onEvent(event: TimetableEvent) {
         when (event) {
             is TimetableEvent.OnHourPickerChanged -> {
@@ -113,7 +114,7 @@ class TimetableViewModel @Inject constructor(
                 _pickSubjectErrorState.value = event.value
             }
             is TimetableEvent.SetTimetableList -> {
-                _timetableListState.value.copy(
+                _timetableListState.value = timetableListState.value.copy(
                     listData = event.listData
                 )
             }
@@ -145,7 +146,13 @@ class TimetableViewModel @Inject constructor(
 
     private fun getAllTimetableItems() = viewModelScope.launch {
         getAllTimetableItemsUseCase.invoke().collect() {
-
+            when (it) {
+                is Resource.Success -> {
+                    it.data?.let { listData ->
+                        onEvent(TimetableEvent.SetTimetableList(listData))
+                    }
+                }
+            }
         }
     }
 
@@ -210,7 +217,8 @@ class TimetableViewModel @Inject constructor(
         val day = convertIntToDay(day = intDay)
         val timetable = Timetable(-1, day, hour, -1)
         val item =
-            timetableListState.value.listData.filter { it -> (it.day == day) && (it.hour == hour) }
+            timetableListState.value.listData.filter { (it.day == day) && (it.hour == hour) }
+
 
         if (item.isEmpty()) {
             return timetable
@@ -220,6 +228,35 @@ class TimetableViewModel @Inject constructor(
                 day = item[0].day,
                 hour = item[0].hour,
                 subjectId = item[0].subjectId
+            )
+        }
+    }
+
+    fun searchForSubject(subjectId: Int, timetableId: Int): Subject {
+        val subject = Subject(
+            -1,
+            "",
+            Color.LightGray.toArgb(),
+            "",
+            50.0,
+            50.0,
+            1.0
+        )
+        if (timetableId == -1) return subject
+
+        val item = subjectListState.value.listData.filter { it.id == subjectId }
+
+        if (item.isEmpty()) {
+            return subject
+        } else {
+            return subject.copy(
+                id = item[0].id,
+                subjectName = item[0].subjectName,
+                color = item[0].color,
+                room = item[0].room,
+                oralPercentage = item[0].oralPercentage,
+                writtenPercentage = item[0].writtenPercentage,
+                average = item[0].average
             )
         }
     }
