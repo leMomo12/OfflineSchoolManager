@@ -4,5 +4,6 @@ import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableEv
 
 sealed class TimetableResult {
     object EmptyDay : TimetableResult()
+    object AlreadyTaken : TimetableResult()
     object Success : TimetableResult()
 }

@@ -104,7 +104,7 @@ fun TimetableScreen(navController: NavController, viewModel: TimetableViewModel 
                 item {
                     TimetableDays(fredoka = fredoka, scrollState = horizontalScrollState)
                 }
-                items(11) {
+                items(12) {
                     TimetableSubjectRow(
                         hour = it + 1,
                         scrollState = horizontalScrollState,
@@ -215,6 +215,10 @@ fun TimetableSubjectRow(
                 )
             }
 
+        } else {
+            for (day in 0 until 5) {
+                TimetableSubjectItem(color = Color.LightGray, weight = .3f, subject = "", room = "")
+            }
         }
     }
 }

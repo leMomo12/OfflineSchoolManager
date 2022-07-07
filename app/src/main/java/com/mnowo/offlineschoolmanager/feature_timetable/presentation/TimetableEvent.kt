@@ -13,5 +13,6 @@ sealed class TimetableEvent {
     data class SetPickSubjectError(var value : Color) : TimetableEvent()
     data class SetTimetableBottomSheet(var value: Boolean) : TimetableEvent()
     data class SetTimetableList(var listData: List<Timetable>) : TimetableEvent()
+    data class SetAlreadyTakenErrorState(var value: Color) : TimetableEvent()
     object AddTimetable : TimetableEvent( )
 }

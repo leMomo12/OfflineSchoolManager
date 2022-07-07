@@ -14,10 +14,24 @@ class AddTimetableItemUseCase @Inject constructor(
     private val repository: TimetableRepository
 ) {
 
-    operator fun invoke(timetable: Timetable) : Flow<Resource<TimetableResult>> = flow {
-        when (val validation = ValidateTimetable.validateTimetable(timetable = timetable)) {
+    operator fun invoke(
+        timetable: Timetable,
+        timetableList: List<Timetable>
+    ): Flow<Resource<TimetableResult>> = flow {
+        when (ValidateTimetable.validateTimetable(
+            timetable = timetable,
+            timetableList = timetableList
+        )) {
             is TimetableResult.EmptyDay -> {
                 emit(Resource.Error<TimetableResult>(message = "", data = TimetableResult.EmptyDay))
+            }
+            is TimetableResult.AlreadyTaken -> {
+                emit(
+                    Resource.Error<TimetableResult>(
+                        message = "",
+                        data = TimetableResult.AlreadyTaken
+                    )
+                )
             }
             is TimetableResult.Success -> {
                 repository.addTimetableItem(timetable = timetable)

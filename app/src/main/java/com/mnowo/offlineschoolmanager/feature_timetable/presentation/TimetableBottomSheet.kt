@@ -1,6 +1,7 @@
 package com.mnowo.offlineschoolmanager.feature_timetable.presentation
 
 import android.util.Log.d
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.chargemap.compose.numberpicker.NumberPicker
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.SubjectPickerDialog
@@ -108,7 +111,6 @@ fun TimetableBottomSheet(
                     }
                 }
             }
-
             Divider(modifier = Modifier.padding(top = 40.dp), color = Color.LightGray, 1.dp)
 
             Column(
@@ -117,6 +119,17 @@ fun TimetableBottomSheet(
                     .padding(start = 30.dp, end = 30.dp, top = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                AnimatedVisibility(visible = viewModel.alreadyTakenErrorState.value == Color.Red) {
+                    Text(
+                        text = "Day and hour already taken. Pick a different hour or day",
+                        color = viewModel.alreadyTakenErrorState.value ,
+                        fontFamily = fredoka,
+                        textAlign = TextAlign.Center,
+                        fontSize = 15.sp
+                    )
+                    Spacer(modifier = Modifier.padding(vertical = 10.dp))
+                }
+
                 Text(text = "Pick day:", fontFamily = fredoka, fontWeight = FontWeight.Medium)
                 Row(
                     modifier = Modifier
@@ -203,7 +216,7 @@ fun TimetableBottomSheet(
                 NumberPicker(
                     value = viewModel.hourPickerState.value,
                     onValueChange = { viewModel.onEvent(TimetableEvent.OnHourPickerChanged(it)) },
-                    range = 1..13
+                    range = 1..12
                 )
             }
         }

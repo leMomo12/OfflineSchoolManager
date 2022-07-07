@@ -46,7 +46,7 @@ class TimetableViewModel @Inject constructor(
     private val _timetableListState = mutableStateOf<ListState<Timetable>>(ListState())
     val timetableListState: State<ListState<Timetable>> = _timetableListState
 
-    private val _hourPickerState = mutableStateOf<Int>(0)
+    private val _hourPickerState = mutableStateOf<Int>(1)
     val hourPickerState: State<Int> = _hourPickerState
 
     private val _subjectDialogState = mutableStateOf<Boolean>(false)
@@ -60,6 +60,9 @@ class TimetableViewModel @Inject constructor(
 
     private val _pickSubjectErrorState = mutableStateOf<Color>(Color.LightGray)
     val pickSubjectErrorState: State<Color> = _pickSubjectErrorState
+
+    private val _alreadyTakenErrorState = mutableStateOf<Color>(Color.White)
+    val alreadyTakenErrorState: State<Color> = _alreadyTakenErrorState
 
     private val _pickedDayColorState = mutableStateMapOf<Int, Color>(
         0 to Color.LightGray,
@@ -118,6 +121,9 @@ class TimetableViewModel @Inject constructor(
                     listData = event.listData
                 )
             }
+            is TimetableEvent.SetAlreadyTakenErrorState -> {
+                _alreadyTakenErrorState.value = event.value
+            }
             is TimetableEvent.AddTimetable -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     removeAllErrors()
@@ -125,11 +131,19 @@ class TimetableViewModel @Inject constructor(
                     pickedSubjectState.value?.let { subject ->
                         val timetable = Timetable(0, day, hourPickerState.value, subject.id)
 
-                        addTimetableItemUseCase.invoke(timetable = timetable).collect {
+                        addTimetableItemUseCase.invoke(
+                            timetable = timetable,
+                            timetableList = timetableListState.value.listData
+                        ).collect {
                             when (it) {
                                 is Resource.Error -> {
-                                    if (it.data == TimetableResult.EmptyDay) {
-                                        setDayErrorColor()
+                                    when (it.data) {
+                                        is TimetableResult.EmptyDay -> {
+                                            setDayErrorColor()
+                                        }
+                                        is TimetableResult.AlreadyTaken -> {
+                                            _alreadyTakenErrorState.value = Color.Red
+                                        }
                                     }
                                 }
                                 is Resource.Success -> {
@@ -201,6 +215,7 @@ class TimetableViewModel @Inject constructor(
 
     private fun removeAllErrors() {
         _pickSubjectErrorState.value = Color.LightGray
+        _alreadyTakenErrorState.value = Color.White
     }
 
     private fun convertIntToDay(day: Int): Days {
