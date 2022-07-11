@@ -18,10 +18,11 @@ sealed class TimetableEvent {
     data class SetEditState(var value: Boolean) : TimetableEvent()
     data class SetDeleteState(var value: Boolean) : TimetableEvent()
     data class SetDeleteAllItemsState(var value: Boolean) : TimetableEvent()
+    data class SetDeleteDialogState(var value: Boolean) : TimetableEvent()
     data class OnEditClicked(var timetableItem: Timetable) : TimetableEvent()
-    data class SetEditTimetableSpecificItem(var timetable: Timetable) : TimetableEvent()
+    data class SetTimetableSpecificItem(var timetable: Timetable) : TimetableEvent()
     object AddTimetable : TimetableEvent()
     object UpdateTimetableItem : TimetableEvent()
-    data class DeleteTimetableItem(var timetableItem: Timetable) : TimetableEvent()
+    object DeleteTimetableItem : TimetableEvent()
     object DeleteEntireTimetable : TimetableEvent()
 }

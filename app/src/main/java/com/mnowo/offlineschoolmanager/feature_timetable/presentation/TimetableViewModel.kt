@@ -91,8 +91,11 @@ class TimetableViewModel @Inject constructor(
     private val _deleteAllItemsState = mutableStateOf<Boolean>(false)
     val deleteAllItemsState: State<Boolean> = _deleteAllItemsState
 
-    private val _editTimetableSpecificItem = mutableStateOf<Timetable?>(null)
-    val editTimetableSpecificItem: State<Timetable?> = _editTimetableSpecificItem
+    private val _timetableSpecificItem = mutableStateOf<Timetable?>(null)
+    val timetableSpecificItem: State<Timetable?> = _timetableSpecificItem
+
+    private val _deleteDialogState = mutableStateOf<Boolean>(false)
+    val deleteDialogState: State<Boolean> = _deleteDialogState
 
     fun bottomNav(screen: Screen, currentScreen: Screen) {
         viewModelScope.launch {
@@ -154,6 +157,9 @@ class TimetableViewModel @Inject constructor(
             is TimetableEvent.SetDeleteAllItemsState -> {
                 _deleteAllItemsState.value = event.value
             }
+            is TimetableEvent.SetDeleteDialogState -> {
+                _deleteDialogState.value = event.value
+            }
             is TimetableEvent.OnEditClicked -> {
                 val subject = searchForSubject(
                     subjectId = event.timetableItem.subjectId,
@@ -164,8 +170,8 @@ class TimetableViewModel @Inject constructor(
                 onEvent(TimetableEvent.OnSubjectPicked(subject = subject))
                 onEvent(TimetableEvent.OnHourPickerChanged(hour = event.timetableItem.hour))
             }
-            is TimetableEvent.SetEditTimetableSpecificItem -> {
-                _editTimetableSpecificItem.value = event.timetable
+            is TimetableEvent.SetTimetableSpecificItem -> {
+                _timetableSpecificItem.value = event.timetable
             }
             is TimetableEvent.AddTimetable -> {
                 viewModelScope.launch {
@@ -186,7 +192,7 @@ class TimetableViewModel @Inject constructor(
             is TimetableEvent.UpdateTimetableItem -> {
                 viewModelScope.launch {
                     removeAllErrors()
-                    editTimetableSpecificItem.value?.let { timetable ->
+                    timetableSpecificItem.value?.let { timetable ->
                         pickedSubjectState.value?.let { subject ->
                             val day = getDay()
                             val timetableItem = Timetable(
@@ -206,7 +212,12 @@ class TimetableViewModel @Inject constructor(
                 }
             }
             is TimetableEvent.DeleteTimetableItem -> {
-
+                viewModelScope.launch {
+                    timetableSpecificItem.value?.let { timetable ->
+                        deleteTimetableItemUseCase.invoke(timetable = timetable)
+                        onEvent(TimetableEvent.SetDeleteDialogState(false))
+                    }
+                }
             }
             is TimetableEvent.DeleteEntireTimetable -> {
                 viewModelScope.launch(Dispatchers.IO) {

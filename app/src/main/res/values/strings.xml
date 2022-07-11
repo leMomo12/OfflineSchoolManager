@@ -45,4 +45,5 @@
     <string name="w">W</string>
     <string name="th">TH</string>
     <string name="f">F</string>
+    <string name="sureToDeleteAllTimetableItems">Sure to delete all timetable items?</string>
 </resources>

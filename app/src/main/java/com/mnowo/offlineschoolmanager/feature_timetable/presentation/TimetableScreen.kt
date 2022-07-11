@@ -136,7 +136,15 @@ fun TimetableScreen(navController: NavController, viewModel: TimetableViewModel 
                         )
                     },
                     onDeleteClicked = { viewModel.onEvent(TimetableEvent.DeleteEntireTimetable) },
-                    title = "Sure to delete all timetable items?",
+                    title = stringResource(R.string.sureToDeleteAllTimetableItems),
+                    text = stringResource(id = R.string.thisChangeCannotBeReset)
+                )
+            }
+            if (viewModel.deleteDialogState.value) {
+                DeleteDialog(
+                    onDismissRequest = { viewModel.onEvent(TimetableEvent.SetDeleteDialogState(false)) },
+                    onDeleteClicked = { viewModel.onEvent(TimetableEvent.DeleteTimetableItem) },
+                    title = stringResource(id = R.string.sureToDelete),
                     text = stringResource(id = R.string.thisChangeCannotBeReset)
                 )
             }
@@ -430,7 +438,7 @@ fun RowScope.TimetableSubjectItem(
                         viewModel.editState.value && color != Color.LightGray -> {
                             IconButton(onClick = {
                                 viewModel.onEvent(
-                                    TimetableEvent.SetEditTimetableSpecificItem(
+                                    TimetableEvent.SetTimetableSpecificItem(
                                         timetable = timetable
                                     )
                                 )
@@ -451,7 +459,17 @@ fun RowScope.TimetableSubjectItem(
                             }
                         }
                         viewModel.deleteState.value && color != Color.LightGray -> {
-                            IconButton(onClick = { }) {
+                            IconButton(onClick = {
+
+                                viewModel.onEvent(
+                                    TimetableEvent.SetTimetableSpecificItem(timetable = timetable)
+                                )
+
+                                viewModel.onEvent(
+                                    TimetableEvent.SetDeleteDialogState(true)
+                                )
+
+                            }) {
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = "",
