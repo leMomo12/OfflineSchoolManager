@@ -160,9 +160,10 @@ fun AddGradeBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 20.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = stringResource(id = R.string.written), fontFamily = fredoka)
                     RadioButton(selected = viewModel.isWrittenState.value, onClick = {
                         if (!viewModel.isWrittenState.value) {
@@ -170,7 +171,7 @@ fun AddGradeBottomSheet(
                         }
                     })
                 }
-                Row {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = stringResource(id = R.string.Orally),
                         fontFamily = fredoka,

@@ -32,17 +32,22 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.mo
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 
 @Composable
-fun DeleteDialog(onDismissRequest: () -> Unit, onDeleteClicked: () -> Unit) {
+fun DeleteDialog(
+    onDismissRequest: () -> Unit,
+    onDeleteClicked: () -> Unit,
+    title: String,
+    text: String
+) {
     AlertDialog(
         onDismissRequest = {
             onDismissRequest()
         },
         title = {
-            Text(text = stringResource(R.string.sureToDelete))
+            Text(text = title)
         },
         text = {
             Column() {
-                Text(text = stringResource(R.string.thisChangeCannotBeReset))
+                Text(text = text)
             }
         },
         buttons = {

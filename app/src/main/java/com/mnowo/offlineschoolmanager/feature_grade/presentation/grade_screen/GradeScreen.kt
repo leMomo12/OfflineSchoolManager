@@ -138,7 +138,9 @@ fun GradeScreen(
             if (viewModel.deleteDialogState.value) {
                 DeleteDialog(
                     onDismissRequest = { viewModel.setDeleteDialogState(false) },
-                    onDeleteClicked = { viewModel.onEvent(GradeEvent.DeleteSpecificGrade) }
+                    onDeleteClicked = { viewModel.onEvent(GradeEvent.DeleteSpecificGrade) },
+                    title = stringResource(id = R.string.sureToDelete),
+                    text = stringResource(id = R.string.thisChangeCannotBeReset)
                 )
             }
         }

@@ -18,5 +18,16 @@ class TimetableRepositoryImpl @Inject constructor(
         return timetableDao.getAllTimetableItems()
     }
 
+    override suspend fun updateTimetableItem(timetable: Timetable) {
+        return timetableDao.updateTimetableItem(timetable = timetable)
+    }
+
+    override suspend fun deleteTimetableItem(timetable: Timetable) {
+        return timetableDao.deleteTimetableItem(timetable = timetable)
+    }
+
+    override suspend fun deleteEntireTimetable() {
+        return timetableDao.deleteEntireTimetable()
+    }
 
 }

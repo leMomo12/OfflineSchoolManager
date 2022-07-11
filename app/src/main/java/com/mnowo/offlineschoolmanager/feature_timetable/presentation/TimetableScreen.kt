@@ -1,24 +1,29 @@
 package com.mnowo.offlineschoolmanager
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Filter
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.blue
@@ -28,12 +33,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.DeleteDialog
+import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Days
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableBottomSheet
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableEvent
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableViewModel
-import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoBottomSheet
+import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -109,12 +117,28 @@ fun TimetableScreen(navController: NavController, viewModel: TimetableViewModel 
                         hour = it + 1,
                         scrollState = horizontalScrollState,
                         fredoka = fredoka,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        openSheet = { openSheet() }
                     )
                 }
                 item {
                     Spacer(modifier = Modifier.padding(vertical = 50.dp))
                 }
+            }
+
+            if (viewModel.deleteAllItemsState.value) {
+                DeleteDialog(
+                    onDismissRequest = {
+                        viewModel.onEvent(
+                            TimetableEvent.SetDeleteAllItemsState(
+                                false
+                            )
+                        )
+                    },
+                    onDeleteClicked = { viewModel.onEvent(TimetableEvent.DeleteEntireTimetable) },
+                    title = "Sure to delete all timetable items?",
+                    text = stringResource(id = R.string.thisChangeCannotBeReset)
+                )
             }
         }
 
@@ -142,14 +166,106 @@ fun TimetableTitle(
             fontWeight = FontWeight.Medium,
             fontSize = 32.sp
         )
-        IconButton(
-            onClick = {
-                viewModel.onEvent(TimetableEvent.SetTimetableBottomSheet(true))
-                onOpenBottomSheet()
-            },
-            enabled = bottomSheetState.bottomSheetState.isCollapsed
+        Row(
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.Add, contentDescription = "", modifier = Modifier.scale(1.2f))
+            if (!viewModel.editState.value && !viewModel.deleteState.value && !viewModel.deleteAllItemsState.value) {
+                IconButton(
+                    onClick = {
+                        viewModel.onEvent(TimetableEvent.SetTimetableBottomSheet(true))
+                        onOpenBottomSheet()
+                    },
+                    enabled = bottomSheetState.bottomSheetState.isCollapsed
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "",
+                        modifier = Modifier.scale(1.2f)
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        viewModel.onEvent(TimetableEvent.SetDropdownMenuState(true))
+                    },
+                    enabled = bottomSheetState.bottomSheetState.isCollapsed
+                ) {
+                    Icon(Icons.Default.MoreVert, contentDescription = "")
+                }
+
+                DropdownMenu(
+                    expanded = viewModel.dropdownMenuState.value,
+                    onDismissRequest = {
+                        viewModel.onEvent(TimetableEvent.SetDropdownMenuState(false))
+                    },
+                    modifier = Modifier
+                        .clip(
+                            RoundedCornerShape(8.dp)
+                        )
+                ) {
+                    DropdownMenuItem(
+                        onClick = { viewModel.onEvent(TimetableEvent.SetEditState(true)) },
+                        enabled = bottomSheetState.bottomSheetState.isCollapsed
+                    ) {
+                        Row {
+                            Icon(Icons.Default.Edit, contentDescription = "")
+                            Text(
+                                text = stringResource(id = R.string.edit),
+                                fontFamily = fredoka,
+                                modifier = Modifier
+                                    .padding(start = 5.dp)
+                            )
+                        }
+                    }
+                    DropdownMenuItem(
+                        onClick = { viewModel.onEvent(TimetableEvent.SetDeleteState(true)) },
+                        enabled = bottomSheetState.bottomSheetState.isCollapsed
+                    ) {
+                        Row {
+                            Icon(Icons.Default.Delete, contentDescription = "")
+                            Text(
+                                text = stringResource(id = R.string.delete),
+                                fontFamily = fredoka,
+                                modifier = Modifier
+                                    .padding(start = 5.dp)
+                            )
+                        }
+                    }
+                    DropdownMenuItem(
+                        onClick = { viewModel.onEvent(TimetableEvent.SetDeleteAllItemsState(true)) },
+                        enabled = bottomSheetState.bottomSheetState.isCollapsed
+                    ) {
+                        Row {
+                            Icon(Icons.Default.DeleteForever, contentDescription = "")
+                            Text(
+                                text = "Delete all timetable items",
+                                fontFamily = fredoka,
+                                modifier = Modifier
+                                    .padding(start = 5.dp)
+                            )
+                        }
+                    }
+                }
+            } else {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.onEvent(TimetableEvent.SetEditState(false))
+                        viewModel.onEvent(TimetableEvent.SetDeleteState(false))
+                        viewModel.onEvent(TimetableEvent.SetDeleteAllItemsState(false))
+                        viewModel.onEvent(TimetableEvent.SetDropdownMenuState(false))
+                    },
+                    border = BorderStroke(1.4.dp, color = LightBlue),
+                    shape = RoundedCornerShape(32.dp),
+                    modifier = Modifier
+                        .padding(end = 5.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        fontFamily = fredoka,
+                        color = LightBlue
+                    )
+                }
+            }
         }
     }
 }
@@ -190,7 +306,8 @@ fun TimetableSubjectRow(
     hour: Int,
     scrollState: ScrollState,
     fredoka: FontFamily,
-    viewModel: TimetableViewModel
+    viewModel: TimetableViewModel,
+    openSheet: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -211,13 +328,26 @@ fun TimetableSubjectRow(
                     color = Color(subject.color.red, subject.color.green, subject.color.blue),
                     weight = .3f,
                     subject = subject.subjectName,
-                    room = subject.room ?: ""
+                    room = subject.room ?: "",
+                    timetable = timetable,
+                    viewModel = viewModel,
+                    openSheet = { openSheet() },
+                    fredoka = fredoka
                 )
             }
 
         } else {
             for (day in 0 until 5) {
-                TimetableSubjectItem(color = Color.LightGray, weight = .3f, subject = "", room = "")
+                TimetableSubjectItem(
+                    color = Color.LightGray,
+                    weight = .3f,
+                    subject = "",
+                    room = "",
+                    timetable = Timetable(-1, Days.EXCEPTION, 0, -1),
+                    viewModel = viewModel,
+                    openSheet = { openSheet() },
+                    fredoka = fredoka
+                )
             }
         }
     }
@@ -239,7 +369,16 @@ fun RowScope.TimetableHourText(hour: Int, weight: Float, fredoka: FontFamily) {
 }
 
 @Composable
-fun RowScope.TimetableSubjectItem(color: Color, weight: Float, subject: String, room: String) {
+fun RowScope.TimetableSubjectItem(
+    color: Color,
+    weight: Float,
+    subject: String,
+    room: String,
+    timetable: Timetable,
+    viewModel: TimetableViewModel,
+    openSheet: () -> Unit,
+    fredoka: FontFamily
+) {
     Card(
         backgroundColor = color,
         shape = RoundedCornerShape(16.dp),
@@ -256,22 +395,72 @@ fun RowScope.TimetableSubjectItem(color: Color, weight: Float, subject: String, 
                     text = subject,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(5.dp),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontFamily = fredoka,
                 )
-                Text(
-                    text = room,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.White,
+
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp),
-                    textAlign = TextAlign.Center
-                )
+                        .animateContentSize(
+                            animationSpec = tween(
+                                durationMillis = 300,
+                                easing = LinearOutSlowInEasing
+                            )
+                        ),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    when {
+                        (!viewModel.deleteState.value && !viewModel.editState.value) || (color == Color.LightGray) -> {
+                            Text(
+                                text = room,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = Color.Black,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp),
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.Light
+                            )
+                        }
+                        viewModel.editState.value && color != Color.LightGray -> {
+                            IconButton(onClick = {
+                                viewModel.onEvent(
+                                    TimetableEvent.SetEditTimetableSpecificItem(
+                                        timetable = timetable
+                                    )
+                                )
+
+                                viewModel.onEvent(
+                                    TimetableEvent.OnEditClicked(
+                                        timetableItem = timetable
+                                    )
+                                )
+
+                                openSheet()
+                            }) {
+                                Icon(
+                                    Icons.Default.Edit,
+                                    contentDescription = "",
+                                    modifier = Modifier.scale(0.9f)
+                                )
+                            }
+                        }
+                        viewModel.deleteState.value && color != Color.LightGray -> {
+                            IconButton(onClick = { }) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "",
+                                    modifier = Modifier.scale(0.9f)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

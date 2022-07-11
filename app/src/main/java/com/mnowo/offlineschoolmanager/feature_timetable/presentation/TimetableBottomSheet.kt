@@ -100,12 +100,20 @@ fun TimetableBottomSheet(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     OutlinedButton(
                         onClick = {
-                            viewModel.onEvent(TimetableEvent.AddTimetable)
+                            if (viewModel.editState.value) {
+                                viewModel.onEvent(TimetableEvent.UpdateTimetableItem)
+                            } else {
+                                viewModel.onEvent(TimetableEvent.AddTimetable)
+                            }
                         },
                         border = BorderStroke(1.dp, color = LightBlue)
                     ) {
                         Text(
-                            text = stringResource(id = R.string.add),
+                            text = if (viewModel.editState.value) {
+                                stringResource(id = R.string.save)
+                            } else {
+                                stringResource(id = R.string.add)
+                            },
                             color = LightBlue
                         )
                     }
@@ -121,8 +129,8 @@ fun TimetableBottomSheet(
             ) {
                 AnimatedVisibility(visible = viewModel.alreadyTakenErrorState.value == Color.Red) {
                     Text(
-                        text = "Day and hour already taken. Pick a different hour or day",
-                        color = viewModel.alreadyTakenErrorState.value ,
+                        text = stringResource(R.string.dayAndHourAlredyTaken),
+                        color = viewModel.alreadyTakenErrorState.value,
                         fontFamily = fredoka,
                         textAlign = TextAlign.Center,
                         fontSize = 15.sp
@@ -130,7 +138,7 @@ fun TimetableBottomSheet(
                     Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 }
 
-                Text(text = "Pick day:", fontFamily = fredoka, fontWeight = FontWeight.Medium)
+                Text(text = stringResource(R.string.pickDay), fontFamily = fredoka, fontWeight = FontWeight.Medium)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -139,35 +147,65 @@ fun TimetableBottomSheet(
 
 
                     TimetableOutlinedDayButton(
-                        text = "M",
+                        text = stringResource(R.string.m),
                         borderColor = viewModel.pickedDayColorState.getValue(0),
                         fredoka = fredoka,
-                        onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 0)) }
+                        onClick = {
+                            viewModel.onEvent(
+                                TimetableEvent.OnPickedDayColorStateChanged(
+                                    day = 0
+                                )
+                            )
+                        }
                     )
 
                     TimetableOutlinedDayButton(
-                        text = "T",
+                        text = stringResource(R.string.t),
                         borderColor = viewModel.pickedDayColorState.getValue(1),
                         fredoka = fredoka,
-                        onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 1)) }
+                        onClick = {
+                            viewModel.onEvent(
+                                TimetableEvent.OnPickedDayColorStateChanged(
+                                    day = 1
+                                )
+                            )
+                        }
                     )
                     TimetableOutlinedDayButton(
-                        text = "W",
+                        text = stringResource(R.string.w),
                         borderColor = viewModel.pickedDayColorState.getValue(2),
                         fredoka = fredoka,
-                        onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 2)) }
+                        onClick = {
+                            viewModel.onEvent(
+                                TimetableEvent.OnPickedDayColorStateChanged(
+                                    day = 2
+                                )
+                            )
+                        }
                     )
                     TimetableOutlinedDayButton(
-                        text = "TH",
+                        text = stringResource(R.string.th),
                         borderColor = viewModel.pickedDayColorState.getValue(3),
                         fredoka = fredoka,
-                        onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 3)) }
+                        onClick = {
+                            viewModel.onEvent(
+                                TimetableEvent.OnPickedDayColorStateChanged(
+                                    day = 3
+                                )
+                            )
+                        }
                     )
                     TimetableOutlinedDayButton(
-                        text = "F",
+                        text = stringResource(R.string.f),
                         borderColor = viewModel.pickedDayColorState.getValue(4),
                         fredoka = fredoka,
-                        onClick = { viewModel.onEvent(TimetableEvent.OnPickedDayColorStateChanged(day = 4)) }
+                        onClick = {
+                            viewModel.onEvent(
+                                TimetableEvent.OnPickedDayColorStateChanged(
+                                    day = 4
+                                )
+                            )
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
@@ -232,7 +270,6 @@ fun TimetableOutlinedDayButton(
     fredoka: FontFamily,
     onClick: () -> Unit
 ) {
-    d("BorderColor", "Color: $borderColor")
     OutlinedButton(
         onClick = { onClick() },
         shape = CircleShape,

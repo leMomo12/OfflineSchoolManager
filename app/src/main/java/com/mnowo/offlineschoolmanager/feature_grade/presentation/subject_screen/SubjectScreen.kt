@@ -159,7 +159,9 @@ fun SubjectScreen(
                     onDismissRequest = { viewModel.setDeleteDialogState(false) },
                     onDeleteClicked = {
                         viewModel.onEvent(SubjectEvent.DeleteSubject)
-                    }
+                    },
+                    title = stringResource(id = R.string.sureToDelete),
+                    text = stringResource(id = R.string.thisChangeCannotBeReset)
                 )
             }
         }

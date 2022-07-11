@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_grade.data.local
 
+import android.os.FileObserver.DELETE
 import androidx.room.*
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
@@ -48,4 +49,9 @@ interface GradeDao {
     @Query("DELETE FROM ${Constants.GRADE_TABLE} WHERE subjectId = :subjectId")
     suspend fun deleteAllSubjectSpecificGrades(subjectId: Int)
 
+    @Query("DELETE FROM ${Constants.TIMETABLE_TABLE} WHERE subjectId = :subjectId")
+    suspend fun deleteAllSubjectsFromTimetable(subjectId: Int)
+
+    @Query("DELETE FROM ${Constants.TODO_TABLE} WHERE subjectId = :subjectId")
+    suspend fun deleteAllSubjectsFromToDo(subjectId: Int)
 }

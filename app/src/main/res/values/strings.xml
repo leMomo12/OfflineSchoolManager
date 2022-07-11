@@ -38,4 +38,11 @@
     <string name="yes">Yes</string>
     <string name="sureToDelete">Sure to delete?</string>
     <string name="thisChangeCannotBeReset">This change cannot be reset</string>
+    <string name="dayAndHourAlredyTaken">Day and hour already taken. Pick a different hour or day</string>
+    <string name="pickDay">Pick day:</string>
+    <string name="m">M</string>
+    <string name="t">T</string>
+    <string name="w">W</string>
+    <string name="th">TH</string>
+    <string name="f">F</string>
 </resources>

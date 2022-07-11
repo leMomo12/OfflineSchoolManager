@@ -8,4 +8,10 @@ interface TimetableRepository {
     fun addTimetableItem(timetable: Timetable)
 
     fun getAllTimetableItems() : Flow<List<Timetable>>
+
+    suspend fun updateTimetableItem(timetable: Timetable)
+
+    suspend fun deleteTimetableItem(timetable: Timetable)
+
+    suspend fun deleteEntireTimetable()
 }

@@ -1,6 +1,7 @@
 package com.mnowo.offlineschoolmanager.feature_timetable.presentation
 
 import android.util.Log.d
+import android.util.Log.e
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -21,8 +22,7 @@ import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjec
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Days
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.TimetableResult
-import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.AddTimetableItemUseCase
-import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.GetAllTimetableItemsUseCase
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.*
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +37,10 @@ import javax.inject.Inject
 class TimetableViewModel @Inject constructor(
     private val helper: Helper,
     private val addTimetableItemUseCase: AddTimetableItemUseCase,
-    private val getAllTimetableItemsUseCase: GetAllTimetableItemsUseCase
+    private val getAllTimetableItemsUseCase: GetAllTimetableItemsUseCase,
+    private val updateTimetableItemUseCase: UpdateTimetableItemUseCase,
+    private val deleteTimetableItemUseCase: DeleteTimetableItemUseCase,
+    private val deleteEntireTimetableUseCase: DeleteEntireTimetableUseCase
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -75,6 +78,21 @@ class TimetableViewModel @Inject constructor(
 
     private val _timetableBottomSheetState = mutableStateOf<Boolean>(false)
     val timetableBottomSheetState: State<Boolean> = _timetableBottomSheetState
+
+    private val _dropdownMenuState = mutableStateOf<Boolean>(false)
+    val dropdownMenuState: State<Boolean> = _dropdownMenuState
+
+    private val _editState = mutableStateOf<Boolean>(false)
+    val editState: State<Boolean> = _editState
+
+    private val _deleteState = mutableStateOf<Boolean>(false)
+    val deleteState: State<Boolean> = _deleteState
+
+    private val _deleteAllItemsState = mutableStateOf<Boolean>(false)
+    val deleteAllItemsState: State<Boolean> = _deleteAllItemsState
+
+    private val _editTimetableSpecificItem = mutableStateOf<Timetable?>(null)
+    val editTimetableSpecificItem: State<Timetable?> = _editTimetableSpecificItem
 
     fun bottomNav(screen: Screen, currentScreen: Screen) {
         viewModelScope.launch {
@@ -124,8 +142,33 @@ class TimetableViewModel @Inject constructor(
             is TimetableEvent.SetAlreadyTakenErrorState -> {
                 _alreadyTakenErrorState.value = event.value
             }
+            is TimetableEvent.SetDropdownMenuState -> {
+                _dropdownMenuState.value = event.value
+            }
+            is TimetableEvent.SetEditState -> {
+                _editState.value = event.value
+            }
+            is TimetableEvent.SetDeleteState -> {
+                _deleteState.value = event.value
+            }
+            is TimetableEvent.SetDeleteAllItemsState -> {
+                _deleteAllItemsState.value = event.value
+            }
+            is TimetableEvent.OnEditClicked -> {
+                val subject = searchForSubject(
+                    subjectId = event.timetableItem.subjectId,
+                    timetableId = event.timetableItem.id
+                )
+                val intDay = convertDayToInt(day = event.timetableItem.day)
+                dayColorChange(day = intDay)
+                onEvent(TimetableEvent.OnSubjectPicked(subject = subject))
+                onEvent(TimetableEvent.OnHourPickerChanged(hour = event.timetableItem.hour))
+            }
+            is TimetableEvent.SetEditTimetableSpecificItem -> {
+                _editTimetableSpecificItem.value = event.timetable
+            }
             is TimetableEvent.AddTimetable -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     removeAllErrors()
                     val day = getDay()
                     pickedSubjectState.value?.let { subject ->
@@ -135,25 +178,60 @@ class TimetableViewModel @Inject constructor(
                             timetable = timetable,
                             timetableList = timetableListState.value.listData
                         ).collect {
-                            when (it) {
-                                is Resource.Error -> {
-                                    when (it.data) {
-                                        is TimetableResult.EmptyDay -> {
-                                            setDayErrorColor()
-                                        }
-                                        is TimetableResult.AlreadyTaken -> {
-                                            _alreadyTakenErrorState.value = Color.Red
-                                        }
-                                    }
-                                }
-                                is Resource.Success -> {
-                                    onEvent(TimetableEvent.SetTimetableBottomSheet(false))
-                                    removeAllErrors()
-                                }
-                            }
+                            addOrEditTimetableEventResult(result = it)
                         }
                     } ?: onEvent(TimetableEvent.SetPickSubjectError(value = Color.Red))
                 }
+            }
+            is TimetableEvent.UpdateTimetableItem -> {
+                viewModelScope.launch {
+                    removeAllErrors()
+                    editTimetableSpecificItem.value?.let { timetable ->
+                        pickedSubjectState.value?.let { subject ->
+                            val day = getDay()
+                            val timetableItem = Timetable(
+                                id = timetable.id,
+                                day = day,
+                                hour = hourPickerState.value,
+                                subjectId = subject.id
+                            )
+                            updateTimetableItemUseCase.invoke(
+                                timetable = timetableItem,
+                                timetableList = timetableListState.value.listData
+                            ).collect() {
+                                addOrEditTimetableEventResult(result = it)
+                            }
+                        } ?: onEvent(TimetableEvent.SetPickSubjectError(Color.Red))
+                    }
+                }
+            }
+            is TimetableEvent.DeleteTimetableItem -> {
+
+            }
+            is TimetableEvent.DeleteEntireTimetable -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    deleteEntireTimetableUseCase.invoke()
+                }
+            }
+        }
+    }
+
+    private fun addOrEditTimetableEventResult(result: Resource<TimetableResult>) {
+        when (result) {
+            is Resource.Error -> {
+                when (result.data) {
+                    is TimetableResult.EmptyDay -> {
+                        setDayErrorColor()
+                    }
+                    is TimetableResult.AlreadyTaken -> {
+                        _alreadyTakenErrorState.value = Color.Red
+                    }
+                }
+            }
+            is Resource.Success -> {
+                d("Timetable", "success ")
+                onEvent(TimetableEvent.SetTimetableBottomSheet(false))
+                removeAllErrors()
             }
         }
     }
@@ -180,12 +258,6 @@ class TimetableViewModel @Inject constructor(
     private fun setDayErrorColor() {
         for (day in 0 until 5) {
             pickedDayColorState[day] = Color.Red
-        }
-    }
-
-    private fun setAllDaysToDefaultColor() {
-        for (day in 0 until 5) {
-            pickedDayColorState[day] = Color.LightGray
         }
     }
 
@@ -225,6 +297,17 @@ class TimetableViewModel @Inject constructor(
             2 -> Days.WEDNESDAY
             3 -> Days.THURSDAY
             else -> Days.FRIDAY
+        }
+    }
+
+    private fun convertDayToInt(day: Days): Int {
+        return when (day) {
+            Days.MONDAY -> 0
+            Days.TUESDAY -> 1
+            Days.WEDNESDAY -> 2
+            Days.THURSDAY -> 3
+            Days.FRIDAY -> 4
+            else -> 5
         }
     }
 

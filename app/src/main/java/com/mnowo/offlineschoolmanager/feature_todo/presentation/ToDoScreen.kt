@@ -265,7 +265,10 @@ fun ToDoStaggeredGrid(
                     }, onDeleteClicked = {
                         d("ToDo", "onDeleteClicked: ${viewModel.deleteToDoIdState.value}")
                         viewModel.onEvent(ToDoEvent.DeleteToDo)
-                    })
+                    },
+                        title = stringResource(id = R.string.sureToDelete),
+                        text = stringResource(id = R.string.thisChangeCannotBeReset)
+                    )
                 }
 
                 val colorState = remember {

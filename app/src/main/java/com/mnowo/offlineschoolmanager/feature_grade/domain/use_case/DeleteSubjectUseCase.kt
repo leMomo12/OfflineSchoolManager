@@ -14,6 +14,8 @@ class DeleteSubjectUseCase @Inject constructor(
     operator fun invoke(subjectId: Int) = flow<Boolean> {
         gradeRepository.deleteSubject(subjectId = subjectId)
         gradeRepository.deleteAllSubjectSpecificGrades(subjectId = subjectId)
+        gradeRepository.deleteAllSubjectsFromTimetable(subjectId = subjectId)
+        gradeRepository.deleteAllSubjectsFromToDo(subjectId = subjectId)
         emit(true)
     }.flowOn(Dispatchers.IO)
 }
