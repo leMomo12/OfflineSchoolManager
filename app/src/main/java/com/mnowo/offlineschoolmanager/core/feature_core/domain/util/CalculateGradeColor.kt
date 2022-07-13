@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util
+package com.mnowo.offlineschoolmanager.core.feature_core.domain.util
 
 import androidx.compose.ui.graphics.toArgb
 import com.mnowo.offlineschoolmanager.core.theme.*

@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -331,7 +332,8 @@ fun ToDoStaggeredGrid(
                                 bottom = 8.dp
                             ),
                             fontFamily = fredoka,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None
                         )
                         Text(
                             text = item.description,

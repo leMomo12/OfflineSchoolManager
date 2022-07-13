@@ -6,8 +6,10 @@ import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.TimetableR
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.repository.TimetableRepository
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.util.ValidateTimetable
 import com.mnowo.offlineschoolmanager.feature_timetable.presentation.TimetableEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class AddTimetableItemUseCase @Inject constructor(
@@ -38,5 +40,5 @@ class AddTimetableItemUseCase @Inject constructor(
                 emit(Resource.Success<TimetableResult>(data = TimetableResult.Success))
             }
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -26,7 +27,9 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.WindowInfo
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
+import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -39,6 +42,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
     val listState = rememberLazyListState()
 
     LaunchedEffect(key1 = true) {
+        viewModel.getStartingInformation()
         viewModel.eventFlow.collectLatest {
             when (it) {
                 is UiEvent.Navigate -> {
@@ -66,15 +70,23 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
 
             LazyColumn(state = listState) {
                 item {
-                    HomeScreenTitle(windowInfo = windowInfo, fredoka = fredoka)
+                    HomeScreenTitle(
+                        windowInfo = windowInfo,
+                        fredoka = fredoka,
+                        viewModel = viewModel
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.padding(vertical = 15.dp))
-                    HomeGradeAverage(windowInfo = windowInfo)
+                    HomeGradeAverage(
+                        windowInfo = windowInfo,
+                        viewModel = viewModel,
+                        fredoka = fredoka
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.padding(15.dp))
-                    HomeTodayTimetable(fredoka = fredoka, windowInfo = windowInfo)
+                    HomeTodayTimetable(fredoka = fredoka, windowInfo = windowInfo, viewModel = viewModel)
                 }
                 item {
                     Spacer(modifier = Modifier.padding(vertical = 15.dp))
@@ -83,7 +95,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                 items(3) {
                     UpcomingExamsItem(fredoka = fredoka, windowInfo = windowInfo)
                 }
-                item { 
+                item {
                     Spacer(modifier = Modifier.padding(60.dp))
                 }
             }
@@ -93,56 +105,39 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
 }
 
 @Composable
-fun HomeScreenTitle(windowInfo: WindowInfo, fredoka: FontFamily) {
-    if (windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact) {
-        Spacer(modifier = Modifier.padding(vertical = 10.dp))
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Overview",
-                fontFamily = fredoka,
-                fontWeight = FontWeight.Medium,
-                fontSize = 40.sp
-            )
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                IconButton(onClick = {  }) {
-                    Icon(Icons.Default.Notifications, contentDescription = "")
-                }
-                IconButton(onClick = { }) {
-                    Icon(Icons.Default.Settings, contentDescription = "")
-                }
-            }
-        }
+fun HomeScreenTitle(windowInfo: WindowInfo, fredoka: FontFamily, viewModel: HomeViewModel) {
+    Spacer(modifier = Modifier.padding(vertical = 10.dp))
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(
-            text = "10 December 2022",
-            fontFamily = fredoka,
-            fontWeight = FontWeight.Normal,
-            fontSize = 16.sp,
-            color = Color.Gray
-        )
-    } else {
-        Spacer(modifier = Modifier.padding(vertical = 16.dp))
-        Text(
-            text = "Dashboard",
+            text = "Overview",
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
-            fontSize = 64.sp
+            fontSize = 40.sp
         )
-        Text(
-            text = "10 December 2022",
-            fontFamily = fredoka,
-            fontWeight = FontWeight.Normal,
-            fontSize = 26.sp,
-            color = Color.Gray
-        )
+        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+            IconButton(onClick = { }) {
+                Icon(Icons.Default.Notifications, contentDescription = "")
+            }
+            IconButton(onClick = { }) {
+                Icon(Icons.Default.Settings, contentDescription = "")
+            }
+        }
     }
+    Text(
+        text = viewModel.currentTimeState.value,
+        fontFamily = fredoka,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        color = Color.Gray
+    )
 }
 
 @Composable
-fun HomeGradeAverage(windowInfo: WindowInfo) {
+fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: FontFamily) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -150,7 +145,7 @@ fun HomeGradeAverage(windowInfo: WindowInfo) {
     ) {
         Card(
             shape = RoundedCornerShape(180.dp),
-            border = BorderStroke(2.dp, color = Color.Green),
+            border = BorderStroke(2.5.dp, color = viewModel.gradeColorState.value),
             modifier = Modifier
                 .size(windowInfo.screenWidth / 2 - 20.dp),
             elevation = 0.dp
@@ -160,11 +155,11 @@ fun HomeGradeAverage(windowInfo: WindowInfo) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "2.1",
+                    text = viewModel.averageState.value.toString(),
                     textAlign = TextAlign.Center,
                     fontSize = 45.sp,
-                    fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.SemiBold
+                    fontFamily = fredoka,
+                    fontWeight = FontWeight.Medium
                 )
             }
         }
@@ -172,7 +167,7 @@ fun HomeGradeAverage(windowInfo: WindowInfo) {
 }
 
 @Composable
-fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo) {
+fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: HomeViewModel) {
     Text(
         text = "Today's timetable",
         fontFamily = fredoka,
@@ -181,10 +176,9 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo) {
     )
     Spacer(modifier = Modifier.padding(vertical = 5.dp))
     LazyRow {
-        items(6) {
+        items(items = viewModel.timetableListState.value.listData) {
             HomeTimetableRow(
-                windowInfo = windowInfo,
-                hour = it,
+                timetable = it,
                 fredoka = fredoka,
                 borderColor = Color.Blue
             )
@@ -193,7 +187,7 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo) {
 }
 
 @Composable
-fun HomeTimetableRow(windowInfo: WindowInfo, hour: Int, fredoka: FontFamily, borderColor: Color) {
+fun HomeTimetableRow(timetable: Timetable, fredoka: FontFamily, borderColor: Color) {
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = 5.dp,
@@ -207,9 +201,9 @@ fun HomeTimetableRow(windowInfo: WindowInfo, hour: Int, fredoka: FontFamily, bor
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.padding(end = 15.dp, start = 15.dp, top = 20.dp, bottom = 20.dp)
         ) {
-            Text(text = "$hour. ", fontSize = 20.sp, fontFamily = FontFamily.SansSerif)
+            Text(text = "${timetable.hour}.", fontSize = 20.sp, fontFamily = FontFamily.SansSerif)
             Text(
-                text = "English",
+                text = "",
                 fontFamily = fredoka,
                 fontWeight = FontWeight.Normal,
                 fontSize = 20.sp

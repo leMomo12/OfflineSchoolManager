@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.ColorSpace
+import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -198,7 +200,7 @@ fun TimetableTitle(
                     },
                     enabled = bottomSheetState.bottomSheetState.isCollapsed
                 ) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "")
+                    Icon(Icons.Default.MoreVert, contentDescription = "", modifier = Modifier.scale(1.2f))
                 }
 
                 DropdownMenu(

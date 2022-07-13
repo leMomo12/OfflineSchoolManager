@@ -1,7 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util
 
-import com.mnowo.offlineschoolmanager.R
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.CalculateGradeColor
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 

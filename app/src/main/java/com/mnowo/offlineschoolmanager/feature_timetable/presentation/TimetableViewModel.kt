@@ -174,7 +174,7 @@ class TimetableViewModel @Inject constructor(
                 _timetableSpecificItem.value = event.timetable
             }
             is TimetableEvent.AddTimetable -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     removeAllErrors()
                     val day = getDay()
                     pickedSubjectState.value?.let { subject ->
@@ -190,7 +190,7 @@ class TimetableViewModel @Inject constructor(
                 }
             }
             is TimetableEvent.UpdateTimetableItem -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     removeAllErrors()
                     timetableSpecificItem.value?.let { timetable ->
                         pickedSubjectState.value?.let { subject ->
@@ -212,7 +212,7 @@ class TimetableViewModel @Inject constructor(
                 }
             }
             is TimetableEvent.DeleteTimetableItem -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     timetableSpecificItem.value?.let { timetable ->
                         deleteTimetableItemUseCase.invoke(timetable = timetable)
                         onEvent(TimetableEvent.SetDeleteDialogState(false))
