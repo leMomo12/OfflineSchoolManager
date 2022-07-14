@@ -264,7 +264,6 @@ fun ToDoStaggeredGrid(
                             )
                         )
                     }, onDeleteClicked = {
-                        d("ToDo", "onDeleteClicked: ${viewModel.deleteToDoIdState.value}")
                         viewModel.onEvent(ToDoEvent.DeleteToDo)
                     },
                         title = stringResource(id = R.string.sureToDelete),
@@ -318,7 +317,7 @@ fun ToDoStaggeredGrid(
                             Spacer(modifier = Modifier.padding(horizontal = 5.dp))
 
                             Text(
-                                text = "Until: ${FormatDate.formatLongToSpring(item.until)}",
+                                text = stringResource(R.string.until) + FormatDate.formatLongToSpring(item.until),
                                 fontFamily = fredoka,
                                 fontWeight = FontWeight.Light
                             )
@@ -342,7 +341,8 @@ fun ToDoStaggeredGrid(
                                 end = 16.dp,
                                 bottom = 16.dp
                             ),
-                            fontFamily = fredoka
+                            fontFamily = fredoka,
+                            textDecoration = if (item.isChecked) TextDecoration.LineThrough else TextDecoration.None
                         )
 
                         when {

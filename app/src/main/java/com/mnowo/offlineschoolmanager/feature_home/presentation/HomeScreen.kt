@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.util.Log.d
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,6 +44,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
 
     LaunchedEffect(key1 = true) {
         viewModel.getStartingInformation()
+
         viewModel.eventFlow.collectLatest {
             when (it) {
                 is UiEvent.Navigate -> {
@@ -106,7 +108,6 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
 
 @Composable
 fun HomeScreenTitle(windowInfo: WindowInfo, fredoka: FontFamily, viewModel: HomeViewModel) {
-    Spacer(modifier = Modifier.padding(vertical = 10.dp))
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
@@ -176,34 +177,34 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: H
     )
     Spacer(modifier = Modifier.padding(vertical = 5.dp))
     LazyRow {
-        items(items = viewModel.timetableListState.value.listData) {
+        items(viewModel.dailyTimetableListState.value.listData) {
             HomeTimetableRow(
                 timetable = it,
                 fredoka = fredoka,
-                borderColor = Color.Blue
+                viewModel = viewModel
             )
         }
     }
 }
 
 @Composable
-fun HomeTimetableRow(timetable: Timetable, fredoka: FontFamily, borderColor: Color) {
+fun HomeTimetableRow(timetable: Timetable, fredoka: FontFamily, viewModel: HomeViewModel) {
     Card(
         shape = RoundedCornerShape(16.dp),
         elevation = 5.dp,
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        border = BorderStroke(width = 0.5.dp, borderColor)
+        border = BorderStroke(width = 1.dp, color = Color(viewModel.dailyTimetableMap[timetable]?.color ?: 0) )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.padding(end = 15.dp, start = 15.dp, top = 20.dp, bottom = 20.dp)
         ) {
-            Text(text = "${timetable.hour}.", fontSize = 20.sp, fontFamily = FontFamily.SansSerif)
+            Text(text = "${timetable.hour}. ${viewModel.dailyTimetableMap[timetable]?.subjectName} ", fontSize = 20.sp, fontFamily = FontFamily.SansSerif)
             Text(
-                text = "",
+                text = "${viewModel.dailyTimetableMap[timetable]?.room}",
                 fontFamily = fredoka,
                 fontWeight = FontWeight.Normal,
                 fontSize = 20.sp

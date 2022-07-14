@@ -46,4 +46,5 @@
     <string name="th">TH</string>
     <string name="f">F</string>
     <string name="sureToDeleteAllTimetableItems">Sure to delete all timetable items?</string>
+    <string name="until">Until: </string>
 </resources>

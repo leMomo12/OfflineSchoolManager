@@ -14,6 +14,9 @@ import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ConvertDay
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ConvertDay.convertDayToInt
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ConvertDay.convertIntToDay
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
@@ -301,26 +304,6 @@ class TimetableViewModel @Inject constructor(
         _alreadyTakenErrorState.value = Color.White
     }
 
-    private fun convertIntToDay(day: Int): Days {
-        return when (day) {
-            0 -> Days.MONDAY
-            1 -> Days.TUESDAY
-            2 -> Days.WEDNESDAY
-            3 -> Days.THURSDAY
-            else -> Days.FRIDAY
-        }
-    }
-
-    private fun convertDayToInt(day: Days): Int {
-        return when (day) {
-            Days.MONDAY -> 0
-            Days.TUESDAY -> 1
-            Days.WEDNESDAY -> 2
-            Days.THURSDAY -> 3
-            Days.FRIDAY -> 4
-            else -> 5
-        }
-    }
 
     fun searchIfTimetableItemExists(hour: Int, intDay: Int): Timetable {
         val day = convertIntToDay(day = intDay)
