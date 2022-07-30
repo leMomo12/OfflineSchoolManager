@@ -47,4 +47,6 @@
     <string name="f">F</string>
     <string name="sureToDeleteAllTimetableItems">Sure to delete all timetable items?</string>
     <string name="until">Until: </string>
+    <string name="todayTimetable">Today\'s timetable</string>
+    <string name="nextTimetable">Next timetable</string>
 </resources>

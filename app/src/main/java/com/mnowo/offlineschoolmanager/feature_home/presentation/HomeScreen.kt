@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.hardware.lights.Light
 import android.util.Log.d
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -17,9 +20,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,6 +34,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.WindowInfo
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import kotlinx.coroutines.flow.collectLatest
@@ -88,11 +94,19 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                 }
                 item {
                     Spacer(modifier = Modifier.padding(15.dp))
-                    HomeTodayTimetable(fredoka = fredoka, windowInfo = windowInfo, viewModel = viewModel)
+                    HomeTodayTimetable(
+                        fredoka = fredoka,
+                        windowInfo = windowInfo,
+                        viewModel = viewModel
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.padding(vertical = 15.dp))
-                    HomeUpcomingExams(fredoka = fredoka, windowInfo = windowInfo)
+                    HomeUpcomingExams(
+                        fredoka = fredoka,
+                        windowInfo = windowInfo,
+                        viewModel = viewModel
+                    )
                 }
                 items(3) {
                     UpcomingExamsItem(fredoka = fredoka, windowInfo = windowInfo)
@@ -169,12 +183,26 @@ fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: 
 
 @Composable
 fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: HomeViewModel) {
-    Text(
-        text = "Today's timetable",
-        fontFamily = fredoka,
-        fontWeight = FontWeight.Medium,
-        fontSize = 32.sp
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = if (viewModel.isTodayTimetableState.value) {
+                stringResource(id = R.string.todayTimetable)
+            } else {
+                stringResource(R.string.nextTimetable)
+            },
+            fontFamily = fredoka,
+            fontWeight = FontWeight.Medium,
+            fontSize = 32.sp
+        )
+        IconButton(onClick = {
+            viewModel.bottomNav(Screen.TimetableScreen, Screen.HomeScreen)
+        }) {
+            Icon(Icons.Default.ArrowForward, contentDescription = "")
+        }
+    }
     Spacer(modifier = Modifier.padding(vertical = 5.dp))
     LazyRow {
         items(viewModel.dailyTimetableListState.value.listData) {
@@ -195,14 +223,21 @@ fun HomeTimetableRow(timetable: Timetable, fredoka: FontFamily, viewModel: HomeV
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        border = BorderStroke(width = 1.dp, color = Color(viewModel.dailyTimetableMap[timetable]?.color ?: 0) )
+        border = BorderStroke(
+            width = 1.dp,
+            color = Color(viewModel.dailyTimetableMap[timetable]?.color ?: 0)
+        )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.padding(end = 15.dp, start = 15.dp, top = 20.dp, bottom = 20.dp)
         ) {
-            Text(text = "${timetable.hour}. ${viewModel.dailyTimetableMap[timetable]?.subjectName} ", fontSize = 20.sp, fontFamily = FontFamily.SansSerif)
+            Text(
+                text = "${timetable.hour}. ${viewModel.dailyTimetableMap[timetable]?.subjectName} ",
+                fontSize = 20.sp,
+                fontFamily = FontFamily.SansSerif
+            )
             Text(
                 text = "${viewModel.dailyTimetableMap[timetable]?.room}",
                 fontFamily = fredoka,
@@ -214,13 +249,21 @@ fun HomeTimetableRow(timetable: Timetable, fredoka: FontFamily, viewModel: HomeV
 }
 
 @Composable
-fun HomeUpcomingExams(fredoka: FontFamily, windowInfo: WindowInfo) {
-    Text(
-        text = "Upcoming exams",
-        fontFamily = fredoka,
-        fontSize = 32.sp,
-        fontWeight = FontWeight.Medium
-    )
+fun HomeUpcomingExams(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: HomeViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Upcoming exams",
+            fontFamily = fredoka,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.Medium
+        )
+        IconButton(onClick = { viewModel.bottomNav(Screen.ExamScreen, Screen.HomeScreen) }) {
+            Icon(Icons.Default.ArrowForward, contentDescription = "")
+        }
+    }
 }
 
 @Composable

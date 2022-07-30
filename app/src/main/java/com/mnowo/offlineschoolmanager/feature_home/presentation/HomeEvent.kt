@@ -10,4 +10,6 @@ sealed class HomeEvent {
     data class SetTimetableListState(val listData: List<Timetable>) : HomeEvent()
     data class AddDailyTimetableListState(var listData: List<Timetable>) : HomeEvent()
     data class SetSubjectListState(var listData: List<Subject>) : HomeEvent()
+    data class SetIsTodayTimetableState(var value: Boolean) : HomeEvent()
+
 }

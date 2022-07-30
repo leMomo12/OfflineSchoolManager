@@ -1,6 +1,5 @@
 package com.mnowo.offlineschoolmanager.feature_home.presentation
 
-import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,17 +20,13 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
 import com.mnowo.offlineschoolmanager.feature_home.domain.use_case.GetAverageUseCase
-import com.mnowo.offlineschoolmanager.feature_home.domain.use_case.GetCountOfSubjectsUseCase
-import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeEvent
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.GetAllTimetableItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.sql.Time
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -67,6 +62,9 @@ class HomeViewModel @Inject constructor(
     private val _subjectListState = mutableStateOf<ListState<Subject>>(ListState())
     val subjectListState: State<ListState<Subject>> = _subjectListState
 
+    private val _isTodayTimetableState = mutableStateOf<Boolean>(true)
+    val isTodayTimetableState: State<Boolean> = _isTodayTimetableState
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SetAverageState -> {
@@ -89,6 +87,9 @@ class HomeViewModel @Inject constructor(
                 _subjectListState.value = subjectListState.value.copy(
                     listData = event.listData
                 )
+            }
+            is HomeEvent.SetIsTodayTimetableState -> {
+                _isTodayTimetableState.value = event.value
             }
         }
     }
@@ -190,15 +191,36 @@ class HomeViewModel @Inject constructor(
 
     private fun getDailyTimetable() {
         val dailyList = mutableListOf<Timetable>()
-        val day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2
+        var day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2
 
         for (item in timetableListState.value.listData) {
             val intDay = convertDayToInt(day = item.day)
+
             if (intDay == day) {
                 dailyList.add(item)
+
                 val subject = subjectListState.value.listData.filter { it.id == item.subjectId }[0]
                 _dailyTimetableMap.set(key = item, value = subject)
-                d("DailyList", "Added item: $item")
+            }
+        }
+
+        if (dailyList.isEmpty()) {
+            while (dailyList.isEmpty()) {
+                day++
+                if (day >= 7) {
+                    day = 2
+                }
+                for (item in timetableListState.value.listData) {
+                    val intDay = convertDayToInt(day = item.day)
+                    if (intDay == day) {
+                        dailyList.add(item)
+
+                        val subject =
+                            subjectListState.value.listData.filter { it.id == item.subjectId }[0]
+                        _dailyTimetableMap.set(key = item, value = subject)
+                        onEvent(HomeEvent.SetIsTodayTimetableState(false))
+                    }
+                }
             }
         }
         dailyList.sortBy { it.hour }

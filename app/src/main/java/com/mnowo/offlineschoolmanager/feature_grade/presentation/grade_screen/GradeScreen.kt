@@ -2,6 +2,7 @@ package com.mnowo.offlineschoolmanager
 
 import android.util.Log.d
 import androidx.compose.animation.*
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -191,7 +192,6 @@ fun GradeTitle(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            d("editState", "${viewModel.editState.value}")
             if (!viewModel.deleteState.value && !viewModel.editState.value) {
                 IconButton(
                     onClick = { onOpenBottomSheet() },
@@ -285,7 +285,13 @@ fun GradeListItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(15.dp),
+            .padding(15.dp)
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = LinearOutSlowInEasing
+                )
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
 

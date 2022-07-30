@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,51 +24,52 @@ fun BottomAppBar(
     exam: Boolean? = null,
     onClick: (Screen) -> Unit
 ) {
-    BottomAppBar(backgroundColor = Color.White) {
+    BottomAppBar(backgroundColor = if (isSystemInDarkTheme()) Color.Black else Color.White)  {
         Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
             IconButton(onClick = {
                 onClick(Screen.HomeScreen)
             }) {
-                if(home == true) {
-                    Icon(Icons.Rounded.Home, contentDescription = "", tint = Color.Black)
+                if (isSystemInDarkTheme()) Color.Gray else Color.Black
+                if (home == true) {
+                    Icon(Icons.Rounded.Home, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 } else {
-                    Icon(Icons.Outlined.Home, contentDescription = "", tint = Color.Black)
+                    Icon(Icons.Outlined.Home, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.TimetableScreen)
             }) {
-                if(timetable == true) {
-                    Icon(Icons.Rounded.AccessAlarm, contentDescription = "", tint = Color.Black)
+                if (timetable == true) {
+                    Icon(Icons.Rounded.AccessAlarm, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 } else {
-                    Icon(Icons.Outlined.AccessAlarm, contentDescription = "", tint = Color.Black)
+                    Icon(Icons.Outlined.AccessAlarm, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.SubjectScreen)
             }) {
-                if(gradeAverage == true) {
-                    Icon(Icons.Rounded.School, contentDescription = "", tint = Color.Black)
+                if (gradeAverage == true) {
+                    Icon(Icons.Rounded.School, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 } else {
-                    Icon(Icons.Outlined.School, contentDescription = "", tint = Color.Black)
+                    Icon(Icons.Outlined.School, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.ToDoScreen)
             }) {
-                if(toDo == true) {
-                    Icon(Icons.Rounded.Edit, contentDescription = "", tint = Color.Black)
+                if (toDo == true) {
+                    Icon(Icons.Rounded.Edit, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 } else {
-                    Icon(Icons.Outlined.Edit, contentDescription = "", tint = Color.Black)
+                    Icon(Icons.Outlined.Edit, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 }
             }
             IconButton(onClick = {
                 onClick(Screen.ExamScreen)
             }) {
-                if(exam == true) {
-                    Icon(Icons.Rounded.PlaylistAdd, contentDescription = "", tint = Color.Black)
+                if (exam == true) {
+                    Icon(Icons.Rounded.PlaylistAdd, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 } else {
-                    Icon(Icons.Outlined.PlaylistAdd, contentDescription = "", tint = Color.Black)
+                    Icon(Icons.Outlined.PlaylistAdd, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 }
             }
         }

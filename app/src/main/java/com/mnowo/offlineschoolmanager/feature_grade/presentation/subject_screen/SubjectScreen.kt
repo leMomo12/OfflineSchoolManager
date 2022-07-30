@@ -3,6 +3,10 @@ package com.mnowo.offlineschoolmanager
 import android.util.Log.d
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -310,7 +314,13 @@ fun SubjectListItem(
                 }
             }
             .padding(15.dp)
-            .testTag(GradeTestTags.LIST_ROW),
+            .testTag(GradeTestTags.LIST_ROW)
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = FastOutLinearInEasing
+                )
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

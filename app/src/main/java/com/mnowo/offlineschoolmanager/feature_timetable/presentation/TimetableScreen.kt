@@ -1,6 +1,7 @@
 package com.mnowo.offlineschoolmanager
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -418,7 +419,7 @@ fun RowScope.TimetableSubjectItem(
                         .animateContentSize(
                             animationSpec = tween(
                                 durationMillis = 300,
-                                easing = LinearOutSlowInEasing
+                                easing = FastOutLinearInEasing
                             )
                         ),
                     horizontalArrangement = Arrangement.Center,
