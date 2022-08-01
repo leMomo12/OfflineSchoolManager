@@ -1,8 +1,6 @@
-package com.mnowo.offlineschoolmanager.feature_todo.presentation
+package com.mnowo.offlineschoolmanager.feature_exam.presentation
 
-import android.util.Log.d
-import android.widget.CalendarView
-import android.widget.DatePicker
+import android.inputmethodservice.Keyboard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -12,71 +10,44 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material.icons.outlined.School
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.window.Dialog
-import androidx.core.graphics.blue
-import androidx.core.graphics.green
-import androidx.core.graphics.red
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.DatePicker
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.SubjectPickerDialog
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.util.AddSubjectTestTags
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
-import com.mnowo.offlineschoolmanager.rememberFredoka
 import kotlinx.coroutines.launch
-import java.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ToDoBottomSheet(
-    onCloseBottomSheet: () -> Unit,
-    viewModel: ToDoViewModel = hiltViewModel()
-) {
-    val fredoka = rememberFredoka()
-    val bottomState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val scope = rememberCoroutineScope()
+fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fredoka: FontFamily) {
 
-    val closeSheet: () -> Unit = {
-        scope.launch {
-            bottomState.hide()
-        }
-    }
+    val bottomState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val coroutineScope = rememberCoroutineScope()
 
     val openSheet: () -> Unit = {
-        scope.launch {
+        coroutineScope.launch {
             bottomState.animateTo(targetValue = ModalBottomSheetValue.Expanded)
         }
     }
 
-    if (viewModel.contentEditState.value) {
-        viewModel.setContentEditState(value = false)
-
-        viewModel.specificEditToDoState.value?.let { toDo ->
-            viewModel.onEvent(ToDoEvent.EnteredTitle(toDo.title))
-            viewModel.onEvent(ToDoEvent.EnteredDescription(toDo.description))
-            viewModel.onEvent(ToDoEvent.EnteredDate(FormatDate.formatLongToDate(toDo.until)))
-            val subject = viewModel.subjectList.value.listData.filter { it.id == toDo.subjectId }[0]
-            viewModel.onEvent(ToDoEvent.ChangePickedSubject(subject = subject))
+    val closeSheet: () -> Unit = {
+        coroutineScope.launch {
+            bottomState.hide()
         }
-
     }
 
     if (!viewModel.bottomSheetState.value) {
-        viewModel.onEvent(ToDoEvent.ChangeBottomSheetState(true))
         onCloseBottomSheet()
     }
 
@@ -88,8 +59,7 @@ fun ToDoBottomSheet(
                 onCloseBottomSheet = { closeSheet() },
                 fredoka = fredoka
             )
-        }
-    ) {
+        }) {
         Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
@@ -111,10 +81,7 @@ fun ToDoBottomSheet(
                 modifier = Modifier
                     .padding(top = 10.dp)
             ) {
-                TextButton(
-                    onClick = { onCloseBottomSheet() },
-                    modifier = Modifier
-                ) {
+                TextButton(onClick = { onCloseBottomSheet() }) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "", tint = LightBlue)
                     Spacer(modifier = Modifier.padding(horizontal = 3.dp))
                     Text(text = stringResource(id = R.string.back), color = LightBlue)
@@ -122,26 +89,18 @@ fun ToDoBottomSheet(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     OutlinedButton(
                         onClick = {
-                            if (!viewModel.editState.value) {
-                                viewModel.onEvent(ToDoEvent.AddToDoEvent)
-                            } else {
-                                viewModel.onEvent(ToDoEvent.EditToDo)
-                            }
+                            viewModel.onEvent(ExamEvent.AddExamItem)
                         },
-                        border = BorderStroke(1.dp, color = LightBlue),
-                        modifier = Modifier.testTag(AddSubjectTestTags.ADD_BUTTON)
+                        border = BorderStroke(1.dp, color = LightBlue)
                     ) {
                         Text(
-                            text = if (!viewModel.editState.value) {
-                                stringResource(id = R.string.add)
-                            } else {
-                                stringResource(id = R.string.save)
-                            },
+                            text = stringResource(id = R.string.add),
                             color = LightBlue
                         )
                     }
                 }
             }
+
             Divider(modifier = Modifier.padding(top = 40.dp), color = Color.LightGray, 1.dp)
 
             Column(
@@ -150,38 +109,32 @@ fun ToDoBottomSheet(
                     .padding(start = 30.dp, end = 30.dp, top = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 OutlinedTextField(
                     value = viewModel.titleState.value.text,
                     onValueChange = {
-                        if (it.length <= 25) {
-                            viewModel.onEvent(ToDoEvent.EnteredTitle(it))
-                        }
+                        viewModel.onEvent(ExamEvent.SetTitleState(text = it))
                     },
                     label = {
-                        Text(text = stringResource(R.string.enterTitle))
+                        Text(stringResource(id = R.string.enterTitle))
                     },
-                    singleLine = true,
-                    isError = viewModel.titleErrorState.value,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.padding(vertical = 10.dp))
                 OutlinedTextField(
                     value = viewModel.descriptionState.value.text,
                     onValueChange = {
-                        viewModel.onEvent(ToDoEvent.EnteredDescription(it))
+                        viewModel.onEvent(ExamEvent.SetDescriptionState(text = it))
                     },
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .fillMaxWidth(),
                     label = {
-                        Text(text = stringResource(R.string.enterDescription))
-                    },
-                    maxLines = 6,
-                    isError = viewModel.descriptionErrorState.value,
-                    modifier = Modifier.fillMaxWidth()
+                        Text(stringResource(id = R.string.enterDescription))
+                    }
                 )
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
                 Text(
                     text = stringResource(R.string.currentDate) + " " + FormatDate.formatDateToString(
-                        viewModel.datePickerDateState.value
+                        viewModel.dateState.value
                     ),
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Normal
@@ -189,7 +142,7 @@ fun ToDoBottomSheet(
                 Spacer(modifier = Modifier.padding(vertical = 5.dp))
                 OutlinedButton(
                     onClick = {
-                        viewModel.onEvent(ToDoEvent.ChangeDatePickerState(isActive = true))
+                        viewModel.onEvent(ExamEvent.SetDatePickerState(value = true))
                     },
                     modifier = Modifier.fillMaxWidth(0.6f),
                     border = BorderStroke(1.dp, Color.LightGray)
@@ -204,16 +157,15 @@ fun ToDoBottomSheet(
                         Icon(Icons.Outlined.AccessTime, contentDescription = "")
                     }
                 }
+
                 DatePicker(
                     fredoka = fredoka,
                     onDateSelected = {
-                        viewModel.onEvent(ToDoEvent.EnteredDate(it))
+                        viewModel.onEvent(ExamEvent.SetDateState(it))
                     },
                     datePickerState = viewModel.datePickerState.value,
-                    onDismissRequest = {
-                        viewModel.onEvent(ToDoEvent.ChangeDatePickerState(false))
-                    },
-                    dateText = FormatDate.formatDateToString(viewModel.datePickerDateState.value)
+                    onDismissRequest = { viewModel.onEvent(ExamEvent.SetDatePickerState(false)) },
+                    dateText = FormatDate.formatDateToString(viewModel.dateState.value)
                 )
 
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
@@ -226,10 +178,10 @@ fun ToDoBottomSheet(
                 Spacer(modifier = Modifier.padding(vertical = 5.dp))
                 OutlinedButton(
                     onClick = {
-                        viewModel.onEvent(ToDoEvent.ChangeSubjectPickerDialogState(isActive = true))
+                        viewModel.onEvent(ExamEvent.SetSubjectPickerState(value = true))
                     },
                     modifier = Modifier.fillMaxWidth(0.6f),
-                    border = BorderStroke(1.dp, viewModel.pickSubjectColorState.value)
+                    border = BorderStroke(1.dp, viewModel.pickedSubjectColorState.value)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -241,25 +193,21 @@ fun ToDoBottomSheet(
                         Icon(Icons.Outlined.School, contentDescription = "")
                     }
                 }
-                if (viewModel.subjectPickerDialogState.value) {
+                if (viewModel.subjectPickerState.value) {
                     SubjectPickerDialog(
                         onSubjectPicked = {
-                            viewModel.onEvent(ToDoEvent.ChangePickedSubject(it))
+                            viewModel.onEvent(ExamEvent.SetPickedSubjectState(subject = it))
                             viewModel.onEvent(
-                                ToDoEvent.ChangeSubjectPickerDialogState(
-                                    false
-                                )
+                                ExamEvent.SetSubjectPickerState(value = false)
                             )
                         },
                         onDismissRequest = {
                             viewModel.onEvent(
-                                ToDoEvent.ChangeSubjectPickerDialogState(
-                                    false
-                                )
+                                ExamEvent.SetSubjectPickerState(value = false)
                             )
                         },
                         fredoka = fredoka,
-                        subjectsList = viewModel.subjectList.value.listData,
+                        subjectsList = viewModel.subjectListState.value.listData,
                         onAddNewSubjectClicked = {
                             openSheet()
                         }
@@ -269,4 +217,3 @@ fun ToDoBottomSheet(
         }
     }
 }
-

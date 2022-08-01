@@ -7,6 +7,9 @@ import com.mnowo.offlineschoolmanager.core.feature_core.data.SchoolManagerDataba
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.data.SubjectDao
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.data.SubjectRepositoryImpl
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.repository.SubjectRepository
+import com.mnowo.offlineschoolmanager.feature_exam.data.local.ExamDao
+import com.mnowo.offlineschoolmanager.feature_exam.data.repository.ExamRepositoryImpl
+import com.mnowo.offlineschoolmanager.feature_exam.domain.repository.ExamRepository
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.data.repository.GradeRepositoryImpl
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
@@ -115,4 +118,16 @@ object AppModule {
     @Provides
     @Singleton
     fun provideHomeDao(db: SchoolManagerDatabase) = db.homeDao()
+
+    @Provides
+    @Singleton
+    fun provideExamDao(db: SchoolManagerDatabase) = db.examDao()
+
+    @Provides
+    @Singleton
+    fun provideExamRepository(
+        dao: ExamDao
+    ) : ExamRepository {
+        return ExamRepositoryImpl(dao = dao)
+    }
 }

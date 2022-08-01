@@ -328,7 +328,7 @@ fun ToDoStaggeredGrid(
                             Spacer(modifier = Modifier.padding(horizontal = 5.dp))
 
                             Text(
-                                text = stringResource(R.string.until) + FormatDate.formatLongToSpring(
+                                text = stringResource(R.string.until) + " " + FormatDate.formatLongToSpring(
                                     item.until
                                 ),
                                 fontFamily = fredoka,

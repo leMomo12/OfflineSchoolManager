@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case
 
+import android.util.Log.d
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
@@ -15,18 +16,17 @@ class GetAllSubjectsUseCase @Inject constructor(
 
     operator fun invoke(): Flow<Resource<List<Subject>>> = flow {
 
-        try {
-            repository.getAllSubjects().collect() {
-                emit(Resource.Loading<List<Subject>>(data = it))
-                emit(Resource.Success<List<Subject>>(data = it))
-            }
-        } catch (e: Exception) {
-            emit(
-                Resource.Error<List<Subject>>(
-                    message = (e.localizedMessage ?: R.string.unexpectedError).toString()
-                )
-            )
+        repository.getAllSubjects().collect() {
+            emit(Resource.Loading<List<Subject>>(data = it))
+            emit(Resource.Success<List<Subject>>(data = it))
         }
 
     }.flowOn(Dispatchers.IO)
+        .catch {
+            emit(
+                Resource.Error<List<Subject>>(
+                    message = (it.localizedMessage ?: R.string.unexpectedError).toString()
+                )
+            )
+        }
 }

@@ -11,6 +11,7 @@ object Constants {
     const val GRADE_TABLE = "grade_table"
     const val TODO_TABLE = "todo_table"
     const val TIMETABLE_TABLE = "timetable_table"
+    const val EXAM_TABLE = "exam_table"
 
     const val GRADE_NAV_ARGUMENT = "grade_nav_arg"
 }

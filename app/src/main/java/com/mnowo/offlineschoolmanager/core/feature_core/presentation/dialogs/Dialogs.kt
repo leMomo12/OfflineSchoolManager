@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs
 
+import android.widget.CalendarView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
@@ -30,6 +32,10 @@ import androidx.core.graphics.red
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
+import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
+import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoViewModel
+import java.util.*
 
 @Composable
 fun DeleteDialog(
@@ -192,5 +198,73 @@ fun PickSubjectNewSubjectItem(onAddNewSubjectClicked: () -> Unit, fredoka: FontF
 fun CancelIconButton(onDismissRequest: () -> Unit) {
     IconButton(onClick = { onDismissRequest() }) {
         Icon(Icons.Outlined.Cancel, contentDescription = "")
+    }
+}
+
+@Composable
+fun DatePicker(
+    fredoka: FontFamily,
+    onDateSelected: (Date) -> Unit,
+    datePickerState: Boolean,
+    onDismissRequest: () -> Unit,
+    dateText: String
+) {
+    if (datePickerState) {
+        Dialog(onDismissRequest = { onDismissRequest() }) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.8f), shape = RoundedCornerShape(8.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.selectDate),
+                            fontFamily = fredoka,
+                            fontWeight = FontWeight.Medium
+                        )
+                        OutlinedButton(onClick = {
+                            onDismissRequest()
+                        }) {
+                            Text(text = stringResource(R.string.apply))
+                        }
+                    }
+                    Text(
+                        text = dateText,
+                        fontFamily = fredoka,
+                        modifier = Modifier.padding(bottom = 5.dp, top = 5.dp)
+                    )
+                    Divider()
+                    AndroidView(
+                        { CalendarView(it) },
+                        modifier = Modifier.wrapContentWidth(),
+                        update = { views ->
+                            views.setOnDateChangeListener { _, year, month, dayOfMonth ->
+                                onDateSelected(
+                                    Calendar.getInstance().apply {
+                                        set(year, month, dayOfMonth)
+                                    }.time
+                                )
+                            }
+                        }
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 5.dp, bottom = 5.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Spacer(modifier = Modifier.padding(horizontal = 5.dp))
+                    }
+                }
+            }
+        }
     }
 }

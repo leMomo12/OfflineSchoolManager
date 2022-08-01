@@ -111,15 +111,15 @@ class ToDoViewModel @Inject constructor(
         _deleteToDoIdState.value = value
     }
 
-    fun setTitleErrorState(value: Boolean) {
+    private fun setTitleErrorState(value: Boolean) {
         _titleErrorState.value = value
     }
 
-    fun setDescriptionErrorState(value: Boolean) {
+    private fun setDescriptionErrorState(value: Boolean) {
         _descriptionErrorState.value = value
     }
 
-    fun setPickSubjectColorState(value: Color) {
+    private fun setPickSubjectColorState(value: Color) {
         _pickSubjectColorState.value = value
     }
 
