@@ -223,7 +223,7 @@ class ToDoViewModel @Inject constructor(
             }
             is ToDoEvent.DeleteToDo -> {
                 viewModelScope.launch(Dispatchers.IO) {
-                    deleteToDoUseCase.invoke(toDoId = _deleteToDoIdState.value)
+                    deleteToDoUseCase.invoke(toDoId = deleteToDoIdState.value)
                 }
             }
             is ToDoEvent.AddToDoEvent -> {

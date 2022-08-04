@@ -36,4 +36,6 @@ interface GradeRepository {
 
     suspend fun deleteAllSubjectsFromToDo(subjectId: Int)
 
+    suspend fun deleteAllSubjectsFromExam(subjectId: Int)
+
 }

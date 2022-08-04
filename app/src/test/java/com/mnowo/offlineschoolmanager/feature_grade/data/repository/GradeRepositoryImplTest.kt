@@ -108,5 +108,13 @@ class GradeRepositoryImplTest : GradeRepository {
         }
     }
 
+    override suspend fun deleteAllSubjectsFromTimetable(subjectId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteAllSubjectsFromToDo(subjectId: Int) {
+        TODO("Not yet implemented")
+    }
+
 
 }

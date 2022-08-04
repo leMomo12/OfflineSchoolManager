@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpace
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
@@ -29,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.alpha
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -336,7 +338,12 @@ fun TimetableSubjectRow(
                     timetableId = timetable.id
                 )
                 TimetableSubjectItem(
-                    color = Color(subject.color.red, subject.color.green, subject.color.blue),
+                    color = Color(
+                        red = subject.color.red,
+                        green = subject.color.green,
+                        blue = subject.color.blue,
+                        alpha = subject.color.alpha
+                    ),
                     weight = .3f,
                     subject = subject.subjectName,
                     room = subject.room ?: "",
@@ -390,15 +397,16 @@ fun RowScope.TimetableSubjectItem(
     openSheet: () -> Unit,
     fredoka: FontFamily
 ) {
-    Card(
-        backgroundColor = color,
-        shape = RoundedCornerShape(16.dp),
+    Box(
         modifier = Modifier
             .weight(weight)
             .padding(5.dp)
             .clickable {
 
             }
+            .clip(RoundedCornerShape(8.dp))
+            .background(color)
+
     ) {
         Row(horizontalArrangement = Arrangement.Center) {
             Column {

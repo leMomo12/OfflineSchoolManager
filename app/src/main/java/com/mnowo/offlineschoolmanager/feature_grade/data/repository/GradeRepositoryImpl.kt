@@ -72,4 +72,8 @@ class GradeRepositoryImpl @Inject constructor(
         return gradeDao.deleteAllSubjectsFromToDo(subjectId = subjectId)
     }
 
+    override suspend fun deleteAllSubjectsFromExam(subjectId: Int) {
+        return gradeDao.deleteAllSubjectsFromExam(subjectId = subjectId)
+    }
+
 }

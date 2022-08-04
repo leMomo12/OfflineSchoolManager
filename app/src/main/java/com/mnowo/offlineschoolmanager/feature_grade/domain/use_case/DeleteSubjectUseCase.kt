@@ -16,6 +16,7 @@ class DeleteSubjectUseCase @Inject constructor(
         gradeRepository.deleteAllSubjectSpecificGrades(subjectId = subjectId)
         gradeRepository.deleteAllSubjectsFromTimetable(subjectId = subjectId)
         gradeRepository.deleteAllSubjectsFromToDo(subjectId = subjectId)
+        gradeRepository.deleteAllSubjectsFromExam(subjectId = subjectId)
         emit(true)
     }.flowOn(Dispatchers.IO)
 }

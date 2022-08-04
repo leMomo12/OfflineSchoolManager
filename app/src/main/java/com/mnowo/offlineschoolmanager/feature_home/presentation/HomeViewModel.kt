@@ -193,14 +193,16 @@ class HomeViewModel @Inject constructor(
         val dailyList = mutableListOf<Timetable>()
         var day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2
 
-        for (item in timetableListState.value.listData) {
-            val intDay = convertDayToInt(day = item.day)
+        if (timetableListState.value.listData.isNotEmpty()) {
+            for (item in timetableListState.value.listData) {
+                val intDay = convertDayToInt(day = item.day)
 
-            if (intDay == day) {
-                dailyList.add(item)
+                if (intDay == day) {
+                    dailyList.add(item)
 
-                val subject = subjectListState.value.listData.filter { it.id == item.subjectId }[0]
-                _dailyTimetableMap.set(key = item, value = subject)
+                    val subject = subjectListState.value.listData.filter { it.id == item.subjectId }[0]
+                    _dailyTimetableMap.set(key = item, value = subject)
+                }
             }
         }
 

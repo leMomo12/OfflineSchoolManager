@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.alpha
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -332,7 +333,8 @@ fun SubjectListItem(
                     color = Color(
                         red = data.color.red,
                         green = data.color.green,
-                        blue = data.color.blue
+                        blue = data.color.blue,
+                        alpha = data.color.alpha
                     )
                 )
                 .testTag(GradeTestTags.COLOR_BOX)

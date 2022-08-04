@@ -1,19 +1,16 @@
 package com.mnowo.offlineschoolmanager
 
-import android.util.Log.d
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
@@ -24,9 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -34,6 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.alpha
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
@@ -47,7 +46,6 @@ import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDa
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoBottomSheet
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
@@ -287,7 +285,7 @@ fun ToDoStaggeredGrid(
                         if (viewModel.subjectList.value.listData.isNotEmpty()) {
                             val intColor =
                                 viewModel.subjectList.value.listData.filter { it.id == item.subjectId }[0].color
-                            return@derivedStateOf Color(intColor)
+                            return@derivedStateOf Color(intColor.red, intColor.green, intColor.blue, intColor.alpha)
                         } else {
                             return@derivedStateOf Color.LightGray
                         }
@@ -310,7 +308,7 @@ fun ToDoStaggeredGrid(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
+                                .padding(start = 8.dp, top = 16.dp, bottom = 8.dp),
                             horizontalArrangement = Arrangement.Start,
                             verticalAlignment = Alignment.CenterVertically
                         ) {

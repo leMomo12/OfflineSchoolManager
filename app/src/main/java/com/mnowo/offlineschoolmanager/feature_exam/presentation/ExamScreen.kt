@@ -1,10 +1,9 @@
 package com.mnowo.offlineschoolmanager
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -12,28 +11,32 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.alpha
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamBottomSheet
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamEvent
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamViewModel
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
-import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoBottomSheet
-import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -98,6 +101,9 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
                         bottomState = bottomState,
                         viewModel = viewModel
                     )
+                }
+                items(viewModel.examListState.value.listData) {
+                    ExamItem(viewModel = viewModel, examData = it, fredoka = fredoka)
                 }
             }
         }
@@ -189,5 +195,79 @@ fun ExamTitle(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
+    val subjectState by remember {
+        derivedStateOf {
+
+            viewModel.subjectListState.value.listData.filter { it.id == examData.id }[0]
+
+        }
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, top = 5.dp, bottom = 10.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(
+                Color(
+                    red = subjectState.color.red,
+                    green = subjectState.color.green,
+                    blue = subjectState.color.blue,
+                    alpha = subjectState.color.alpha
+                )
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 16.dp, end = 16.dp, top = 5.dp, bottom = 15.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                Text(
+                    text = subjectState.subjectName + " " + "Exam",
+                    fontFamily = fredoka,
+                    fontWeight = FontWeight.Light,
+                    color = Color.DarkGray
+                )
+            }
+            Text(text = examData.title, fontFamily = fredoka, fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.padding(vertical = 3.dp))
+            Text(text = examData.description, fontFamily = fredoka, fontWeight = FontWeight.Normal)
+
+            Spacer(modifier = Modifier.padding(vertical = 10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedButton(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color(
+                            red = subjectState.color.red,
+                            green = subjectState.color.green,
+                            blue = subjectState.color.blue,
+                            alpha = subjectState.color.alpha
+                        )
+                    ),
+                    enabled = false
+                ) {
+                    Text(text = "Add result")
+                }
+                Text(
+                    text = "27 August 2022",
+                    color = Color.DarkGray,
+                    fontFamily = fredoka,
+                    fontWeight = FontWeight.Light
+                )
+
+            }
+        }
+
     }
 }

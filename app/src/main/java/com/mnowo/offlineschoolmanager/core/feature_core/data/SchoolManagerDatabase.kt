@@ -20,7 +20,7 @@ import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
 
 @Database(
     entities = [Subject::class, Grade::class, ToDo::class, Timetable::class, Exam::class],
-    version = 26,
+    version = 27,
     exportSchema = false
 )
 @TypeConverters(TimestampConverter::class, DaysConverter::class)
