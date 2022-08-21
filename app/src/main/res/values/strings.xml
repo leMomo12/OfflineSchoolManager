@@ -50,4 +50,5 @@
     <string name="todayTimetable">Today\'s timetable</string>
     <string name="nextTimetable">Next timetable</string>
     <string name="currentDate">Current date:</string>
+    <string name="exam">Exam</string>
 </resources>

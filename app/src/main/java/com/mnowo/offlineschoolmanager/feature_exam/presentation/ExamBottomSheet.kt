@@ -117,7 +117,8 @@ fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fr
                     label = {
                         Text(stringResource(id = R.string.enterTitle))
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = viewModel.descriptionState.value.text,
@@ -129,7 +130,8 @@ fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fr
                         .fillMaxWidth(),
                     label = {
                         Text(stringResource(id = R.string.enterDescription))
-                    }
+                    },
+                    maxLines = 2
                 )
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
                 Text(

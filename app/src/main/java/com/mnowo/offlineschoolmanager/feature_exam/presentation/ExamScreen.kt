@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.util.Log.d
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,6 +38,8 @@ import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamBottomSheet
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamEvent
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamViewModel
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -104,6 +107,9 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
                 }
                 items(viewModel.examListState.value.listData) {
                     ExamItem(viewModel = viewModel, examData = it, fredoka = fredoka)
+                }
+                item { 
+                    Spacer(modifier = Modifier.padding(vertical = 50.dp))
                 }
             }
         }
@@ -202,9 +208,7 @@ fun ExamTitle(
 fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
     val subjectState by remember {
         derivedStateOf {
-
-            viewModel.subjectListState.value.listData.filter { it.id == examData.id }[0]
-
+            viewModel.getSubjectItem(examData = examData)
         }
     }
     Box(
@@ -224,12 +228,12 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 16.dp, end = 16.dp, top = 5.dp, bottom = 15.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 15.dp),
             horizontalAlignment = Alignment.Start
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 Text(
-                    text = subjectState.subjectName + " " + "Exam",
+                    text = subjectState.subjectName + " " + stringResource(R.string.exam),
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Light,
                     color = Color.DarkGray
@@ -255,12 +259,12 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
                             alpha = subjectState.color.alpha
                         )
                     ),
-                    enabled = false
+                    enabled = viewModel.isExamExpired(examLongDate = examData.date)
                 ) {
                     Text(text = "Add result")
                 }
                 Text(
-                    text = "27 August 2022",
+                    text = FormatDate.formatLongToSpring(time = examData.date),
                     color = Color.DarkGray,
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Light

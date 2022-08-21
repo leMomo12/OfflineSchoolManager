@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_exam.presentation
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
@@ -19,6 +20,7 @@ import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.GetAllExamIte
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeEvent
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -163,7 +165,8 @@ class ExamViewModel @Inject constructor(
                         addOrEditError(eventResult = examResult)
                     }
                 }
-                is Resource.Loading -> { /* not needed */ }
+                is Resource.Loading -> { /* not needed */
+                }
                 is Resource.Success -> {
                     addOrEditSuccess()
                 }
@@ -183,7 +186,8 @@ class ExamViewModel @Inject constructor(
             ExamResult.EmptyDescription -> _descriptionErrorState.value = true
             ExamResult.EmptyTitle -> _titleErrorState.value = true
             ExamResult.SubjectNotPicked -> onEvent(ExamEvent.SetPickedSubjectColorState(Color.Red))
-            ExamResult.Success -> { /* no need */ }
+            ExamResult.Success -> { /* no need */
+            }
         }
     }
 
@@ -207,6 +211,23 @@ class ExamViewModel @Inject constructor(
         )
         onEvent(ExamEvent.SetPickedSubjectState(subject))
         onEvent(ExamEvent.SetDateState(Calendar.getInstance().time))
+    }
+
+    fun getSubjectItem(examData: Exam): Subject {
+        val errorSubject = Subject(-1, "", 0, "fds", 50.0, 50.0, 2.0)
+        return if (subjectListState.value.listData.isNotEmpty()) {
+            subjectListState.value.listData.filter { it.id == examData.subjectId }[0]
+        } else {
+            errorSubject
+        }
+    }
+
+    fun isExamExpired(examLongDate: Long) : Boolean {
+        val examDate = FormatDate.formatLongToDate(time = examLongDate)
+        if(Calendar.getInstance().time.after(examDate)) {
+            return true
+        }
+        return false
     }
 
     fun bottomNav(screen: Screen, currentScreen: Screen) {

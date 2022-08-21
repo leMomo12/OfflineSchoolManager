@@ -157,6 +157,9 @@ fun SubjectScreen(
                         thickness = 0.8.dp
                     )
                 }
+                item {
+                    Spacer(Modifier.padding(vertical = 40.dp))
+                }
 
             }
             if (viewModel.deleteDialogState.value) {

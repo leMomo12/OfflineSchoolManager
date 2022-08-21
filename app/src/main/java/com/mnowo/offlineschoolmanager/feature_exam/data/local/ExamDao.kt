@@ -14,7 +14,7 @@ interface ExamDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addExam(exam: Exam)
 
-    @Query("SELECT * FROM ${Constants.EXAM_TABLE}")
+    @Query("SELECT * FROM ${Constants.EXAM_TABLE} ORDER BY date ASC")
     fun getAllExamItems() : Flow<List<Exam>>
 
 }
