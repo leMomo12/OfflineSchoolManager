@@ -433,7 +433,7 @@ fun RowScope.TimetableSubjectItem(
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     when {
-                        (!viewModel.deleteState.value && !viewModel.editState.value) || (color == Color.LightGray) -> {
+                        (!viewModel.deleteState.value && !viewModel.editState.value) || (subject.isBlank()) -> {
                             Text(
                                 text = room,
                                 maxLines = 1,
@@ -446,7 +446,7 @@ fun RowScope.TimetableSubjectItem(
                                 fontWeight = FontWeight.Light
                             )
                         }
-                        viewModel.editState.value && color != Color.LightGray -> {
+                        viewModel.editState.value && subject.isNotBlank() -> {
                             IconButton(onClick = {
                                 viewModel.onEvent(
                                     TimetableEvent.SetTimetableSpecificItem(
@@ -469,7 +469,7 @@ fun RowScope.TimetableSubjectItem(
                                 )
                             }
                         }
-                        viewModel.deleteState.value && color != Color.LightGray -> {
+                        viewModel.deleteState.value && subject.isNotBlank() -> {
                             IconButton(onClick = {
 
                                 viewModel.onEvent(

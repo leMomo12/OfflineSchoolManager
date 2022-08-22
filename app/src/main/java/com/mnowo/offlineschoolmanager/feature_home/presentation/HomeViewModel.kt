@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_home.presentation
 
+import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -200,8 +201,13 @@ class HomeViewModel @Inject constructor(
                 if (intDay == day) {
                     dailyList.add(item)
 
-                    val subject = subjectListState.value.listData.filter { it.id == item.subjectId }[0]
-                    _dailyTimetableMap.set(key = item, value = subject)
+                    try {
+                        val subject = subjectListState.value.listData.filter { it.id == item.subjectId }[0]
+                        _dailyTimetableMap.set(key = item, value = subject)
+                    } catch (e: Exception) {
+                        return
+                    }
+
                 }
             }
         }
@@ -216,11 +222,16 @@ class HomeViewModel @Inject constructor(
                     val intDay = convertDayToInt(day = item.day)
                     if (intDay == day) {
                         dailyList.add(item)
+                        try {
+                            val subject =
+                                subjectListState.value.listData.filter { it.id == item.subjectId }[0]
 
-                        val subject =
-                            subjectListState.value.listData.filter { it.id == item.subjectId }[0]
-                        _dailyTimetableMap.set(key = item, value = subject)
-                        onEvent(HomeEvent.SetIsTodayTimetableState(false))
+                            _dailyTimetableMap.set(key = item, value = subject)
+                            onEvent(HomeEvent.SetIsTodayTimetableState(false))
+                        } catch (e: Exception) {
+                            return
+                            d("Subject", "exception: ${e.localizedMessage}")
+                        }
                     }
                 }
             }
