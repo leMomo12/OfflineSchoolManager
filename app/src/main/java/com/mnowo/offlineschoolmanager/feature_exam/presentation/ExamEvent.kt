@@ -14,8 +14,10 @@ sealed interface ExamEvent {
     data class SetPickedSubjectColorState(var color: Color) : ExamEvent
     data class SetPickedSubjectState(var subject: Subject) : ExamEvent
     data class SetSubjectListState(var list: List<Subject>) : ExamEvent
+    data class SetAddExamSubjectIdState(var subjectId: Int) : ExamEvent
     data class ChangeBottomSheetState(var value: Boolean) : ExamEvent
     data class SetExamListState(var list: List<Exam>) : ExamEvent
+    data class AddResult(var subjectId: Int) : ExamEvent
 
     object AddExamItem : ExamEvent
     object GetAllExamItems : ExamEvent

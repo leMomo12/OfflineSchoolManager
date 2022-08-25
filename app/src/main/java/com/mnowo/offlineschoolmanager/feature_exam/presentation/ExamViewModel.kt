@@ -77,6 +77,9 @@ class ExamViewModel @Inject constructor(
     private val _descriptionErrorState = mutableStateOf<Boolean>(false)
     val descriptionErrorState: State<Boolean> = _descriptionErrorState
 
+    private val _addExamSubjectIdState = mutableStateOf<Int>(-1)
+    val addExamSubjectIdState: State<Int> = _addExamSubjectIdState
+
     fun onEvent(event: ExamEvent) {
         when (event) {
             is ExamEvent.SetTitleState -> {
@@ -106,6 +109,9 @@ class ExamViewModel @Inject constructor(
                     listData = event.list
                 )
             }
+            is ExamEvent.SetAddExamSubjectIdState -> {
+                _addExamSubjectIdState.value = event.subjectId
+            }
             is ExamEvent.ChangeBottomSheetState -> {
                 _bottomSheetState.value = event.value
             }
@@ -117,6 +123,15 @@ class ExamViewModel @Inject constructor(
             is ExamEvent.SetPickedSubjectColorState -> {
                 _pickedSubjectColorState.value = event.color
             }
+            is ExamEvent.AddResult -> {
+                viewModelScope.launch {
+                    onEvent(ExamEvent.SetAddExamSubjectIdState(subjectId = event.subjectId))
+                    _eventFlow.emit(
+                        UiEvent.Navigate(Screen.GradeScreen.route)
+                    )
+                }
+            }
+
             is ExamEvent.AddExamItem -> {
                 addExamItem()
             }

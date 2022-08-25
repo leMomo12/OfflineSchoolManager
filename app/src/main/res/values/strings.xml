@@ -51,4 +51,12 @@
     <string name="nextTimetable">Next timetable</string>
     <string name="currentDate">Current date:</string>
     <string name="exam">Exam</string>
+    <string name="noToDosFound">No ToDo\'s found</string>
+    <string name="emptyToDoSubtitle">Add new ToDo\'s so you don\'t forget important appointments or homework</string>
+    <string name="emptySubjectListTitle">No Subjects found</string>
+    <string name="emptySubjectListSubtitle">Add new subjects needed for adding grades, toDo\'s, exams and a timetable</string>
+    <string name="examEmptyListTitle">No Exams found</string>
+    <string name="examEmptyListSubtitle">Add new exams to help you keep track of your tests</string>
+    <string name="gradeEmptyListTitle">No grades found</string>
+    <string name="gradeEmptyListSubtitle">Add new grades to keep track of your average and subjects performance</string>
 </resources>

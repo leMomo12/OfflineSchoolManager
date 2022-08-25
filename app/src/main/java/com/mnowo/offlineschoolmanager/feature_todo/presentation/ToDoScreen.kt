@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,9 +24,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -122,11 +126,26 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
             }
             if (viewModel.toDoList.value.listData.isEmpty()) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxHeight(0.8f)
+                        .fillMaxWidth(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
+                    Image(painterResource(id = R.drawable.todo_icon), contentDescription = "")
+                    Spacer(modifier = Modifier.padding(vertical = 5.dp))
+                    Text(
+                        text = stringResource(R.string.noToDosFound),
+                        fontFamily = fredoka,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = stringResource(R.string.emptyToDoSubtitle),
+                        fontFamily = fredoka,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(0.5f).padding(top = 5.dp)
+                    )
                 }
             }
         }
@@ -285,7 +304,12 @@ fun ToDoStaggeredGrid(
                         if (viewModel.subjectList.value.listData.isNotEmpty()) {
                             val intColor =
                                 viewModel.subjectList.value.listData.filter { it.id == item.subjectId }[0].color
-                            return@derivedStateOf Color(intColor.red, intColor.green, intColor.blue, intColor.alpha)
+                            return@derivedStateOf Color(
+                                intColor.red,
+                                intColor.green,
+                                intColor.blue,
+                                intColor.alpha
+                            )
                         } else {
                             return@derivedStateOf Color.LightGray
                         }

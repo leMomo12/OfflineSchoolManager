@@ -1,6 +1,7 @@
 package com.mnowo.offlineschoolmanager
 
 import android.util.Log.d
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,9 +20,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.alpha
@@ -31,6 +34,7 @@ import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
@@ -55,6 +59,11 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
         viewModel.eventFlow.collectLatest {
             when (it) {
                 is UiEvent.Navigate -> {
+                    navController.currentBackStackEntry?.savedStateHandle?.set(
+                        key = Constants.GRADE_NAV_ARGUMENT,
+                        value = viewModel.addExamSubjectIdState.value
+                    )
+
                     navController.navigate(it.route)
                 }
                 is UiEvent.ShowSnackbar -> {
@@ -110,6 +119,31 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
                 }
                 item { 
                     Spacer(modifier = Modifier.padding(vertical = 50.dp))
+                }
+            }
+
+            if (viewModel.examListState.value.listData.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight(0.8f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(painterResource(id = R.drawable.exam_icon), contentDescription = "")
+                    Spacer(modifier = Modifier.padding(vertical = 5.dp))
+                    Text(
+                        text = stringResource(R.string.examEmptyListTitle),
+                        fontFamily = fredoka,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = stringResource(R.string.examEmptyListSubtitle),
+                        fontFamily = fredoka,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(0.5f).padding(top = 5.dp)
+                    )
                 }
             }
         }
@@ -250,7 +284,7 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedButton(
-                    onClick = { },
+                    onClick = { viewModel.onEvent(ExamEvent.AddResult(subjectId = examData.subjectId)) },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color(
                             red = subjectState.color.red,

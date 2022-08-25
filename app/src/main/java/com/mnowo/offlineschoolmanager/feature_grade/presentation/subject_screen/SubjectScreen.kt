@@ -5,9 +5,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -28,9 +28,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.alpha
@@ -48,7 +50,6 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.mo
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectViewModel
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
-import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectViewModel
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
@@ -171,6 +172,30 @@ fun SubjectScreen(
                     title = stringResource(id = R.string.sureToDelete),
                     text = stringResource(id = R.string.thisChangeCannotBeReset)
                 )
+            }
+            if (viewModel.subjectListState.value.listData.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight(0.8f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(painterResource(id = R.drawable.education_icon), contentDescription = "")
+                    Spacer(modifier = Modifier.padding(vertical = 5.dp))
+                    Text(
+                        text = stringResource(R.string.emptySubjectListTitle),
+                        fontFamily = fredoka,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = stringResource(R.string.emptySubjectListSubtitle),
+                        fontFamily = fredoka,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(0.5f).padding(top = 5.dp)
+                    )
+                }
             }
         }
     }

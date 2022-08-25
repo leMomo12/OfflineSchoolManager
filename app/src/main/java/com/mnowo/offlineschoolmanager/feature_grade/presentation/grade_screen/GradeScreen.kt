@@ -5,6 +5,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,9 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -143,6 +146,31 @@ fun GradeScreen(
                     title = stringResource(id = R.string.sureToDelete),
                     text = stringResource(id = R.string.thisChangeCannotBeReset)
                 )
+            }
+
+            if (viewModel.gradeListState.value.listData.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight(0.8f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(painterResource(id = R.drawable.exam_icon), contentDescription = "")
+                    Spacer(modifier = Modifier.padding(vertical = 5.dp))
+                    Text(
+                        text = stringResource(R.string.gradeEmptyListTitle),
+                        fontFamily = fredoka,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = stringResource(R.string.gradeEmptyListSubtitle),
+                        fontFamily = fredoka,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(0.5f).padding(top = 5.dp)
+                    )
+                }
             }
         }
     }
