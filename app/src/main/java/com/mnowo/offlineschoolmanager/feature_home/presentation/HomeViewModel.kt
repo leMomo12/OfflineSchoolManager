@@ -25,11 +25,13 @@ import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.GetAllTimetableItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.Calendar.DAY_OF_WEEK
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,6 +68,9 @@ class HomeViewModel @Inject constructor(
     private val _isTodayTimetableState = mutableStateOf<Boolean>(true)
     val isTodayTimetableState: State<Boolean> = _isTodayTimetableState
 
+    private val _emptyDailyList = mutableStateOf<Boolean>(true)
+    val emptyDailyList: State<Boolean> = _emptyDailyList
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SetAverageState -> {
@@ -91,6 +96,9 @@ class HomeViewModel @Inject constructor(
             }
             is HomeEvent.SetIsTodayTimetableState -> {
                 _isTodayTimetableState.value = event.value
+            }
+            is HomeEvent.SetEmptyDailyList -> {
+                _emptyDailyList.value = event.isEmpty
             }
         }
     }
@@ -189,55 +197,52 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
     private fun getDailyTimetable() {
         val dailyList = mutableListOf<Timetable>()
         var day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2
 
         if (timetableListState.value.listData.isNotEmpty()) {
-            for (item in timetableListState.value.listData) {
-                val intDay = convertDayToInt(day = item.day)
-
-                if (intDay == day) {
-                    dailyList.add(item)
-
-                    try {
-                        val subject = subjectListState.value.listData.filter { it.id == item.subjectId }[0]
-                        _dailyTimetableMap.set(key = item, value = subject)
-                    } catch (e: Exception) {
-                        return
-                    }
-
+            onEvent(HomeEvent.SetEmptyDailyList(isEmpty = false))
+            dailyTimetableLoop(
+                day = day,
+                addToDailyList = {
+                    dailyList.add(it)
                 }
-            }
-        }
-
-        if (dailyList.isEmpty()) {
+            )
             while (dailyList.isEmpty()) {
                 day++
-                if (day >= 7) {
-                    day = 2
+                if (day >= 5) {
+                    day = 0
                 }
-                for (item in timetableListState.value.listData) {
-                    val intDay = convertDayToInt(day = item.day)
-                    if (intDay == day) {
-                        dailyList.add(item)
-                        try {
-                            val subject =
-                                subjectListState.value.listData.filter { it.id == item.subjectId }[0]
-
-                            _dailyTimetableMap.set(key = item, value = subject)
-                            onEvent(HomeEvent.SetIsTodayTimetableState(false))
-                        } catch (e: Exception) {
-                            return
-                            d("Subject", "exception: ${e.localizedMessage}")
-                        }
+                dailyTimetableLoop(
+                    day = day,
+                    addToDailyList = {
+                        dailyList.add(it)
                     }
+                )
+            }
+        }
+
+        dailyList.sortBy { it.hour }
+        onEvent(HomeEvent.AddDailyTimetableListState(dailyList))
+    }
+
+    private fun dailyTimetableLoop(day: Int, addToDailyList: (Timetable) -> Unit) {
+        for (item in timetableListState.value.listData) {
+            val intDay = convertDayToInt(day = item.day)
+            if (intDay == day) {
+                addToDailyList(item)
+                try {
+                    val subject =
+                        subjectListState.value.listData.filter { it.id == item.subjectId }[0]
+
+                    _dailyTimetableMap.set(key = item, value = subject)
+                    onEvent(HomeEvent.SetIsTodayTimetableState(false))
+                } catch (e: Exception) {
+                    return
                 }
             }
         }
-        dailyList.sortBy { it.hour }
-        onEvent(HomeEvent.AddDailyTimetableListState(dailyList))
     }
 }
 

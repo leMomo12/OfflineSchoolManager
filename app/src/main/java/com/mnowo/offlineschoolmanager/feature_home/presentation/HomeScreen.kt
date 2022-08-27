@@ -3,6 +3,7 @@ package com.mnowo.offlineschoolmanager
 import android.hardware.lights.Light
 import android.util.Log.d
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -211,6 +214,38 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: H
                 fredoka = fredoka,
                 viewModel = viewModel
             )
+        }
+        item {
+            if (viewModel.emptyDailyList.value) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painterResource(id = R.drawable.no_data_icon),
+                        contentDescription = "",
+                        modifier = Modifier.scale(0.8f)
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 5.dp)
+                    ) {
+                        Text(
+                            text = "You have no timetable yet",
+                            fontFamily = fredoka,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = "Let's change that",
+                            fontFamily = fredoka,
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
         }
     }
 }
