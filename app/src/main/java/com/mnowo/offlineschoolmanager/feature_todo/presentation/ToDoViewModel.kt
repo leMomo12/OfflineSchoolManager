@@ -297,7 +297,7 @@ class ToDoViewModel @Inject constructor(
             }
         }
 
-    private fun clearAfterToDoEvent() {
+    fun clearAfterToDoEvent() {
         _titleState.value.clearText()
         _descriptionState.value.clearText()
         _datePickerDateState.value = Calendar.getInstance().time
@@ -305,7 +305,7 @@ class ToDoViewModel @Inject constructor(
             Subject(-1, "", 0, "123", 50.0, 50.0, 1.0)
     }
 
-    private fun removeAllErrors() {
+    fun removeAllErrors() {
         setTitleErrorState(false)
         setDescriptionErrorState(false)
         setPickSubjectColorState(Color.LightGray)

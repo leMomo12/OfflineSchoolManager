@@ -10,4 +10,8 @@ interface ExamRepository {
 
     fun getAllExamItems() : Flow<List<Exam>>
 
+    suspend fun deleteExamItem(id: Int)
+
+    suspend fun updateExamItem(exam: Exam)
+
 }

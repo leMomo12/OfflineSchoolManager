@@ -16,8 +16,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -28,8 +27,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.alpha
+import androidx.core.graphics.blue
+import androidx.core.graphics.green
+import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
@@ -38,6 +42,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.WindowInfo
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import kotlinx.coroutines.flow.collectLatest
@@ -111,8 +116,17 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                         viewModel = viewModel
                     )
                 }
-                items(3) {
-                    UpcomingExamsItem(fredoka = fredoka, windowInfo = windowInfo)
+                items(viewModel.examListState.value.listData.filter {
+                    !viewModel.isExamExpired(
+                        examLongDate = it.date
+                    )
+                }.take(3)) { examData ->
+                    UpcomingExamsItem(
+                        fredoka = fredoka,
+                        windowInfo = windowInfo,
+                        examData = examData,
+                        viewModel = viewModel
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.padding(60.dp))
@@ -302,14 +316,31 @@ fun HomeUpcomingExams(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: Ho
 }
 
 @Composable
-fun UpcomingExamsItem(fredoka: FontFamily, windowInfo: WindowInfo) {
+fun UpcomingExamsItem(
+    fredoka: FontFamily,
+    windowInfo: WindowInfo,
+    examData: Exam,
+    viewModel: HomeViewModel
+) {
+    val subjectState by remember {
+        derivedStateOf {
+            viewModel.getExamSubjectItem(examData = examData)
+        }
+    }
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp, bottom = 8.dp),
         elevation = 5.dp,
-        border = BorderStroke(0.4.dp, color = Color.LightGray)
+        border = BorderStroke(
+            0.4.dp, color = Color(
+                red = subjectState.color.red,
+                green = subjectState.color.green,
+                blue = subjectState.color.blue,
+                alpha = subjectState.color.alpha
+            )
+        )
     ) {
         Row(
             Modifier
@@ -319,17 +350,22 @@ fun UpcomingExamsItem(fredoka: FontFamily, windowInfo: WindowInfo) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "English Exam",
+                text = examData.title,
                 fontFamily = fredoka,
                 fontWeight = FontWeight.Normal,
-                fontSize = 20.sp
+                fontSize = 20.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth(0.5f)
             )
             Text(
                 text = "13 December 2022",
                 fontFamily = fredoka,
                 fontWeight = FontWeight.Light,
                 fontSize = 15.sp,
-                color = Color.Gray
+                color = Color.Gray,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

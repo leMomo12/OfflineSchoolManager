@@ -1,6 +1,5 @@
 package com.mnowo.offlineschoolmanager.feature_exam.presentation
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
@@ -16,16 +15,15 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.mo
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.ExamResult
 import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.AddExamUseCase
-import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.GetAllExamItemsUseCase
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
-import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
-import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.use_case.GetAllExamItemsUseCase
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ExamSubjectItemHelper
+import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.DeleteExamItemUseCase
+import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.EditExamItemUseCase
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -34,7 +32,9 @@ import javax.inject.Inject
 class ExamViewModel @Inject constructor(
     private val helper: Helper,
     private val getAllExamItemsUseCase: GetAllExamItemsUseCase,
-    private val addExamUseCase: AddExamUseCase
+    private val addExamUseCase: AddExamUseCase,
+    private val deleteExamItemUseCase: DeleteExamItemUseCase,
+    private val editExamItemUseCase: EditExamItemUseCase
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -79,6 +79,21 @@ class ExamViewModel @Inject constructor(
 
     private val _addExamSubjectIdState = mutableStateOf<Int>(-1)
     val addExamSubjectIdState: State<Int> = _addExamSubjectIdState
+
+    private val _editState = mutableStateOf<Boolean>(false)
+    val editState: State<Boolean> = _editState
+
+    private val _contentEditState = mutableStateOf<Boolean>(false)
+    val contentEditState: State<Boolean> = _contentEditState
+
+    private val _deleteState = mutableStateOf<Boolean>(false)
+    val deleteState: State<Boolean> = _deleteState
+
+    private val _dropDownMenuState = mutableStateOf<Boolean>(false)
+    val dropDownMenuState: State<Boolean> = _dropDownMenuState
+
+    private val _editSpecificExam = mutableStateOf<Exam>(Exam(-1, "", "", -1, 0))
+    val editSpecificExam: State<Exam> = _editSpecificExam
 
     fun onEvent(event: ExamEvent) {
         when (event) {
@@ -131,7 +146,27 @@ class ExamViewModel @Inject constructor(
                     )
                 }
             }
+            is ExamEvent.SetEditState -> {
+                _editState.value = event.value
+            }
+            is ExamEvent.SetDeleteState -> {
+                _deleteState.value = event.value
+            }
+            is ExamEvent.SetDropDownMenuState -> {
+                _dropDownMenuState.value = event.value
+            }
+            is ExamEvent.SetEditSpecificExam -> {
+                _editSpecificExam.value = event.exam
+            }
+            is ExamEvent.SetContentEditState -> {
+                _contentEditState.value = event.value
+            }
+            is ExamEvent.EditExam -> {
+                editExamItem(exam = event.exam)
+            }
+            is ExamEvent.DeleteExam -> {
 
+            }
             is ExamEvent.AddExamItem -> {
                 addExamItem()
             }
@@ -146,6 +181,28 @@ class ExamViewModel @Inject constructor(
         getAllExamItems()
     }
 
+
+    private fun editExamItem(exam: Exam) = viewModelScope.launch(Dispatchers.IO) {
+        editExamItemUseCase.invoke(exam = exam).collect() {
+            when (it) {
+                is Resource.Error -> {
+                    it.data?.let { examResult ->
+                        addOrEditError(eventResult = examResult)
+                    }
+                }
+                is Resource.Loading -> {
+                    // not needed
+                }
+                is Resource.Success -> {
+                    addOrEditSuccess()
+                }
+            }
+        }
+    }
+
+    private fun deleteExamItem(id: Int) = viewModelScope.launch(Dispatchers.IO) {
+        deleteExamItemUseCase.invoke(id = id)
+    }
 
     private fun getAllSubjects() = viewModelScope.launch {
         helper.getAllSubjectUseCaseResultHandler(
@@ -206,43 +263,41 @@ class ExamViewModel @Inject constructor(
         }
     }
 
-    private fun removeAllErrors() {
+    fun removeAllErrors() {
         _titleErrorState.value = false
         _descriptionErrorState.value = false
         _pickedSubjectColorState.value = Color.LightGray
     }
 
-    private fun clearAfterExamEvent() {
+    fun clearAfterExamEvent() {
         onEvent(ExamEvent.SetTitleState(text = ""))
         onEvent(ExamEvent.SetDescriptionState(text = ""))
-        val subject = Subject(
-            -1,
-            "",
-            0,
-            "123",
-            50.0,
-            1.0,
-            1.0
-        )
-        onEvent(ExamEvent.SetPickedSubjectState(subject))
+
+        if (!editState.value) {
+            val subject = Subject(
+                -1,
+                "",
+                0,
+                "123",
+                50.0,
+                1.0,
+                1.0
+            )
+            onEvent(ExamEvent.SetPickedSubjectState(subject))
+        }
+
         onEvent(ExamEvent.SetDateState(Calendar.getInstance().time))
     }
 
     fun getSubjectItem(examData: Exam): Subject {
-        val errorSubject = Subject(-1, "", 0, "fds", 50.0, 50.0, 2.0)
-        return if (subjectListState.value.listData.isNotEmpty()) {
-            subjectListState.value.listData.filter { it.id == examData.subjectId }[0]
-        } else {
-            errorSubject
-        }
+        return ExamSubjectItemHelper.getSubjectItem(
+            examData = examData,
+            subjectList = subjectListState.value.listData
+        )
     }
 
-    fun isExamExpired(examLongDate: Long) : Boolean {
-        val examDate = FormatDate.formatLongToDate(time = examLongDate)
-        if(Calendar.getInstance().time.after(examDate)) {
-            return true
-        }
-        return false
+    fun isExamExpired(examLongDate: Long): Boolean {
+        return ExamSubjectItemHelper.isExamExpired(examLongDate = examLongDate)
     }
 
     fun bottomNav(screen: Screen, currentScreen: Screen) {

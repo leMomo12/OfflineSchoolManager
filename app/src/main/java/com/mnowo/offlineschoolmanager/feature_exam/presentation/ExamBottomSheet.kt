@@ -25,6 +25,7 @@ import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.Dat
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.SubjectPickerDialog
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.AddSubjectBottomSheet
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import kotlinx.coroutines.launch
 
@@ -49,6 +50,16 @@ fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fr
 
     if (!viewModel.bottomSheetState.value) {
         onCloseBottomSheet()
+    }
+
+    if (viewModel.contentEditState.value) {
+        viewModel.onEvent(ExamEvent.SetContentEditState(false))
+
+        viewModel.onEvent(ExamEvent.SetTitleState(text = viewModel.editSpecificExam.value.title))
+        viewModel.onEvent(ExamEvent.SetDescriptionState(text = viewModel.editSpecificExam.value.description))
+        viewModel.onEvent(
+            ExamEvent.SetDateState(date = FormatDate.formatLongToDate(viewModel.editSpecificExam.value.date))
+        )
     }
 
     ModalBottomSheetLayout(
@@ -89,12 +100,28 @@ fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fr
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     OutlinedButton(
                         onClick = {
-                            viewModel.onEvent(ExamEvent.AddExamItem)
+                            if (!viewModel.editState.value) {
+                                viewModel.onEvent(ExamEvent.AddExamItem)
+                            } else {
+                                val exam = Exam(
+                                    id = viewModel.editSpecificExam.value.id,
+                                    title = viewModel.titleState.value.text,
+                                    description = viewModel.descriptionState.value.text,
+                                    subjectId = viewModel.pickedSubjectState.value.id,
+                                    date = viewModel.dateState.value.time
+                                )
+                                viewModel.onEvent(ExamEvent.EditExam(exam = exam))
+                            }
                         },
-                        border = BorderStroke(1.dp, color = LightBlue)
+                        border = BorderStroke(1.dp, color = LightBlue),
+
                     ) {
                         Text(
-                            text = stringResource(id = R.string.add),
+                            text = if (!viewModel.editState.value) {
+                                stringResource(id = R.string.add)
+                            } else {
+                                stringResource(id = R.string.save)
+                            },
                             color = LightBlue
                         )
                     }
@@ -118,7 +145,8 @@ fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fr
                         Text(stringResource(id = R.string.enterTitle))
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    isError = viewModel.titleErrorState.value
                 )
                 OutlinedTextField(
                     value = viewModel.descriptionState.value.text,
@@ -131,7 +159,8 @@ fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fr
                     label = {
                         Text(stringResource(id = R.string.enterDescription))
                     },
-                    maxLines = 2
+                    maxLines = 2,
+                    isError = viewModel.descriptionErrorState.value
                 )
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
                 Text(

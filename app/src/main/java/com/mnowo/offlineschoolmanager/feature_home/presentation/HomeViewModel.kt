@@ -1,6 +1,5 @@
 package com.mnowo.offlineschoolmanager.feature_home.presentation
 
-import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -14,31 +13,32 @@ import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.use_case.GetAllExamItemsUseCase
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.CalculateGradeColor
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ConvertDay.convertDayToInt
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ExamSubjectItemHelper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
 import com.mnowo.offlineschoolmanager.feature_home.domain.use_case.GetAverageUseCase
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.GetAllTimetableItemsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.Calendar.DAY_OF_WEEK
 import javax.inject.Inject
-
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getAverageUseCase: GetAverageUseCase,
     private val getAllTimetableItemsUseCase: GetAllTimetableItemsUseCase,
-    private val helper: Helper
+    private val helper: Helper,
+    private val getAllExamItemsUseCase: GetAllExamItemsUseCase
 ) : ViewModel() {
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
@@ -71,6 +71,9 @@ class HomeViewModel @Inject constructor(
     private val _emptyDailyList = mutableStateOf<Boolean>(true)
     val emptyDailyList: State<Boolean> = _emptyDailyList
 
+    private val _examListState = mutableStateOf<ListState<Exam>>(ListState())
+    val examListState: State<ListState<Exam>> = _examListState
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SetAverageState -> {
@@ -100,6 +103,11 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.SetEmptyDailyList -> {
                 _emptyDailyList.value = event.isEmpty
             }
+            is HomeEvent.SetExamListState -> {
+                _examListState.value = examListState.value.copy(
+                    listData = event.list
+                )
+            }
         }
     }
 
@@ -125,6 +133,9 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
             getAllTimetableItems()
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            getAllExamItems()
         }
     }
 
@@ -244,6 +255,29 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    private suspend fun getAllExamItems() {
+        getAllExamItemsUseCase.invoke().collect() {
+            when (it) {
+                is Resource.Loading -> {
+                    onEvent(HomeEvent.SetExamListState(list = it.data ?: listOf()))
+                }
+            }
+        }
+    }
+
+    fun getExamSubjectItem(examData: Exam): Subject  {
+        return ExamSubjectItemHelper.getSubjectItem(
+            examData = examData,
+            subjectList = subjectListState.value.listData
+        )
+    }
+
+    fun isExamExpired(examLongDate: Long): Boolean {
+         return ExamSubjectItemHelper.isExamExpired(examLongDate = examLongDate)
+    }
+
 }
+
 
 

@@ -63,6 +63,8 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
 
     val closeSheet: () -> Unit = {
         scope.launch {
+            viewModel.removeAllErrors()
+            viewModel.clearAfterToDoEvent()
             bottomState.bottomSheetState.collapse()
         }
     }
@@ -253,7 +255,6 @@ fun ToDoTitle(
                     border = BorderStroke(1.4.dp, color = LightBlue),
                     shape = RoundedCornerShape(32.dp),
                     modifier = Modifier
-                        .testTag(GradeTestTags.CANCEL_BUTTON)
                         .padding(end = 5.dp)
                 ) {
                     Text(

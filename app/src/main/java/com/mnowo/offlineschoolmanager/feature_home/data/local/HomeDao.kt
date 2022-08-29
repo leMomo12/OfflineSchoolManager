@@ -16,4 +16,5 @@ interface HomeDao {
 
     @Query("SELECT * FROM ${Constants.TIMETABLE_TABLE} WHERE day = :day")
     suspend fun getSpecificTimetableDay(day: Int): List<Timetable>
+
 }

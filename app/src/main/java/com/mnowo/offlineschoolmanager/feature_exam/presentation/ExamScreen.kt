@@ -1,6 +1,11 @@
 package com.mnowo.offlineschoolmanager
 
 import android.util.Log.d
+import android.util.Log.i
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,6 +16,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.outlined.Error
+import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.*
@@ -36,16 +44,20 @@ import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dropdown_menu.EditAndDeleteDropdownMenu
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamBottomSheet
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamEvent
 import com.mnowo.offlineschoolmanager.feature_exam.presentation.ExamViewModel
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.util.GradeTestTags
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
+import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.annotation.Untainted
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -75,6 +87,8 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
 
     val openSheet: () -> Unit = {
         scope.launch {
+            viewModel.removeAllErrors()
+            viewModel.clearAfterExamEvent()
             bottomState.bottomSheetState.expand()
         }
     }
@@ -115,9 +129,13 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
                     )
                 }
                 items(viewModel.examListState.value.listData) {
-                    ExamItem(viewModel = viewModel, examData = it, fredoka = fredoka)
+                    ExamItem(
+                        viewModel = viewModel,
+                        examData = it,
+                        fredoka = fredoka,
+                        openSheet = { openSheet() })
                 }
-                item { 
+                item {
                     Spacer(modifier = Modifier.padding(vertical = 50.dp))
                 }
             }
@@ -142,7 +160,9 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
                         fontFamily = fredoka,
                         color = Color.Gray,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(0.5f).padding(top = 5.dp)
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(top = 5.dp)
                     )
                 }
             }
@@ -164,74 +184,63 @@ fun ExamTitle(
             .padding(start = 20.dp, end = 20.dp)
     ) {
         Text(
-            text = "Exam",
+            text = stringResource(id = R.string.exam),
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
             fontSize = 32.sp
         )
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            IconButton(
-                onClick = {
-                    viewModel.onEvent(ExamEvent.ChangeBottomSheetState(true))
-                    openSheet()
-                },
-                enabled = bottomState.bottomSheetState.isCollapsed
-            ) {
-                Icon(
-                    Icons.Rounded.Add,
-                    contentDescription = "",
-                    modifier = Modifier.scale(1.2f)
-                )
-            }
-            IconButton(onClick = {
-            }, enabled = bottomState.bottomSheetState.isCollapsed) {
-                Icon(
-                    Icons.Rounded.MoreVert,
-                    contentDescription = "",
-                    modifier = Modifier.scale(1.2f)
-                )
-
-                DropdownMenu(
-                    expanded = false,
-                    onDismissRequest = {
-
+            if (!viewModel.editState.value && !viewModel.deleteState.value) {
+                IconButton(
+                    onClick = {
+                        viewModel.onEvent(ExamEvent.ChangeBottomSheetState(true))
+                        openSheet()
                     },
-                    modifier = Modifier
-                        .clip(
-                            RoundedCornerShape(8.dp)
-                        )
-                        .testTag(GradeTestTags.DROPDOWN_MENU)
+                    enabled = bottomState.bottomSheetState.isCollapsed
                 ) {
-                    DropdownMenuItem(
-                        onClick = { },
-                        modifier = Modifier.testTag(GradeTestTags.EDIT_MENU_ITEM),
-                        enabled = bottomState.bottomSheetState.isCollapsed
-                    ) {
-                        Row {
-                            Icon(Icons.Default.Edit, contentDescription = "")
-                            Text(
-                                text = stringResource(id = R.string.edit),
-                                fontFamily = fredoka,
-                                modifier = Modifier
-                                    .padding(start = 5.dp)
-                            )
-                        }
-                    }
-                    DropdownMenuItem(
-                        onClick = { },
-                        modifier = Modifier.testTag(GradeTestTags.DELETE_MENU_ITEM),
-                        enabled = bottomState.bottomSheetState.isCollapsed
-                    ) {
-                        Row {
-                            Icon(Icons.Default.Delete, contentDescription = "")
-                            Text(
-                                text = stringResource(id = R.string.delete),
-                                fontFamily = fredoka,
-                                modifier = Modifier
-                                    .padding(start = 5.dp)
-                            )
-                        }
-                    }
+                    Icon(
+                        Icons.Rounded.Add,
+                        contentDescription = "",
+                        modifier = Modifier.scale(1.2f)
+                    )
+                }
+                IconButton(
+                    onClick = { viewModel.onEvent(ExamEvent.SetDropDownMenuState(true)) },
+                    enabled = bottomState.bottomSheetState.isCollapsed
+                ) {
+                    Icon(
+                        Icons.Rounded.MoreVert,
+                        contentDescription = "",
+                        modifier = Modifier.scale(1.2f)
+                    )
+
+                    EditAndDeleteDropdownMenu(
+                        fredoka = fredoka,
+                        expanded = viewModel.dropDownMenuState.value,
+                        onDismissRequest = { viewModel.onEvent(ExamEvent.SetDropDownMenuState(false)) },
+                        onEditMenuClicked = { viewModel.onEvent(ExamEvent.SetEditState(true)) },
+                        editMenuEnabled = bottomState.bottomSheetState.isCollapsed,
+                        onDeleteMenuClicked = { viewModel.onEvent(ExamEvent.SetDeleteState(true)) },
+                        deleteMenuEnabled = bottomState.bottomSheetState.isCollapsed
+                    )
+                }
+            } else {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.onEvent(ExamEvent.SetEditState(false))
+                        viewModel.onEvent(ExamEvent.SetDeleteState(false))
+                        viewModel.onEvent(ExamEvent.SetDropDownMenuState(false))
+                    },
+                    border = BorderStroke(1.4.dp, color = LightBlue),
+                    shape = RoundedCornerShape(32.dp),
+                    modifier = Modifier
+                        .padding(end = 5.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.cancel),
+                        fontFamily = fredoka,
+                        color = LightBlue
+                    )
                 }
             }
         }
@@ -239,12 +248,19 @@ fun ExamTitle(
 }
 
 @Composable
-fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
+fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily, openSheet: () -> Unit) {
     val subjectState by remember {
         derivedStateOf {
             viewModel.getSubjectItem(examData = examData)
         }
     }
+
+    val isExpiredState by remember {
+        derivedStateOf {
+            viewModel.isExamExpired(examLongDate = examData.date)
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -256,6 +272,12 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
                     green = subjectState.color.green,
                     blue = subjectState.color.blue,
                     alpha = subjectState.color.alpha
+                )
+            )
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = LinearOutSlowInEasing
                 )
             )
     ) {
@@ -293,7 +315,7 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
                             alpha = subjectState.color.alpha
                         )
                     ),
-                    enabled = viewModel.isExamExpired(examLongDate = examData.date)
+                    enabled = isExpiredState
                 ) {
                     Text(text = "Add result")
                 }
@@ -303,9 +325,55 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily) {
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Light
                 )
+            }
+            if (isExpiredState) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = stringResource(R.string.expired),
+                        fontFamily = fredoka,
+                        color = Color.Red
+                    )
+                    Icon(
+                        Icons.Outlined.ErrorOutline,
+                        contentDescription = "",
+                        tint = Color.Red,
+                        modifier = Modifier.padding(start = 5.dp)
+                    )
+                }
+            }
+            when {
+                viewModel.editState.value -> {
+                    ExamDeleteOrEditState(isEditState = true, onClick = {
+                        viewModel.onEvent(ExamEvent.SetEditSpecificExam(exam = examData))
+                        viewModel.onEvent(ExamEvent.SetPickedSubjectState(subject = subjectState))
+                        viewModel.onEvent(ExamEvent.SetContentEditState(true))
+                        viewModel.onEvent(ExamEvent.ChangeBottomSheetState(true))
+                        openSheet()
+                    })
+                }
+                viewModel.deleteState.value -> {
+                    ExamDeleteOrEditState(isEditState = false, onClick = {
 
+                    })
+                }
             }
         }
+    }
+}
 
+@Composable
+fun ExamDeleteOrEditState(isEditState: Boolean, onClick: () -> Unit) {
+    Divider()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        IconButton(onClick = { onClick() }) {
+            if (isEditState) {
+                Icon(Icons.Default.Edit, contentDescription = "")
+            } else {
+                Icon(Icons.Default.Delete, contentDescription = "")
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.mnowo.offlineschoolmanager.feature_exam.domain.use_case
+package com.mnowo.offlineschoolmanager.core.feature_core.domain.use_case
 
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam

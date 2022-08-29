@@ -59,4 +59,5 @@
     <string name="examEmptyListSubtitle">Add new exams to help you keep track of your tests</string>
     <string name="gradeEmptyListTitle">No grades found</string>
     <string name="gradeEmptyListSubtitle">Add new grades to keep track of your average and subjects performance</string>
+    <string name="expired">Expired</string>
 </resources>

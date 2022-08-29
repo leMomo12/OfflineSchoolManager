@@ -18,7 +18,14 @@ sealed interface ExamEvent {
     data class ChangeBottomSheetState(var value: Boolean) : ExamEvent
     data class SetExamListState(var list: List<Exam>) : ExamEvent
     data class AddResult(var subjectId: Int) : ExamEvent
+    data class SetEditState(var value: Boolean) : ExamEvent
+    data class SetDeleteState(var value: Boolean) : ExamEvent
+    data class SetDropDownMenuState(var value: Boolean) : ExamEvent
+    data class SetEditSpecificExam(var exam: Exam) : ExamEvent
+    data class SetContentEditState(var value: Boolean) : ExamEvent
 
+    data class EditExam(var exam: Exam) : ExamEvent
+    object DeleteExam : ExamEvent
     object AddExamItem : ExamEvent
     object GetAllExamItems : ExamEvent
 }

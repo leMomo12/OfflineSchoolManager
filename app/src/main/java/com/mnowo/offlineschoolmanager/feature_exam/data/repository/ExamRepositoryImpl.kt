@@ -18,4 +18,12 @@ class ExamRepositoryImpl @Inject constructor(
         return dao.getAllExamItems()
     }
 
+    override suspend fun deleteExamItem(id: Int) {
+        return dao.deleteExamItem(id = id)
+    }
+
+    override suspend fun updateExamItem(exam: Exam) {
+        return dao.updateExamItem(exam = exam)
+    }
+
 }
