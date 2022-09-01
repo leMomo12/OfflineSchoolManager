@@ -60,4 +60,7 @@
     <string name="gradeEmptyListTitle">No grades found</string>
     <string name="gradeEmptyListSubtitle">Add new grades to keep track of your average and subjects performance</string>
     <string name="expired">Expired</string>
+    <string name="upcomingExams">Upcoming exams</string>
+    <string name="youHaveNoTimetableYet">You have no timetable yet</string>
+    <string name="letsChangeThat">Let\'s change that</string>
 </resources>

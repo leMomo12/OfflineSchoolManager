@@ -45,6 +45,7 @@ import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -116,17 +117,22 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                         viewModel = viewModel
                     )
                 }
-                items(viewModel.examListState.value.listData.filter {
-                    !viewModel.isExamExpired(
-                        examLongDate = it.date
-                    )
-                }.take(3)) { examData ->
+                items(viewModel.notExpiredExamListState.value.listData.take(3)) { examData ->
                     UpcomingExamsItem(
                         fredoka = fredoka,
                         windowInfo = windowInfo,
                         examData = examData,
                         viewModel = viewModel
                     )
+                }
+                item {
+                    if (viewModel.notExpiredExamListState.value.listData.isEmpty()) {
+                        HomeNoDataYet(
+                            title = "You have no upcoming Exams",
+                            description = stringResource(id = R.string.letsChangeThat),
+                            fredoka = fredoka
+                        )
+                    }
                 }
                 item {
                     Spacer(modifier = Modifier.padding(60.dp))
@@ -231,34 +237,13 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: H
         }
         item {
             if (viewModel.emptyDailyList.value) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painterResource(id = R.drawable.no_data_icon),
-                        contentDescription = "",
-                        modifier = Modifier.scale(0.8f)
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 5.dp)
-                    ) {
-                        Text(
-                            text = "You have no timetable yet",
-                            fontFamily = fredoka,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Gray
-                        )
-                        Text(
-                            text = "Let's change that",
-                            fontFamily = fredoka,
-                            color = Color.Gray
-                        )
-                    }
-                }
+                HomeNoDataYet(
+                    title = stringResource(id = R.string.youHaveNoTimetableYet),
+                    description = stringResource(
+                        id = R.string.letsChangeThat
+                    ),
+                    fredoka = fredoka
+                )
             }
         }
     }
@@ -304,7 +289,7 @@ fun HomeUpcomingExams(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: Ho
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Upcoming exams",
+            text = stringResource(R.string.upcomingExams),
             fontFamily = fredoka,
             fontSize = 32.sp,
             fontWeight = FontWeight.Medium
@@ -359,13 +344,45 @@ fun UpcomingExamsItem(
                 modifier = Modifier.fillMaxWidth(0.5f)
             )
             Text(
-                text = "13 December 2022",
+                text = FormatDate.formatLongToSpring(time = examData.date),
                 fontFamily = fredoka,
                 fontWeight = FontWeight.Light,
                 fontSize = 15.sp,
                 color = Color.Gray,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+fun HomeNoDataYet(title: String, description: String, fredoka: FontFamily) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painterResource(id = R.drawable.no_data_icon),
+            contentDescription = "",
+            modifier = Modifier.scale(0.8f)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 5.dp)
+        ) {
+            Text(
+                text = title,
+                fontFamily = fredoka,
+                fontWeight = FontWeight.Medium,
+                color = Color.Gray
+            )
+            Text(
+                text = description,
+                fontFamily = fredoka,
+                color = Color.Gray
             )
         }
     }

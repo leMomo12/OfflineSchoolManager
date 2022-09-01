@@ -23,9 +23,9 @@ sealed interface ExamEvent {
     data class SetDropDownMenuState(var value: Boolean) : ExamEvent
     data class SetEditSpecificExam(var exam: Exam) : ExamEvent
     data class SetContentEditState(var value: Boolean) : ExamEvent
-
     data class EditExam(var exam: Exam) : ExamEvent
-    object DeleteExam : ExamEvent
+    data class DeleteExam(var id: Int) : ExamEvent
+
     object AddExamItem : ExamEvent
     object GetAllExamItems : ExamEvent
 }

@@ -353,7 +353,7 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily, open
                 }
                 viewModel.deleteState.value -> {
                     ExamDeleteOrEditState(isEditState = false, onClick = {
-
+                        viewModel.onEvent(ExamEvent.DeleteExam(id = examData.id))
                     })
                 }
             }

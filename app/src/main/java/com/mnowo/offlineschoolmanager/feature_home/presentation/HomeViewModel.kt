@@ -74,6 +74,9 @@ class HomeViewModel @Inject constructor(
     private val _examListState = mutableStateOf<ListState<Exam>>(ListState())
     val examListState: State<ListState<Exam>> = _examListState
 
+    private val _notExpiredExamListState = mutableStateOf<ListState<Exam>>(ListState())
+    val notExpiredExamListState: State<ListState<Exam>> = _notExpiredExamListState
+
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SetAverageState -> {
@@ -108,6 +111,10 @@ class HomeViewModel @Inject constructor(
                     listData = event.list
                 )
             }
+            is HomeEvent.SetNotExpiredExamListState -> {
+                _notExpiredExamListState.value = notExpiredExamListState.value.copy(
+                    listData = event.list
+                )            }
         }
     }
 
@@ -136,6 +143,7 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
             getAllExamItems()
+            getNotExpiredList()
         }
     }
 
@@ -271,6 +279,13 @@ class HomeViewModel @Inject constructor(
             examData = examData,
             subjectList = subjectListState.value.listData
         )
+    }
+
+    private suspend fun getNotExpiredList() {
+        val notExpiredExamList = examListState.value.listData.filter {
+            !isExamExpired(examLongDate = it.date)
+        }
+        onEvent(HomeEvent.SetNotExpiredExamListState(list = notExpiredExamList))
     }
 
     fun isExamExpired(examLongDate: Long): Boolean {

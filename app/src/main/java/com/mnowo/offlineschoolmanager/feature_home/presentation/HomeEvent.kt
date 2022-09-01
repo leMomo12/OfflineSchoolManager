@@ -14,5 +14,6 @@ sealed class HomeEvent {
     data class SetIsTodayTimetableState(var value: Boolean) : HomeEvent()
     data class SetEmptyDailyList(var isEmpty: Boolean) : HomeEvent()
     data class SetExamListState(var list: List<Exam>) : HomeEvent()
+    data class SetNotExpiredExamListState(var list: List<Exam>) : HomeEvent()
 
 }

@@ -2,6 +2,7 @@ package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case
 
 
 import android.content.Context
+import android.util.Log.d
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
@@ -19,7 +20,6 @@ class AddGradeUseCase @Inject constructor(
 ) {
 
     operator fun invoke(grade: Grade): Flow<Resource<GradeResult>> = flow {
-
         when (val validationResult = GradeValidation.validateGrade(grade = grade)) {
             is GradeResult.EmptyDescription -> {
                 emit(

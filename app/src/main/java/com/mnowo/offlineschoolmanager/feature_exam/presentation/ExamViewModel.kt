@@ -165,7 +165,7 @@ class ExamViewModel @Inject constructor(
                 editExamItem(exam = event.exam)
             }
             is ExamEvent.DeleteExam -> {
-
+                deleteExamItem(id = event.id)
             }
             is ExamEvent.AddExamItem -> {
                 addExamItem()
