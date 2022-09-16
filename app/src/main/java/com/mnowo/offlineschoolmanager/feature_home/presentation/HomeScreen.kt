@@ -1,7 +1,9 @@
 package com.mnowo.offlineschoolmanager
 
+import android.content.Context
 import android.hardware.lights.Light
 import android.util.Log.d
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -21,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -46,16 +49,19 @@ import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavController) {
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel(), navController: NavController) {
 
     val fredoka = rememberFredoka()
     val windowInfo = rememberWindowInfo()
 
     val listState = rememberLazyListState()
+    val context = LocalContext.current
 
     LaunchedEffect(key1 = true) {
         viewModel.getStartingInformation()
@@ -90,7 +96,8 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                     HomeScreenTitle(
                         windowInfo = windowInfo,
                         fredoka = fredoka,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        context = context
                     )
                 }
                 item {
@@ -128,7 +135,7 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
                 item {
                     if (viewModel.notExpiredExamListState.value.listData.isEmpty()) {
                         HomeNoDataYet(
-                            title = "You have no upcoming Exams",
+                            title = stringResource(R.string.youHaveNotUpcomingExams),
                             description = stringResource(id = R.string.letsChangeThat),
                             fredoka = fredoka
                         )
@@ -144,23 +151,23 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel(), navController: NavCon
 }
 
 @Composable
-fun HomeScreenTitle(windowInfo: WindowInfo, fredoka: FontFamily, viewModel: HomeViewModel) {
+fun HomeScreenTitle(windowInfo: WindowInfo, fredoka: FontFamily, viewModel: HomeViewModel, context: Context) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Overview",
+            text = stringResource(R.string.Overwiew),
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
             fontSize = 40.sp
         )
         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-            IconButton(onClick = { }) {
+            IconButton(onClick = { Toast.makeText(context, "Not yet implemented", Toast.LENGTH_LONG).show() }) {
                 Icon(Icons.Default.Notifications, contentDescription = "")
             }
-            IconButton(onClick = { }) {
+            IconButton(onClick = { Toast.makeText(context, "Not yet implemented", Toast.LENGTH_LONG).show() }) {
                 Icon(Icons.Default.Settings, contentDescription = "")
             }
         }
@@ -218,7 +225,10 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: H
             },
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
-            fontSize = 32.sp
+            fontSize = 32.sp,
+            modifier = Modifier.fillMaxWidth(0.8f),
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
         )
         IconButton(onClick = {
             viewModel.bottomNav(Screen.TimetableScreen, Screen.HomeScreen)
@@ -292,7 +302,10 @@ fun HomeUpcomingExams(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: Ho
             text = stringResource(R.string.upcomingExams),
             fontFamily = fredoka,
             fontSize = 32.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.fillMaxWidth(0.8f),
+            overflow = TextOverflow.Visible,
+            maxLines = 1
         )
         IconButton(onClick = { viewModel.bottomNav(Screen.ExamScreen, Screen.HomeScreen) }) {
             Icon(Icons.Default.ArrowForward, contentDescription = "")

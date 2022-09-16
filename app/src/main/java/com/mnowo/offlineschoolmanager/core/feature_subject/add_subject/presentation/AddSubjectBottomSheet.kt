@@ -66,7 +66,8 @@ fun AddSubjectBottomSheet(
             },
             onColorPicked = {
                 viewModel.onPickColorEvent(PickColorEvent.ColorPicked(color = it))
-            }
+            },
+            pickColorTitle = stringResource(id = R.string.pickColor)
         )
     }
 
@@ -197,13 +198,17 @@ fun AddSubjectBottomSheet(
                 Spacer(modifier = Modifier.padding(horizontal = 10.dp))
                 OutlinedButton(
                     onClick = { viewModel.onAddSubjectEvent(AddSubjectEvent.PickedColor) },
-                    modifier = Modifier.fillMaxWidth().testTag(AddSubjectTestTags.PICK_COLOR_BUTTON)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(AddSubjectTestTags.PICK_COLOR_BUTTON)
                 ) {
                     Text(text = stringResource(id = R.string.pickColor))
                 }
             }
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth().testTag(AddSubjectTestTags.ROOM_TEXT_FIELD),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(AddSubjectTestTags.ROOM_TEXT_FIELD),
                 isError = viewModel.roomErrorState.value,
                 value = viewModel.roomState.value.text,
                 label = { Text(text = stringResource(id = R.string.room)) },

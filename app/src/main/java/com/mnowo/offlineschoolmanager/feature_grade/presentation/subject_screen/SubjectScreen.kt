@@ -226,7 +226,6 @@ fun SubjectTitle(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            d("editState", "${viewModel.editState.value}")
             if (!viewModel.editState.value && !viewModel.deleteState.value) {
                 IconButton(
                     onClick = {

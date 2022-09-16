@@ -36,14 +36,14 @@ fun OfflineSchoolManagerTheme(
     val systemUiController = rememberSystemUiController()
 
     val colors = if (darkTheme) {
-        DarkColorPalette
+        LightColorPalette
     } else {
         LightColorPalette
     }
 
     if (darkTheme) {
         systemUiController.setStatusBarColor(
-            color = Color.Black
+            color = Color.DarkGray
         )
     } else {
         systemUiController.setStatusBarColor(

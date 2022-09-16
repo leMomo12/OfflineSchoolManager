@@ -3,7 +3,7 @@
     <string name="unexpectedError">An unexpected error occurred</string>
     <string name="emptySubject">Please enter subject name</string>
     <string name="emptyPercentage">Percentage cannot be 0</string>
-    <string name="oralAndWrittenPercentageArent100">Oral and written percentage must exactly be 100</string>
+    <string name="oralAndWrittenPercentageArent100">Oral and written percentage must exactly be 100%</string>
     <string name="classTestDescription">Class test description</string>
     <string name="grade">Grade</string>
     <string name="written">Written</string>
@@ -63,4 +63,15 @@
     <string name="upcomingExams">Upcoming exams</string>
     <string name="youHaveNoTimetableYet">You have no timetable yet</string>
     <string name="letsChangeThat">Let\'s change that</string>
+    <string name="youHaveNotUpcomingExams">You have no upcoming Exams</string>
+    <string name="addResult">Add grade</string>
+    <string name="notYetImplemented">Not yet implemented</string>
+    <string name="Overwiew">Overview</string>
+    <string name="timetable">Timetable</string>
+    <string name="deleteAllTimetableItems">Delete all timetable items</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
 </resources>

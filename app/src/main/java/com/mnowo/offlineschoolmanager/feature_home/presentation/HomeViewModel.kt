@@ -1,5 +1,10 @@
 package com.mnowo.offlineschoolmanager.feature_home.presentation
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -20,12 +25,15 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ExamSubjectI
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.use_case.util.ExamNotificationReceiver
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
 import com.mnowo.offlineschoolmanager.feature_home.domain.use_case.GetAverageUseCase
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.GetAllTimetableItemsUseCase
+import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -33,13 +41,21 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.hours
+
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getAverageUseCase: GetAverageUseCase,
     private val getAllTimetableItemsUseCase: GetAllTimetableItemsUseCase,
     private val helper: Helper,
-    private val getAllExamItemsUseCase: GetAllExamItemsUseCase
+    private val getAllExamItemsUseCase: GetAllExamItemsUseCase,
+    @ApplicationContext context: Context
 ) : ViewModel() {
+
+    private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private val notifyIntent = Intent(context, ExamNotificationReceiver::class.java)
+    private val notifyPendingIntent: PendingIntent =
+        PendingIntent.getBroadcast(context, 100, notifyIntent, 0)
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -114,7 +130,8 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.SetNotExpiredExamListState -> {
                 _notExpiredExamListState.value = notExpiredExamListState.value.copy(
                     listData = event.list
-                )            }
+                )
+            }
         }
     }
 
@@ -143,7 +160,6 @@ class HomeViewModel @Inject constructor(
         }
         viewModelScope.launch(Dispatchers.IO) {
             getAllExamItems()
-            getNotExpiredList()
         }
     }
 
@@ -269,29 +285,58 @@ class HomeViewModel @Inject constructor(
             when (it) {
                 is Resource.Loading -> {
                     onEvent(HomeEvent.SetExamListState(list = it.data ?: listOf()))
+                    getNotExpiredList()
+                    setExamNotification()
                 }
             }
         }
     }
 
-    fun getExamSubjectItem(examData: Exam): Subject  {
+    fun getExamSubjectItem(examData: Exam): Subject {
         return ExamSubjectItemHelper.getSubjectItem(
             examData = examData,
             subjectList = subjectListState.value.listData
         )
     }
 
-    private suspend fun getNotExpiredList() {
+    private fun getNotExpiredList() {
         val notExpiredExamList = examListState.value.listData.filter {
             !isExamExpired(examLongDate = it.date)
         }
         onEvent(HomeEvent.SetNotExpiredExamListState(list = notExpiredExamList))
     }
 
-    fun isExamExpired(examLongDate: Long): Boolean {
-         return ExamSubjectItemHelper.isExamExpired(examLongDate = examLongDate)
+    private fun isExamExpired(examLongDate: Long): Boolean {
+        return ExamSubjectItemHelper.isExamExpired(examLongDate = examLongDate)
     }
 
+    private fun getNextExpiredItem(): Exam? {
+        return if (notExpiredExamListState.value.listData.isNotEmpty()) {
+            notExpiredExamListState.value.listData.first()
+        } else {
+            null
+        }
+    }
+
+    private fun setExamNotification() {
+        val nextExpiredExamItem = getNextExpiredItem()
+
+        nextExpiredExamItem?.let { exam ->
+            val examItemDate = FormatDate.formatLongToDate(exam.date)
+
+            val currentDate = Calendar.getInstance()
+
+            if (currentDate.time.after(examItemDate)) {
+                currentDate.add(Calendar.DAY_OF_MONTH, 1)
+            }
+            alarmManager.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                currentDate.timeInMillis,
+                AlarmManager.INTERVAL_DAY,
+                notifyPendingIntent
+            )
+        }
+    }
 }
 
 

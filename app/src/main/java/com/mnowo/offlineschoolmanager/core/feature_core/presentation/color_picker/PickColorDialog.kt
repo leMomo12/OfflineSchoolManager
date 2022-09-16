@@ -35,7 +35,8 @@ import com.mnowo.offlineschoolmanager.core.theme.colorPickerList
 fun PickColorDialog(
     fredoka: FontFamily,
     onDismissClicked: () -> Unit,
-    onColorPicked: (Color) -> Unit
+    onColorPicked: (Color) -> Unit,
+    pickColorTitle: String
 ) {
     val colorList = colorPickerList
 
@@ -56,7 +57,7 @@ fun PickColorDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Pick color",
+                        text = pickColorTitle,
                         fontFamily = fredoka,
                         fontWeight = FontWeight.Medium,
                         fontSize = 25.sp
@@ -88,13 +89,12 @@ fun PickColorDialog(
 fun ColorPickItem(color: Color, onColorPicked: (Color) -> Unit) {
     Box(
         modifier = Modifier
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(16.dp))
             .size(60.dp)
             .padding(8.dp)
             .background(color = color)
             .clickable {
                 onColorPicked(color)
             }
-
     )
 }

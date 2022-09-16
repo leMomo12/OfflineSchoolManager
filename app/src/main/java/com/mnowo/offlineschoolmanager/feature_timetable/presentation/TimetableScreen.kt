@@ -174,7 +174,7 @@ fun TimetableTitle(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Timetable",
+            text = stringResource(R.string.timetable),
             fontFamily = fredoka,
             fontWeight = FontWeight.Medium,
             fontSize = 32.sp
@@ -251,7 +251,7 @@ fun TimetableTitle(
                         Row {
                             Icon(Icons.Default.DeleteForever, contentDescription = "")
                             Text(
-                                text = "Delete all timetable items",
+                                text = stringResource(R.string.deleteAllTimetableItems),
                                 fontFamily = fredoka,
                                 modifier = Modifier
                                     .padding(start = 5.dp)
@@ -291,11 +291,11 @@ fun TimetableDays(fredoka: FontFamily, scrollState: ScrollState) {
             .horizontalScroll(state = scrollState)
     ) {
         TimetableDayText(text = "", fredoka = fredoka, weight = .15f)
-        TimetableDayText(text = "Monday", fredoka = fredoka, weight = .3f)
-        TimetableDayText(text = "Tuesday", fredoka = fredoka, weight = .3f)
-        TimetableDayText(text = "Wednesday", fredoka = fredoka, weight = .3f)
-        TimetableDayText(text = "Thursday", fredoka = fredoka, weight = .3f)
-        TimetableDayText(text = "Friday", fredoka = fredoka, weight = .3f)
+        TimetableDayText(text = stringResource(R.string.monday), fredoka = fredoka, weight = .3f)
+        TimetableDayText(text = stringResource(R.string.tuesday), fredoka = fredoka, weight = .3f)
+        TimetableDayText(text = stringResource(R.string.wednesday), fredoka = fredoka, weight = .3f)
+        TimetableDayText(text = stringResource(R.string.thursday), fredoka = fredoka, weight = .3f)
+        TimetableDayText(text = stringResource(R.string.friday), fredoka = fredoka, weight = .3f)
     }
 }
 

@@ -10,7 +10,7 @@ object RoundOffDecimals {
         return try {
             return grade.toBigDecimal().setScale(1, RoundingMode.UP).toDouble()
         } catch (e: NumberFormatException) {
-            -1.0
+            0.0
         }
     }
 }

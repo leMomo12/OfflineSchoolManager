@@ -289,10 +289,12 @@ class ExamViewModel @Inject constructor(
         onEvent(ExamEvent.SetDateState(Calendar.getInstance().time))
     }
 
-    fun getSubjectItem(examData: Exam): Subject {
-        return ExamSubjectItemHelper.getSubjectItem(
-            examData = examData,
-            subjectList = subjectListState.value.listData
+    fun getSubjectItem(examData: Exam): State<Subject> {
+        return mutableStateOf(
+            ExamSubjectItemHelper.getSubjectItem(
+                examData = examData,
+                subjectList = subjectListState.value.listData
+            )
         )
     }
 

@@ -67,9 +67,9 @@ fun BottomAppBar(
                 onClick(Screen.ExamScreen)
             }) {
                 if (exam == true) {
-                    Icon(Icons.Rounded.PlaylistAdd, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
+                    Icon(Icons.Rounded.Assignment, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 } else {
-                    Icon(Icons.Outlined.PlaylistAdd, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
+                    Icon(Icons.Outlined.Assignment, contentDescription = "", tint = if (isSystemInDarkTheme()) Color.Gray else Color.Black)
                 }
             }
         }

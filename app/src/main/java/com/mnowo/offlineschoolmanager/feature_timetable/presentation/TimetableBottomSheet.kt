@@ -210,9 +210,15 @@ fun TimetableBottomSheet(
                 }
                 Spacer(modifier = Modifier.padding(vertical = 20.dp))
                 Text(
-                    text = stringResource(id = R.string.currentSubject) + " ${viewModel.pickedSubjectState.value?.subjectName ?: ""}",
+                    text = stringResource(id = R.string.currentSubject),
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = viewModel.pickedSubjectState.value?.subjectName ?: "",
+                    fontFamily = fredoka,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.Gray
                 )
                 OutlinedButton(
                     onClick = {

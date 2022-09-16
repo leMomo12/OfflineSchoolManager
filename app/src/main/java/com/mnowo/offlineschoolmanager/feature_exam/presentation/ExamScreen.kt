@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.graphics.Color.red
 import android.util.Log.d
 import android.util.Log.i
 import androidx.compose.animation.animateContentSize
@@ -250,9 +251,9 @@ fun ExamTitle(
 @Composable
 fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily, openSheet: () -> Unit) {
     val subjectState by remember {
-        derivedStateOf {
-            viewModel.getSubjectItem(examData = examData)
-        }
+        mutableStateOf(
+            viewModel.getSubjectItem(examData = examData).value
+        )
     }
 
     val isExpiredState by remember {
@@ -317,7 +318,7 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily, open
                     ),
                     enabled = isExpiredState
                 ) {
-                    Text(text = "Add result")
+                    Text(text = stringResource(id = R.string.addResult))
                 }
                 Text(
                     text = FormatDate.formatLongToSpring(time = examData.date),
