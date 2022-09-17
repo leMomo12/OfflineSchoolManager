@@ -5,9 +5,9 @@
     <application
         android:name=".SchoolManagerApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/manso_512px_app_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/manso_512px_app_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.OfflineSchoolManager">
         <activity

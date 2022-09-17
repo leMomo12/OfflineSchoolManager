@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">OfflineSchoolManager</string>
+    <string name="app_name">Manso</string>
     <string name="unexpectedError">An unexpected error occurred</string>
     <string name="emptySubject">Please enter subject name</string>
     <string name="emptyPercentage">Percentage cannot be 0</string>
