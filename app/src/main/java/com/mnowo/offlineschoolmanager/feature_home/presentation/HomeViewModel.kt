@@ -286,7 +286,6 @@ class HomeViewModel @Inject constructor(
                 is Resource.Loading -> {
                     onEvent(HomeEvent.SetExamListState(list = it.data ?: listOf()))
                     getNotExpiredList()
-                    setExamNotification()
                 }
             }
         }
