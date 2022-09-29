@@ -74,4 +74,8 @@
     <string name="wednesday">Wednesday</string>
     <string name="thursday">Thursday</string>
     <string name="friday">Friday</string>
+    <string name="yourAverage">Your average</string>
+    <string name="noData">No Data</string>
+    <string name="best">Best:</string>
+    <string name="worst">Worst:</string>
 </resources>

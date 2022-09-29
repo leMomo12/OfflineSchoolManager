@@ -52,11 +52,6 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext context: Context
 ) : ViewModel() {
 
-    private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    private val notifyIntent = Intent(context, ExamNotificationReceiver::class.java)
-    private val notifyPendingIntent: PendingIntent =
-        PendingIntent.getBroadcast(context, 100, notifyIntent, 0)
-
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
@@ -92,6 +87,9 @@ class HomeViewModel @Inject constructor(
 
     private val _notExpiredExamListState = mutableStateOf<ListState<Exam>>(ListState())
     val notExpiredExamListState: State<ListState<Exam>> = _notExpiredExamListState
+
+    private val _bestAndWorstSubjectState = mutableMapOf<Int, String?>(0 to null, 1 to null)
+    val bestAndWorstSubjectState: Map<Int, String?> = _bestAndWorstSubjectState
 
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -173,6 +171,7 @@ class HomeViewModel @Inject constructor(
                 if (timetableListState.value.listData.isNotEmpty()) {
                     getDailyTimetable()
                 }
+                getBestAndWorstSubject()
             }
         )
     }
@@ -309,31 +308,15 @@ class HomeViewModel @Inject constructor(
         return ExamSubjectItemHelper.isExamExpired(examLongDate = examLongDate)
     }
 
-    private fun getNextExpiredItem(): Exam? {
-        return if (notExpiredExamListState.value.listData.isNotEmpty()) {
-            notExpiredExamListState.value.listData.first()
-        } else {
-            null
-        }
-    }
+    private fun getBestAndWorstSubject() {
+        if (subjectListState.value.listData.isNotEmpty()) {
+            val sortedSubjectList =
+                subjectListState.value.listData.filter { it.average != 0.0 }.sortedBy { it.average }
 
-    private fun setExamNotification() {
-        val nextExpiredExamItem = getNextExpiredItem()
-
-        nextExpiredExamItem?.let { exam ->
-            val examItemDate = FormatDate.formatLongToDate(exam.date)
-
-            val currentDate = Calendar.getInstance()
-
-            if (currentDate.time.after(examItemDate)) {
-                currentDate.add(Calendar.DAY_OF_MONTH, 1)
+            if (sortedSubjectList.isNotEmpty()) {
+                _bestAndWorstSubjectState[0] = sortedSubjectList[0].subjectName
+                _bestAndWorstSubjectState[1] = sortedSubjectList.last().subjectName
             }
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP,
-                currentDate.timeInMillis,
-                AlarmManager.INTERVAL_DAY,
-                notifyPendingIntent
-            )
         }
     }
 }

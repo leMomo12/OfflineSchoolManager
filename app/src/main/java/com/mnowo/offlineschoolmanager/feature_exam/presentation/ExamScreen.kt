@@ -262,6 +262,7 @@ fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily, open
         }
     }
 
+
     Box(
         modifier = Modifier
             .fillMaxWidth()

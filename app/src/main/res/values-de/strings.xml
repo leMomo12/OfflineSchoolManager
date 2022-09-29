@@ -75,4 +75,8 @@
     <string name="wednesday">Mittwoch</string>
     <string name="thursday">Donnerstag</string>
     <string name="friday">Freitag</string>
+    <string name="yourAverage">Dein Schnitt</string>
+    <string name="noData">Keine Daten</string>
+    <string name="best">bestes:</string>
+    <string name="worst">schlechtestes:</string>
 </resources>

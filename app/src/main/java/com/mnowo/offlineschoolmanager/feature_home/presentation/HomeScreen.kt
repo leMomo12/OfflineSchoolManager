@@ -4,6 +4,8 @@ import android.content.Context
 import android.hardware.lights.Light
 import android.util.Log.d
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
@@ -15,10 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -130,15 +129,6 @@ fun HomeScreen(
                     )
                 }
                 item {
-                    if (viewModel.notExpiredExamListState.value.listData.isEmpty()) {
-                        HomeNoDataYet(
-                            title = stringResource(R.string.youHaveNotUpcomingExams),
-                            description = stringResource(id = R.string.letsChangeThat),
-                            fredoka = fredoka
-                        )
-                    }
-                }
-                item {
                     Spacer(modifier = Modifier.padding(60.dp))
                 }
             }
@@ -192,8 +182,9 @@ fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: 
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
         Card(
             modifier = Modifier
-                .height(windowInfo.screenWidth / 2 + 30.dp)
-                .width(windowInfo.screenWidth / 1 - 20.dp),
+                .fillMaxHeight()
+                .width(windowInfo.screenWidth / 1 - 20.dp)
+                .animateContentSize(animationSpec = tween(300)),
             elevation = 4.dp,
             backgroundColor = darkerWhite,
             shape = RoundedCornerShape(16.dp)
@@ -204,17 +195,79 @@ fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: 
                     .padding(10.dp)
             ) {
                 Text(
-                    text = "Your average",
+                    text = stringResource(R.string.yourAverage),
                     fontFamily = fredoka,
                     fontWeight = FontWeight.Normal,
                     fontSize = 20.sp
                 )
                 Spacer(modifier = Modifier.padding(vertical = 5.dp))
                 HomeAverageCircle(windowInfo = windowInfo, viewModel = viewModel, fredoka = fredoka)
+                HomeAverageDropdown(
+                    fredoka = fredoka,
+                    bestSubject = viewModel.bestAndWorstSubjectState[0] ?: stringResource(R.string.noData),
+                    worstSubject = viewModel.bestAndWorstSubjectState[1] ?: stringResource(id = R.string.noData)
+                )
             }
         }
     }
 }
+
+@Composable
+fun HomeAverageDropdown(fredoka: FontFamily, bestSubject: String, worstSubject: String) {
+    val dropdownState = remember {
+        mutableStateOf(false)
+    }
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+        IconButton(onClick = { dropdownState.value = !dropdownState.value }) {
+            if (dropdownState.value) {
+                Icon(Icons.Default.ArrowDropUp, contentDescription = "")
+            } else {
+                Icon(Icons.Default.ArrowDropDown, contentDescription = "")
+            }
+        }
+    }
+    if (dropdownState.value) {
+        Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
+            HomeBestSubject(fredoka = fredoka, bestSubject = bestSubject)
+            Divider(modifier = Modifier
+                .height(50.dp)
+                .width(1.dp))
+            HomeWorstSubject(fredoka = fredoka, worstSubject = worstSubject)
+        }
+    }
+}
+
+@Composable
+fun RowScope.HomeBestSubject(fredoka: FontFamily, bestSubject: String) {
+    Column(
+        modifier = Modifier
+            .weight(0.5f)
+            .padding(end = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = stringResource(R.string.best), fontFamily = fredoka, color = Color.Gray)
+        Text(
+            text = bestSubject,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontFamily = fredoka
+        )
+    }
+}
+
+@Composable
+fun RowScope.HomeWorstSubject(fredoka: FontFamily, worstSubject: String) {
+    Column(
+        modifier = Modifier
+            .weight(0.5f)
+            .padding(start = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = stringResource(R.string.worst), fontFamily = fredoka, color = Color.Gray)
+        Text(text = worstSubject, maxLines = 1, overflow = TextOverflow.Ellipsis, fontFamily = fredoka)
+    }
+}
+
 
 @Composable
 fun HomeAverageCircle(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: FontFamily) {
@@ -229,7 +282,6 @@ fun HomeAverageCircle(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka:
             modifier = Modifier
                 .size(windowInfo.screenWidth / 2 - 40.dp),
             elevation = 0.dp,
-            //backgroundColor = darkerWhite
         ) {
             Column(
                 verticalArrangement = Arrangement.Center,
@@ -427,6 +479,13 @@ fun HomeUpcomingExams(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: Ho
                     viewModel = viewModel
                 )
             }
+            if (viewModel.notExpiredExamListState.value.listData.isEmpty()) {
+                HomeNoDataYet(
+                    title = stringResource(R.string.youHaveNotUpcomingExams),
+                    description = stringResource(id = R.string.letsChangeThat),
+                    fredoka = fredoka
+                )
+            }
             Spacer(modifier = Modifier.padding(10.dp))
         }
     }
@@ -500,7 +559,7 @@ fun HomeNoDataYet(title: String, description: String, fredoka: FontFamily) {
         Image(
             painterResource(id = R.drawable.no_data_icon),
             contentDescription = "",
-            modifier = Modifier.scale(0.8f)
+            modifier = Modifier.scale(0.8f).background(color = darkerWhite)
         )
         Column(
             modifier = Modifier
