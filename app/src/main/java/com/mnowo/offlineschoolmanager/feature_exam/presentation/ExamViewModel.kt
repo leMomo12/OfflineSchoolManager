@@ -1,5 +1,7 @@
 package com.mnowo.offlineschoolmanager.feature_exam.presentation
 
+import android.util.Log.d
+import android.view.animation.AnimationSet
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
@@ -19,18 +21,19 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.use_case.GetAllEx
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ExamSubjectItemHelper
 import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.DeleteExamItemUseCase
 import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.EditExamItemUseCase
+import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class ExamViewModel @Inject constructor(
-    private val helper: Helper,
+    private val getAllSubjectsUseCase: GetAllSubjectsUseCase,
     private val getAllExamItemsUseCase: GetAllExamItemsUseCase,
     private val addExamUseCase: AddExamUseCase,
     private val deleteExamItemUseCase: DeleteExamItemUseCase,
@@ -40,59 +43,59 @@ class ExamViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private val _titleState = mutableStateOf<TextFieldState>(TextFieldState())
+    private val _titleState = mutableStateOf(TextFieldState())
     val titleState: State<TextFieldState> = _titleState
 
-    private val _descriptionState = mutableStateOf<TextFieldState>(TextFieldState())
+    private val _descriptionState = mutableStateOf(TextFieldState())
     val descriptionState: State<TextFieldState> = _descriptionState
 
     private val _dateState = mutableStateOf<Date>(value = Calendar.getInstance().time)
     val dateState: State<Date> = _dateState
 
-    private val _datePickerState = mutableStateOf<Boolean>(false)
+    private val _datePickerState = mutableStateOf(false)
     val datePickerState: State<Boolean> = _datePickerState
 
     private val _pickedSubjectState =
-        mutableStateOf<Subject>(Subject(-1, "", 0, "123", 50.0, 50.0, 1.0))
+        mutableStateOf(Subject(-1, "", 0, "123", 50.0, 50.0, 1.0))
     val pickedSubjectState: State<Subject> = _pickedSubjectState
 
-    private val _subjectPickerState = mutableStateOf<Boolean>(false)
+    private val _subjectPickerState = mutableStateOf(false)
     val subjectPickerState: State<Boolean> = _subjectPickerState
 
-    private val _pickedSubjectColorState = mutableStateOf<Color>(Color.LightGray)
+    private val _pickedSubjectColorState = mutableStateOf(Color.LightGray)
     val pickedSubjectColorState: State<Color> = _pickedSubjectColorState
 
     private val _subjectListState = mutableStateOf<ListState<Subject>>(ListState())
     val subjectListState: State<ListState<Subject>> = _subjectListState
 
-    private val _bottomSheetState = mutableStateOf<Boolean>(false)
+    private val _bottomSheetState = mutableStateOf(false)
     val bottomSheetState: State<Boolean> = _bottomSheetState
 
     private val _examListState = mutableStateOf<ListState<Exam>>(ListState())
     val examListState: State<ListState<Exam>> = _examListState
 
-    private val _titleErrorState = mutableStateOf<Boolean>(false)
+    private val _titleErrorState = mutableStateOf(false)
     val titleErrorState: State<Boolean> = _titleErrorState
 
-    private val _descriptionErrorState = mutableStateOf<Boolean>(false)
+    private val _descriptionErrorState = mutableStateOf(false)
     val descriptionErrorState: State<Boolean> = _descriptionErrorState
 
-    private val _addExamSubjectIdState = mutableStateOf<Int>(-1)
+    private val _addExamSubjectIdState = mutableStateOf(-1)
     val addExamSubjectIdState: State<Int> = _addExamSubjectIdState
 
-    private val _editState = mutableStateOf<Boolean>(false)
+    private val _editState = mutableStateOf(false)
     val editState: State<Boolean> = _editState
 
-    private val _contentEditState = mutableStateOf<Boolean>(false)
+    private val _contentEditState = mutableStateOf(false)
     val contentEditState: State<Boolean> = _contentEditState
 
-    private val _deleteState = mutableStateOf<Boolean>(false)
+    private val _deleteState = mutableStateOf(false)
     val deleteState: State<Boolean> = _deleteState
 
-    private val _dropDownMenuState = mutableStateOf<Boolean>(false)
+    private val _dropDownMenuState = mutableStateOf(false)
     val dropDownMenuState: State<Boolean> = _dropDownMenuState
 
-    private val _editSpecificExam = mutableStateOf<Exam>(Exam(-1, "", "", -1, 0))
+    private val _editSpecificExam = mutableStateOf(Exam(-1, "", "", -1, 0))
     val editSpecificExam: State<Exam> = _editSpecificExam
 
     fun onEvent(event: ExamEvent) {
@@ -177,7 +180,6 @@ class ExamViewModel @Inject constructor(
     }
 
     init {
-        getAllSubjects()
         getAllExamItems()
     }
 
@@ -204,22 +206,17 @@ class ExamViewModel @Inject constructor(
         deleteExamItemUseCase.invoke(id = id)
     }
 
-    private fun getAllSubjects() = viewModelScope.launch {
-        helper.getAllSubjectUseCaseResultHandler(
-            onSuccess = {},
-            onLoading = {},
-            onError = {},
-            data = { onEvent(ExamEvent.SetSubjectListState(it)) })
-    }
-
     private fun getAllExamItems() = viewModelScope.launch {
-        getAllExamItemsUseCase.invoke().collect() {
-            when (it) {
-                is Resource.Loading -> {
-                    onEvent(ExamEvent.SetExamListState(list = it.data ?: listOf()))
+        getAllExamItemsUseCase.invoke()
+            .combine(getAllSubjectsUseCase.invoke()) { examList, subjectList ->
+                onEvent(ExamEvent.SetExamListState(list = examList.data ?: listOf()))
+                onEvent(ExamEvent.SetSubjectListState(list = subjectList.data ?: listOf()))
+                examListState.value.listData.forEach {
+                    d("ExamListItems", "id: ${it.id}, name: ${it.title}")
+                    val subject = getSubjectItem(examData = it)
+                    d("ExamListItems", "subject: ${subject.value.subjectName}")
                 }
-            }
-        }
+            }.collect()
     }
 
     private fun addExamItem() = viewModelScope.launch {
@@ -278,7 +275,7 @@ class ExamViewModel @Inject constructor(
                 -1,
                 "",
                 0,
-                "123",
+                "",
                 50.0,
                 1.0,
                 1.0

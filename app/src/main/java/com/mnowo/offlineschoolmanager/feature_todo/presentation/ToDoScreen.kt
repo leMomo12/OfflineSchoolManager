@@ -146,7 +146,9 @@ fun ToDoScreen(navController: NavController, viewModel: ToDoViewModel = hiltView
                         fontFamily = fredoka,
                         color = Color.Gray,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(0.5f).padding(top = 5.dp)
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(top = 5.dp)
                     )
                 }
             }
@@ -300,28 +302,21 @@ fun ToDoStaggeredGrid(
                     )
                 }
 
-                val colorState = remember {
-                    derivedStateOf {
-                        if (viewModel.subjectList.value.listData.isNotEmpty()) {
-                            val intColor =
-                                viewModel.subjectList.value.listData.filter { it.id == item.subjectId }[0].color
-                            return@derivedStateOf Color(
-                                intColor.red,
-                                intColor.green,
-                                intColor.blue,
-                                intColor.alpha
-                            )
-                        } else {
-                            return@derivedStateOf Color.LightGray
-                        }
-                    }
-                }
+                val colorState = viewModel.getSubjectItem(toDoData = item).value.color
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(5.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(color = colorState.value)
+                        .background(
+                            Color(
+                                red = colorState.red,
+                                green = colorState.green,
+                                blue = colorState.blue,
+                                alpha = colorState.alpha
+                            )
+                        )
                         .animateContentSize(
                             animationSpec = tween(
                                 durationMillis = 600,

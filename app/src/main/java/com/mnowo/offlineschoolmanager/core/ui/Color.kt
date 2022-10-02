@@ -28,7 +28,7 @@ val colorPickerList = listOf<Color>(
     Color(211, 47, 47, 166),
     Color(194, 24, 91, 166),
     Color(123, 31, 162, 166),
-    Color(81, 45, 168, 166),
+    Color(98, 60, 192, 166),
     Color(48, 63, 159, 166),
     Color(25, 118, 210, 166),
     Color(2, 136, 209, 166),

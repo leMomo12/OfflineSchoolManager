@@ -134,7 +134,8 @@ fun ExamScreen(navController: NavController, viewModel: ExamViewModel = hiltView
                         viewModel = viewModel,
                         examData = it,
                         fredoka = fredoka,
-                        openSheet = { openSheet() })
+                        openSheet = { openSheet() }
+                    )
                 }
                 item {
                     Spacer(modifier = Modifier.padding(vertical = 50.dp))
@@ -250,18 +251,14 @@ fun ExamTitle(
 
 @Composable
 fun ExamItem(viewModel: ExamViewModel, examData: Exam, fredoka: FontFamily, openSheet: () -> Unit) {
-    val subjectState by remember {
-        mutableStateOf(
-            viewModel.getSubjectItem(examData = examData).value
-        )
-    }
+
+    val subjectState = viewModel.getSubjectItem(examData = examData).value
 
     val isExpiredState by remember {
         derivedStateOf {
             viewModel.isExamExpired(examLongDate = examData.date)
         }
     }
-
 
     Box(
         modifier = Modifier
