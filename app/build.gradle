@@ -12,7 +12,7 @@ android {
         applicationId "com.mnowo.offlineschoolmanager"
         minSdk 21
         targetSdk 31
-        versionCode 4
+        versionCode 6
         versionName "1.2"
 
         testInstrumentationRunner "com.mnowo.offlineschoolmanager.HiltTestRunner"
@@ -23,7 +23,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
         }

@@ -79,4 +79,5 @@
     <string name="noData">Keine Daten</string>
     <string name="best">bestes:</string>
     <string name="worst">schlechtestes:</string>
+    <string name="oral">Mündlich</string>
 </resources>

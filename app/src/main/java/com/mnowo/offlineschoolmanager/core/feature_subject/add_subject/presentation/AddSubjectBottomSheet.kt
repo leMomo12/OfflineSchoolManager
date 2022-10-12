@@ -1,8 +1,10 @@
 package com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation
 
 
+import android.net.ipsec.ike.ChildSaProposal
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -22,7 +24,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.graphics.blue
 import androidx.core.graphics.green
 import androidx.core.graphics.red
@@ -84,16 +89,10 @@ fun AddSubjectBottomSheet(
                 viewModel.specificSubjectState.value?.room ?: ""
             )
         )
-        viewModel.onAddSubjectEvent(
-            AddSubjectEvent.EnteredWrittenPercentage(
-                viewModel.specificSubjectState.value?.writtenPercentage.toString()
-            )
+        viewModel.roundOffPercentage(
+            ((viewModel.specificSubjectState.value?.writtenPercentage)?.div(100))?.toFloat() ?: 0.5f
         )
-        viewModel.onAddSubjectEvent(
-            AddSubjectEvent.EnteredOralPercentage(
-                viewModel.specificSubjectState.value?.oralPercentage.toString()
-            )
-        )
+
         viewModel.specificSubjectState.value?.color?.let {
             val color = Color(
                 it.red,
@@ -218,53 +217,106 @@ fun AddSubjectBottomSheet(
                 },
                 singleLine = true
             )
-
-            OutlinedTextField(
-                label = { Text(text = stringResource(id = R.string.writtenPercentage)) },
-                value = viewModel.writtenPercentageState.value.text,
-                onValueChange = {
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredWrittenPercentage(it))
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
+            Spacer(modifier = Modifier.padding(vertical = 20.dp))
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 10.dp)
-                    .testTag(AddSubjectTestTags.WRITTEN_PERCENTAGE_TEXT_FIELD),
-                trailingIcon = {
-                    Text(text = "%")
-                },
-                isError = viewModel.writtenErrorState.value
-            )
-
-            OutlinedTextField(
-                label = { Text(text = stringResource(id = R.string.oralPercentage)) },
-                value = viewModel.oralPercentageState.value.text,
+                    .padding(start = 5.dp, end = 5.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                AddSubjectBottomSheetWrittenAndOral(
+                    descriptionText = stringResource(id = R.string.written) + ":",
+                    percentageText = "${viewModel.writtenPercentageState.value.toString()} %",
+                    fredoka = fredoka,
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .weight(0.5f)
+                )
+                Divider(
+                    modifier = Modifier
+                        .height(40.dp)
+                        .width(1.dp)
+                )
+                AddSubjectBottomSheetWrittenAndOral(
+                    descriptionText = stringResource(R.string.oral) + ":",
+                    percentageText = "${viewModel.oralPercentageState.value.toString()} %",
+                    fredoka = fredoka,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .weight(0.5f)
+                )
+            }
+            Slider(
+                value = viewModel.sliderState.value,
                 onValueChange = {
-                    viewModel.onAddSubjectEvent(AddSubjectEvent.EnteredOralPercentage(it))
+                    viewModel.roundOffPercentage(writtenPercentage = it)
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp)
-                    .testTag(AddSubjectTestTags.ORAL_PERCENTAGE_TEXT_FIELD),
-                trailingIcon = {
-                    Text(text = "%")
-                },
-                isError = viewModel.oralErrorState.value
             )
-            Text(
-                text = stringResource(id = R.string.mustExactlyAddUpTo100),
-                color = if (viewModel.mustAddUpTo100ErrorState.value) {
-                    Color.Red
-                } else {
-                    Color.Gray
-                },
-                fontFamily = fredoka,
-                fontWeight = FontWeight.Light,
-                modifier = Modifier.testTag(AddSubjectTestTags.ADD_UP_TO_100_TEXT)
-            )
+            AddSubjectBottomSheetSliderChips(fredoka = fredoka, viewModel = viewModel)
         }
+    }
+}
+
+
+@Composable
+fun RowScope.AddSubjectBottomSheetWrittenAndOral(
+    descriptionText: String,
+    percentageText: String,
+    fredoka: FontFamily,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = descriptionText, fontFamily = fredoka, color = Color.Gray)
+        Text(
+            text = percentageText,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontFamily = fredoka
+        )
+    }
+}
+
+@Composable
+fun AddSubjectBottomSheetSliderChips(fredoka: FontFamily, viewModel: AddSubjectViewModel) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+        Chip(
+            text = "30:70",
+            borderColor = Color.Gray,
+            fredoka = fredoka,
+            onClick = { viewModel.roundOffPercentage(0.30f) }
+        )
+        Chip(
+            text = "50:50",
+            borderColor = Color.Gray,
+            fredoka = fredoka,
+            onClick = { viewModel.roundOffPercentage(0.50f) }
+        )
+        Chip(
+            text = "70:30",
+            borderColor = Color.Gray,
+            fredoka = fredoka,
+            onClick = { viewModel.roundOffPercentage(0.70f) }
+        )
+    }
+}
+
+@Composable
+fun Chip(text: String, borderColor: Color, fredoka: FontFamily, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .wrapContentSize()
+            .clip(RoundedCornerShape(32.dp))
+            .border(1.dp, color = borderColor, shape = RoundedCornerShape(32.dp))
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontFamily = fredoka,
+            modifier = Modifier.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
+        )
     }
 }

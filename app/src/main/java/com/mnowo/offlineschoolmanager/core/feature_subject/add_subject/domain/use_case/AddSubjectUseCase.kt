@@ -29,21 +29,9 @@ class AddSubjectUseCase @Inject constructor(
                 )
                 return@flow
             }
-            if(subject.writtenPercentage + subject.oralPercentage != 100.0) {
-                emit(
-                    Resource.Error<SubjectResult>(
-                        message = context.getString(R.string.oralAndWrittenPercentageArent100),
-                        data = SubjectResult.DoesntAddUpTo100
-                    )
-                )
-                d("AddSubject", "Empty subject")
-                return@flow
-            }
-
             repo.addSubject(subject = subject)
             emit(Resource.Success<SubjectResult>(data = SubjectResult.Success))
         } catch (e: Exception) {
-            d("Error", "Error: ${e.localizedMessage}  ,,,, ${e.stackTrace}")
             emit(
                 Resource.Error<SubjectResult>(
                     message = (e.localizedMessage ?: R.string.unexpectedError).toString(),
