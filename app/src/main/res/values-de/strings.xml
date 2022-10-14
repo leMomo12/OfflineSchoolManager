@@ -80,4 +80,6 @@
     <string name="best">bestes:</string>
     <string name="worst">schlechtestes:</string>
     <string name="oral">Mündlich</string>
+    <string name="goodJob">Gut gemacht!</string>
+    <string name="keepUpWithTheGoodGrades">Weiter so mit den guten Noten</string>
 </resources>

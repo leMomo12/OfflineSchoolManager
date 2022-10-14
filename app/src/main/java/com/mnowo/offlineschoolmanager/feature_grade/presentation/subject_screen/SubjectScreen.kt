@@ -136,9 +136,6 @@ fun SubjectScreen(
                         bottomSheetScaffoldState = bottomState
                     )
                 }
-                item {
-                    Spacer(modifier = Modifier.padding(vertical = 15.dp))
-                }
                 items(viewModel.subjectListState.value.listData) {
                     SubjectListItem(
                         fredoka = fredoka,

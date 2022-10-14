@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.navigation.compose.rememberNavController
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.mnowo.offlineschoolmanager.core.Navigation
 import com.mnowo.offlineschoolmanager.core.theme.OfflineSchoolManagerTheme
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
@@ -20,7 +21,21 @@ class MainActivity : ComponentActivity() {
             OfflineSchoolManagerTheme {
                 val navController = rememberNavController()
                 Navigation(navController = navController)
+                askForReview()
+            }
+        }
+    }
 
+    private fun askForReview() {
+        val manager = ReviewManagerFactory.create(this)
+        manager.requestReviewFlow().addOnCompleteListener { request ->
+            if (request.isSuccessful) {
+                val reviewInfo = request.result
+                manager.launchReviewFlow(this, reviewInfo).addOnFailureListener {
+                    print("In-app review request failed, reason=$it")
+                }.addOnCompleteListener { _ ->
+                    print("In-app review finished")
+                }
             }
         }
     }

@@ -1,6 +1,12 @@
 package com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs
 
 import android.widget.CalendarView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,6 +18,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Cancel
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -32,7 +42,16 @@ import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.core.Angle
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun DeleteDialog(
@@ -264,4 +283,81 @@ fun DatePicker(
             }
         }
     }
+}
+
+@Composable
+fun ConfettiDialog(onDismiss: () -> Unit, fredoka: FontFamily, visibility: Boolean) {
+    val textVisibility = remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(key1 = true) {
+        textVisibility.value = true
+    }
+
+    Dialog(onDismissRequest = { onDismiss() }) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.6f),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            AnimatedVisibility(
+                visible = textVisibility.value,
+                enter = expandHorizontally(animationSpec = tween(durationMillis = 1000)) + fadeIn(
+                    animationSpec = tween(durationMillis = 1300)
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    Text(
+                        text = stringResource(R.string.goodJob),
+                        fontSize = 35.sp,
+                        fontFamily = fredoka,
+                        color = Color.Gray,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.padding(vertical = 10.dp))
+                    Text(
+                        text = stringResource(R.string.keepUpWithTheGoodGrades),
+                        fontSize = 28.sp,
+                        fontFamily = fredoka,
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
+                    )
+
+                }
+            }
+            KonfettiView(
+                modifier = Modifier.fillMaxSize(),
+                parties = listOf(
+                    Party(
+                        angle = 45,
+                        speed = 0f,
+                        maxSpeed = 30f,
+                        damping = 0.9f,
+                        spread = 180,
+                        colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
+                        position = Position.Relative(0.0, 0.0),
+                        emitter = Emitter(duration = 4000, TimeUnit.MILLISECONDS).perSecond(50)
+                    ),
+                    Party(
+                        angle = 135,
+                        speed = 0f,
+                        maxSpeed = 30f,
+                        damping = 0.9f,
+                        spread = 180,
+                        colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
+                        position = Position.Relative(1.0, 0.0),
+                        emitter = Emitter(duration = 4000, TimeUnit.MILLISECONDS).perSecond(50)
+                    )
+                )
+            )
+        }
+    }
+
 }

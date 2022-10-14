@@ -13,6 +13,7 @@ import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -78,6 +79,13 @@ class GradeViewModel @Inject constructor(
     // Important for the TextFields in the GradeBottomSheet to get specific edit value
     private val _editTextFieldState = mutableStateOf<Boolean>(false)
     val editTextFieldState: State<Boolean> = _editTextFieldState
+
+    private val _confettiDialogState = mutableStateOf(false)
+    val confettiDialogState: State<Boolean> = _confettiDialogState
+
+    fun setConfettiDialogState(value: Boolean) {
+        _confettiDialogState.value = value
+    }
 
     fun setEditTextFieldState(value: Boolean) {
         _editTextFieldState.value = value
@@ -285,12 +293,26 @@ class GradeViewModel @Inject constructor(
     // When adding or edit a grade is successful
     private fun addOrEditGradeSuccess() {
         viewModelScope.launch {
+            confettiAnimationLogic()
             clearAfterGradeEvent()
             removeAllErrors()
             _bottomSheetState.value = false
 
             updateAverageUseCase.invoke(subjectId = subjectId.value)
                 .collect()
+        }
+    }
+
+    private fun confettiAnimationLogic() {
+        if (gradeState.value.text.toDouble() <= 1.75) {
+            viewModelScope.launch {
+                delay(200)
+                setConfettiDialogState(value = true)
+            }
+            viewModelScope.launch {
+                delay(5000)
+                setConfettiDialogState(value = false)
+            }
         }
     }
 

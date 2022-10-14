@@ -151,8 +151,6 @@ Sapp/src/main/java/com/mnowo/offlineschoolmanager/feature_todo/domain/models/ToD
 [app/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/util/Constants.kt,e\1\e12015fe5c6f409f1ef118f13e50d909ee19f6af
 î
 dapp/src/main/java/com/mnowo/offlineschoolmanager/feature_exam/domain/use_case/util/ExamValidation.kt,4\e\4e58bc07a8f9fb3b007fe53670805266014f2704
-í
-bapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/presentation/dialogs/Dialogs.kt,5\9\5975fcb11dc3eccd0d9cfd5ad619622279e83551
 ì
 capp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/domain/repository/GradeRepository.kt,1\6\1693e9d9f2643281b871e349c98961320070cafa
 ï
@@ -181,8 +179,6 @@ mapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/presentation
 Sapp/src/main/java/com/mnowo/offlineschoolmanager/feature_home/data/local/HomeDao.kt,9\c\9c5176faed62f984a7dd4cdf82bc3ee3f422ecff
 ã
 [app/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/domain/models/GradeResult.kt,6\d\6de4f242813dc58064a1fba3ddd9a3e8d0be9278
-ö
-japp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/grade_screen/GradeViewModel.kt,d\9\d944102f2f5626973875e4c48e5818c175aa3037
 ë
 aapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/domain/use_case/AddGradeUseCase.kt,b\f\bfcba2d6d39a22a50f7297c27e06854487f81607
 ñ
@@ -193,8 +189,6 @@ fapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/domain/use_case/
 lapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/use_case/GetAllExamItemsUseCase.kt,8\e\8e2bc1eced8f088cabb2d6f2dd00b03dd7e4a5d3
 p
 @app/src/main/java/com/mnowo/offlineschoolmanager/di/AppModule.kt,a\b\abd5f4c98353a57716dfa6b09d70a761fdb77519
-ó
-gapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/grade_screen/GradeScreen.kt,1\2\12bfe54b475b6f858d042856c0d91948052e607c
 ö
 japp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/subject_screen/SubjectEvent.kt,0\5\056cb67c3ba0c7b00eab8927f825648e94ece085
 û
@@ -215,12 +209,8 @@ bapp/src/main/java/com/mnowo/offlineschoolmanager/feature_timetable/presentation
 fapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/domain/use_case/UpdateAverageUseCase.kt,6\3\633b6c6af59c569f62df7fba28dcaf07149de173
 í
 bapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/presentation/util/Navigation.kt,3\0\301a6bd5694957b210fee491be7467e736e396f1
-õ
-kapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/subject_screen/SubjectScreen.kt,c\2\c21736fd8eddccfdf1fcca6825cd35fd3c9d370f
 ï
 eapp/src/main/java/com/mnowo/offlineschoolmanager/feature_timetable/presentation/TimetableViewModel.kt,8\a\8a9e4f710992ca6875e2f703af901d83f2149bda
-è
-_app/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/presentation/MainActivity.kt,8\4\848bff68ad6822d2178ba31039b3d1fa9c512a84
 <
 build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
 á
@@ -249,8 +239,6 @@ Sapp/src/main/java/com/mnowo/offlineschoolmanager/feature_exam/data/local/ExamDa
 Wapp/src/main/java/com/mnowo/offlineschoolmanager/feature_exam/presentation/ExamEvent.kt,3\2\324e9540e382524fd88a4bc6271a400f84acd73a
 É
 Sapp/src/main/java/com/mnowo/offlineschoolmanager/feature_exam/domain/models/Exam.kt,f\c\fcc68db461a14162abf92be22179c5155425c450
-ã
-[app/src/main/java/com/mnowo/offlineschoolmanager/feature_home/presentation/HomeViewModel.kt,3\c\3c92a70cbee647919a3b71dec87c3aff7da5769d
 û
 napp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/presentation/subject_screen/SubjectViewModel.kt,0\6\065fe6e2471912df3362f854f80ad501c3b8e312
 q
@@ -261,9 +249,19 @@ Xapp/src/main/java/com/mnowo/offlineschoolmanager/feature_exam/presentation/Exam
 kapp/src/main/java/com/mnowo/offlineschoolmanager/feature_exam/domain/use_case/util/ToDoSubjectItemHelper.kt,d\0\d093bc4cb0c1563eec1e088c83e5778abff1d147
 ã
 [app/src/main/java/com/mnowo/offlineschoolmanager/feature_todo/presentation/ToDoViewModel.kt,e\2\e2429ea19a8c8e10f1045848b0ad42c4ac035b96
-à
-Xapp/src/main/java/com/mnowo/offlineschoolmanager/feature_todo/presentation/ToDoScreen.kt,c\2\c2b05f62411482c825b27928489fc637ccbce61c
 ã
 [app/src/main/java/com/mnowo/offlineschoolmanager/feature_exam/presentation/ExamViewModel.kt,0\7\078d329b70d428ee204b44f19ef4a63ac1cfe660
 ó
 gapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_core/domain/util/ExamSubjectItemHelper.kt,b\c\bc266ff9bb5d645c7a8218afdcdc80a06a9d6129
+ß
+wapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_subject/add_subject/presentation/AddSubjectBottomSheet.kt,f\1\f177b55916deb61a503cdec3dd8b0e24ccad4b75
+¶
+vapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_subject/add_subject/domain/use_case/AddSubjectUseCase.kt,7\a\7a1ba63c8577fc4ce98e419b0f9224f3ffb9ae46
+•
+uapp/src/main/java/com/mnowo/offlineschoolmanager/core/feature_subject/add_subject/presentation/AddSubjectViewModel.kt,2\1\21add815d74e2876b32b55a43c75a63638257656
+P
+ app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
+ó
+gapp/src/main/java/com/mnowo/offlineschoolmanager/feature_grade/domain/use_case/util/RoundOffDecimals.kt,3\8\381a85e6fb468aa14a956c961baebda7179e3b7e
+X
+(gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e

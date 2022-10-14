@@ -79,4 +79,6 @@
     <string name="best">Best:</string>
     <string name="worst">Worst:</string>
     <string name="oral">Oral</string>
+    <string name="goodJob">Good job!</string>
+    <string name="keepUpWithTheGoodGrades">Keep up the good grades</string>
 </resources>

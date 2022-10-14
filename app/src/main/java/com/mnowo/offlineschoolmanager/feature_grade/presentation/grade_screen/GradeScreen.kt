@@ -40,12 +40,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.rememberWindowInfo
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.ConfettiDialog
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.dialogs.DeleteDialog
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen.AddGradeBottomSheet
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen.GradeEvent
 import com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen.GradeViewModel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -168,9 +171,15 @@ fun GradeScreen(
                         fontFamily = fredoka,
                         color = Color.Gray,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(0.5f).padding(top = 5.dp)
+                        modifier = Modifier
+                            .fillMaxWidth(0.5f)
+                            .padding(top = 5.dp)
                     )
                 }
+            }
+
+            if (viewModel.confettiDialogState.value) {
+                ConfettiDialog(fredoka = fredoka, onDismiss = {}, visibility = true)
             }
         }
     }

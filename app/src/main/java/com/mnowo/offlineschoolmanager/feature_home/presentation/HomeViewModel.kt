@@ -76,10 +76,10 @@ class HomeViewModel @Inject constructor(
     private val _subjectListState = mutableStateOf<ListState<Subject>>(ListState())
     val subjectListState: State<ListState<Subject>> = _subjectListState
 
-    private val _isTodayTimetableState = mutableStateOf<Boolean>(true)
+    private val _isTodayTimetableState = mutableStateOf(true)
     val isTodayTimetableState: State<Boolean> = _isTodayTimetableState
 
-    private val _emptyDailyList = mutableStateOf<Boolean>(true)
+    private val _emptyDailyList = mutableStateOf(true)
     val emptyDailyList: State<Boolean> = _emptyDailyList
 
     private val _examListState = mutableStateOf<ListState<Exam>>(ListState())
@@ -271,7 +271,7 @@ class HomeViewModel @Inject constructor(
                         subjectListState.value.listData.filter { it.id == item.subjectId }[0]
 
                     _dailyTimetableMap.set(key = item, value = subject)
-                    onEvent(HomeEvent.SetIsTodayTimetableState(false))
+                    onEvent(HomeEvent.SetIsTodayTimetableState(true))
                 } catch (e: Exception) {
                     return
                 }
