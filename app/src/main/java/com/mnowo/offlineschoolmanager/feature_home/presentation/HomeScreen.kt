@@ -41,6 +41,7 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.WindowInfo
@@ -49,6 +50,7 @@ import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.mo
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.core.theme.darkerWhite
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
+import com.mnowo.offlineschoolmanager.feature_home.presentation.CustomAverageCircle
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
@@ -185,14 +187,14 @@ fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: 
                 .fillMaxHeight()
                 .width(windowInfo.screenWidth / 1 - 20.dp)
                 .animateContentSize(animationSpec = tween(300)),
-            elevation = 4.dp,
+            elevation = 1.dp,
             backgroundColor = darkerWhite,
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(10.dp)
+                    .padding(10.dp),
             ) {
                 Text(
                     text = stringResource(R.string.yourAverage),
@@ -200,12 +202,25 @@ fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: 
                     fontWeight = FontWeight.Normal,
                     fontSize = 20.sp
                 )
-                Spacer(modifier = Modifier.padding(vertical = 5.dp))
-                HomeAverageCircle(windowInfo = windowInfo, viewModel = viewModel, fredoka = fredoka)
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 40.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CustomAverageCircle(
+                        fredoka = fredoka,
+                        foregroundIndicatorColor = viewModel.gradeColorState.value,
+                        indicatorValue = 6 - viewModel.averageState.value + 1,
+                        indicatorText = "${viewModel.averageState.value}"
+                    )
+                }
                 HomeAverageDropdown(
                     fredoka = fredoka,
-                    bestSubject = viewModel.bestAndWorstSubjectState[0] ?: stringResource(R.string.noData),
-                    worstSubject = viewModel.bestAndWorstSubjectState[1] ?: stringResource(id = R.string.noData)
+                    bestSubject = viewModel.bestAndWorstSubjectState[0]
+                        ?: stringResource(R.string.noData),
+                    worstSubject = viewModel.bestAndWorstSubjectState[1]
+                        ?: stringResource(id = R.string.noData)
                 )
             }
         }
@@ -229,9 +244,11 @@ fun HomeAverageDropdown(fredoka: FontFamily, bestSubject: String, worstSubject: 
     if (dropdownState.value) {
         Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
             HomeBestSubject(fredoka = fredoka, bestSubject = bestSubject)
-            Divider(modifier = Modifier
-                .height(50.dp)
-                .width(1.dp))
+            Divider(
+                modifier = Modifier
+                    .height(50.dp)
+                    .width(1.dp)
+            )
             HomeWorstSubject(fredoka = fredoka, worstSubject = worstSubject)
         }
     }
@@ -264,7 +281,12 @@ fun RowScope.HomeWorstSubject(fredoka: FontFamily, worstSubject: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = stringResource(R.string.worst), fontFamily = fredoka, color = Color.Gray)
-        Text(text = worstSubject, maxLines = 1, overflow = TextOverflow.Ellipsis, fontFamily = fredoka)
+        Text(
+            text = worstSubject,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontFamily = fredoka
+        )
     }
 }
 
@@ -304,7 +326,7 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: H
     Card(
         modifier = Modifier
             .width(windowInfo.screenWidth / 1 - 20.dp),
-        elevation = 4.dp,
+        elevation = 2.dp,
         backgroundColor = darkerWhite,
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -343,17 +365,15 @@ fun HomeTodayTimetable(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: H
                         viewModel = viewModel
                     )
                 }
-                item {
-                    if (viewModel.emptyDailyList.value) {
-                        HomeNoDataYet(
-                            title = stringResource(id = R.string.youHaveNoTimetableYet),
-                            description = stringResource(
-                                id = R.string.letsChangeThat
-                            ),
-                            fredoka = fredoka
-                        )
-                    }
-                }
+            }
+            if (viewModel.emptyDailyList.value) {
+                HomeNoDataYet(
+                    title = stringResource(id = R.string.youHaveNoTimetableYet),
+                    description = stringResource(
+                        id = R.string.letsChangeThat
+                    ),
+                    fredoka = fredoka
+                )
             }
             Spacer(modifier = Modifier.padding(vertical = 10.dp))
         }
@@ -440,7 +460,7 @@ fun HomeUpcomingExams(fredoka: FontFamily, windowInfo: WindowInfo, viewModel: Ho
     Card(
         modifier = Modifier
             .width(windowInfo.screenWidth / 1 - 20.dp),
-        elevation = 4.dp,
+        elevation = 2.dp,
         backgroundColor = darkerWhite,
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -551,32 +571,21 @@ fun UpcomingExamsItem(
 
 @Composable
 fun HomeNoDataYet(title: String, description: String, fredoka: FontFamily) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painterResource(id = R.drawable.no_data_icon),
-            contentDescription = "",
-            modifier = Modifier.scale(0.8f).background(color = darkerWhite)
+        Text(
+            text = title,
+            fontFamily = fredoka,
+            fontWeight = FontWeight.Medium,
+            color = Color.Gray
         )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 5.dp)
-        ) {
-            Text(
-                text = title,
-                fontFamily = fredoka,
-                fontWeight = FontWeight.Medium,
-                color = Color.Gray
-            )
-            Text(
-                text = description,
-                fontFamily = fredoka,
-                color = Color.Gray
-            )
-        }
+        Text(
+            text = description,
+            fontFamily = fredoka,
+            color = Color.Gray
+        )
     }
 }

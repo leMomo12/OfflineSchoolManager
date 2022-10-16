@@ -1,10 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_home.presentation
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.util.Log.d
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +11,7 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.use_case.GetAllExamItemsUseCase
@@ -25,13 +21,11 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ExamSubjectI
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
-import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.use_case.util.ExamNotificationReceiver
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
 import com.mnowo.offlineschoolmanager.feature_home.domain.use_case.GetAverageUseCase
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.GetAllTimetableItemsUseCase
-import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +35,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.hours
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(

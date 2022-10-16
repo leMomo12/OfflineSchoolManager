@@ -1,13 +1,11 @@
 package com.mnowo.offlineschoolmanager.feature_exam.presentation
 
 import android.util.Log.d
-import android.view.animation.AnimationSet
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
@@ -22,12 +20,10 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ExamSubjectI
 import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.DeleteExamItemUseCase
 import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.EditExamItemUseCase
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
-import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.*
 import javax.inject.Inject
 

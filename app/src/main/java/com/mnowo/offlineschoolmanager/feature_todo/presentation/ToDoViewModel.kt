@@ -1,25 +1,19 @@
 package com.mnowo.offlineschoolmanager.feature_todo.presentation
 
-import android.util.Log.d
-import android.util.Log.i
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ExamSubjectItemHelper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.feature_exam.domain.use_case.util.ToDoSubjectItemHelper
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
-import com.mnowo.offlineschoolmanager.feature_grade.presentation.subject_screen.SubjectEvent
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDoResult
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.*
@@ -28,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 

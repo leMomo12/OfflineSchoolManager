@@ -1,9 +1,7 @@
 package com.mnowo.offlineschoolmanager.feature_timetable.presentation
 
 import android.util.Log.d
-import android.util.Log.e
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateMap
@@ -11,26 +9,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.Helper
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ConvertDay
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ConvertDay.convertDayToInt
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ConvertDay.convertIntToDay
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
-import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.GetAllSubjectsUseCase
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Days
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.TimetableResult
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.use_case.*
-import com.mnowo.offlineschoolmanager.feature_todo.presentation.ToDoEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch

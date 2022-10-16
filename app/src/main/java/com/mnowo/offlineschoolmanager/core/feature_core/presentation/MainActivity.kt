@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
             OfflineSchoolManagerTheme {
                 val navController = rememberNavController()
                 Navigation(navController = navController)
-                askForReview()
             }
         }
     }
@@ -32,9 +31,7 @@ class MainActivity : ComponentActivity() {
             if (request.isSuccessful) {
                 val reviewInfo = request.result
                 manager.launchReviewFlow(this, reviewInfo).addOnFailureListener {
-                    print("In-app review request failed, reason=$it")
                 }.addOnCompleteListener { _ ->
-                    print("In-app review finished")
                 }
             }
         }
