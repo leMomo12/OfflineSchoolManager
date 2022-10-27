@@ -1,9 +1,13 @@
 package com.mnowo.offlineschoolmanager.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.data.SchoolManagerDatabase
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ReviewService
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.data.SubjectDao
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.data.SubjectRepositoryImpl
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.repository.SubjectRepository
@@ -29,6 +33,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore("com.mnowo.offlineschoolmanager.user_in_app_counter")
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -53,10 +59,12 @@ object AppModule {
     @Provides
     @Singleton
     fun provideGradeRepository(
-        gradeDao: GradeDao
+        gradeDao: GradeDao,
+        dataStoreManager: DataStore<Preferences>
     ): GradeRepository {
         return GradeRepositoryImpl(
-            gradeDao = gradeDao
+            gradeDao = gradeDao,
+            dataStorePreferences = dataStoreManager
         )
     }
 
@@ -109,7 +117,7 @@ object AppModule {
     @Singleton
     fun provideHomeRepository(
         dao: HomeDao
-    ) : HomeRepository {
+    ): HomeRepository {
         return HomeRepositoryImpl(
             dao = dao
         )
@@ -127,7 +135,16 @@ object AppModule {
     @Singleton
     fun provideExamRepository(
         dao: ExamDao
-    ) : ExamRepository {
+    ): ExamRepository {
         return ExamRepositoryImpl(dao = dao)
     }
+
+    @Provides
+    @Singleton
+    fun dataStoreManager(@ApplicationContext appContext: Context): DataStore<Preferences> =
+        appContext.dataStore
+
+    @Provides
+    @Singleton
+    fun provideReviewService(): ReviewService = ReviewService
 }

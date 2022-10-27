@@ -12,8 +12,8 @@ android {
         applicationId "com.mnowo.offlineschoolmanager"
         minSdk 21
         targetSdk 31
-        versionCode 7
-        versionName "1.2"
+        versionCode 8
+        versionName "1.3"
 
         testInstrumentationRunner "com.mnowo.offlineschoolmanager.HiltTestRunner"
         vectorDrawables {
@@ -67,6 +67,8 @@ dependencies {
     // Confetti Third-Party library
     implementation 'nl.dionsegijn:konfetti-compose:2.0.2'
 
+    // Datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Compose dependencies
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha04"
@@ -97,7 +99,6 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$room_version"
 
-
     // Local unit tests
     testImplementation "androidx.test:core:1.4.0"
     testImplementation "junit:junit:4.13.2"
@@ -125,7 +126,6 @@ dependencies {
 
     // NumberPicker
     implementation "com.chargemap.compose:numberpicker:1.0.3"
-
 
     // Accompanist
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"

@@ -35,6 +35,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.PickColorDialog
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.Chip.Chip
 import com.mnowo.offlineschoolmanager.core.feature_core.presentation.color_picker.PickColorEvent
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.presentation.util.AddSubjectTestTags
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
@@ -299,24 +300,6 @@ fun AddSubjectBottomSheetSliderChips(fredoka: FontFamily, viewModel: AddSubjectV
             borderColor = Color.Gray,
             fredoka = fredoka,
             onClick = { viewModel.roundOffPercentage(0.70f) }
-        )
-    }
-}
-
-@Composable
-fun Chip(text: String, borderColor: Color, fredoka: FontFamily, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .wrapContentSize()
-            .clip(RoundedCornerShape(32.dp))
-            .border(1.dp, color = borderColor, shape = RoundedCornerShape(32.dp))
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            fontFamily = fredoka,
-            modifier = Modifier.padding(top = 5.dp, bottom = 5.dp, start = 10.dp, end = 10.dp)
         )
     }
 }

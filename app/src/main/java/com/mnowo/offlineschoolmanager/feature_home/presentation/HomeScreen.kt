@@ -1,10 +1,12 @@
 package com.mnowo.offlineschoolmanager
 
+import android.app.Activity
 import android.content.Context
 import android.hardware.lights.Light
 import android.util.Log.d
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.scrollable
@@ -186,7 +188,7 @@ fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: 
             modifier = Modifier
                 .fillMaxHeight()
                 .width(windowInfo.screenWidth / 1 - 20.dp)
-                .animateContentSize(animationSpec = tween(300)),
+                .animateContentSize(animationSpec = tween(300, easing = LinearOutSlowInEasing)),
             elevation = 1.dp,
             backgroundColor = darkerWhite,
             shape = RoundedCornerShape(16.dp)

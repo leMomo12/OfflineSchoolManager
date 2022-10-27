@@ -1,15 +1,22 @@
 package com.mnowo.offlineschoolmanager.feature_grade.data.repository
 
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_subject.add_subject.domain.models.Subject
+import com.mnowo.offlineschoolmanager.di.dataStore
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class GradeRepositoryImpl @Inject constructor(
-    private val gradeDao: GradeDao
+    private val gradeDao: GradeDao,
+    private val dataStorePreferences: DataStore<Preferences>
 ) : GradeRepository {
 
     override fun addGrade(grade: Grade) {
@@ -28,7 +35,7 @@ class GradeRepositoryImpl @Inject constructor(
         return gradeDao.updateAverage(newAverage = newAverage, subjectId = subjectId)
     }
 
-    override fun getSpecificSubject(subjectId: Int) : Subject {
+    override fun getSpecificSubject(subjectId: Int): Subject {
         return gradeDao.getSpecificSubject(subjectId = subjectId)
     }
 
@@ -74,6 +81,12 @@ class GradeRepositoryImpl @Inject constructor(
 
     override suspend fun deleteAllSubjectsFromExam(subjectId: Int) {
         return gradeDao.deleteAllSubjectsFromExam(subjectId = subjectId)
+    }
+
+    override suspend fun getInAppCounter(): Int {
+        val dataStoreKey = stringPreferencesKey(Constants.USER_IN_APP_COUNTER)
+        val preferences = dataStorePreferences.data.first()
+        return preferences[dataStoreKey]?.toInt() ?: 0
     }
 
 }

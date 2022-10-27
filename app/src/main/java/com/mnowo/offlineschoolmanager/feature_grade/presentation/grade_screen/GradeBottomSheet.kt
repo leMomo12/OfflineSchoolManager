@@ -5,13 +5,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,7 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.presentation.Chip.Chip
 import com.mnowo.offlineschoolmanager.core.theme.LightBlue
+import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -34,6 +36,10 @@ fun AddGradeBottomSheet(
     fredoka: FontFamily,
     scaffoldState: BottomSheetScaffoldState,
 ) {
+
+    var range by remember {
+        mutableStateOf(0.75f..6.5f)
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest {
@@ -63,7 +69,7 @@ fun AddGradeBottomSheet(
 
         viewModel.onEvent(
             GradeEvent.EnteredGrade(
-                grade = viewModel.specificGradeState.value?.grade.toString()
+                grade = viewModel.specificGradeState.value?.grade?.toFloat() ?: 0.5f
             )
         )
 
@@ -125,7 +131,6 @@ fun AddGradeBottomSheet(
         }
 
         Divider(modifier = Modifier.padding(top = 40.dp), color = Color.LightGray, 1.dp)
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -142,20 +147,14 @@ fun AddGradeBottomSheet(
                 },
                 singleLine = true
             )
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                isError = viewModel.gradeErrorState.value,
-                value = viewModel.gradeState.value.text,
-                label = { Text(text = stringResource(id = R.string.grade)) },
-                onValueChange = {
-                    viewModel.onEvent(GradeEvent.EnteredGrade(it))
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            Spacer(modifier = Modifier.padding(top = 30.dp))
+            Text(text = stringResource(id = R.string.grade) + ":", color = Color.Gray, fontFamily = fredoka)
+            Text(text = "${viewModel.gradeState.value}", fontFamily = fredoka)
+            Slider(
+                value = viewModel.gradeState.value,
+                onValueChange = { viewModel.onEvent(GradeEvent.EnteredGrade(grade = it)) },
+                valueRange = range
             )
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -187,5 +186,20 @@ fun AddGradeBottomSheet(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun GradeSliderChips(viewModel: GradeViewModel, fredoka: FontFamily) {
+    LazyRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+        items(10) {
+            Chip(text = "$it",
+                borderColor = Color.Gray,
+                fredoka = fredoka,
+                onClick = { viewModel.onEvent(GradeEvent.EnteredGrade(1.5f)) }
+            )
+            Spacer(modifier = Modifier.padding(end = 10.dp))
+        }
+
     }
 }

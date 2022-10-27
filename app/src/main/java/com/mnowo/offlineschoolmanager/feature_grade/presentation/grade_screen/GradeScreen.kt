@@ -180,6 +180,7 @@ fun GradeScreen(
 
             if (viewModel.confettiDialogState.value) {
                 ConfettiDialog(fredoka = fredoka, onDismiss = {}, visibility = true)
+
             }
         }
     }

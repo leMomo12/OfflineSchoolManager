@@ -1,6 +1,10 @@
 package com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen
 
+import android.app.Activity
+import android.content.Context
+import android.util.Log.d
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,11 +12,15 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ReviewService
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.*
+import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,8 +33,13 @@ class GradeViewModel @Inject constructor(
     private val updateAverageUseCase: UpdateAverageUseCase,
     private val getSpecificSubjectUseCase: GetSpecificSubjectUseCase,
     private val deleteSpecificGradeUseCase: DeleteSpecificGradeUseCase,
-    private val updateGradeUseCase: UpdateGradeUseCase
+    private val updateGradeUseCase: UpdateGradeUseCase,
+    private val reviewService: ReviewService,
+    private val getInAppCounterUseCase: GetInAppCounterUseCase,
+    @ApplicationContext context: Context
 ) : ViewModel() {
+
+    //private val contexte = context
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -43,8 +56,8 @@ class GradeViewModel @Inject constructor(
     private val _classTestDescriptionErrorState = mutableStateOf(false)
     val classTestDescriptionErrorState: State<Boolean> = _classTestDescriptionErrorState
 
-    private val _gradeState = mutableStateOf(TextFieldState())
-    val gradeState: State<TextFieldState> = _gradeState
+    private val _gradeState = mutableStateOf<Float>(0.75f)
+    val gradeState: State<Float> = _gradeState
 
     private val _gradeErrorState = mutableStateOf(false)
     val gradeErrorState: State<Boolean> = _gradeErrorState
@@ -132,32 +145,27 @@ class GradeViewModel @Inject constructor(
                 )
             }
             is GradeEvent.AddGrade -> {
-                if (gradeState.value.text.trim().isNotBlank()) {
-                    val grade = Grade(
-                        0,
-                        subjectId = subjectId.value,
-                        description = classTestDescriptionState.value.text,
-                        grade = gradeState.value.text.replace(oldChar = ',', newChar = '.')
-                            .toDouble(),
-                        isWritten = isWrittenState.value
-                    )
-                    addGradeUseCase.invoke(grade = grade).onEach {
-                        when (it) {
-                            is Resource.Success -> {
-                                addOrEditGradeSuccess()
-                            }
-                            is Resource.Error -> {
-                                addOrEditGradeError(
-                                    errorMessage = it.message,
-                                    gradeResult = it.data
-                                )
-                            }
+                val grade = Grade(
+                    0,
+                    subjectId = subjectId.value,
+                    description = classTestDescriptionState.value.text,
+                    grade = gradeState.value.toDouble(),
+                    isWritten = isWrittenState.value
+                )
+                addGradeUseCase.invoke(grade = grade).onEach {
+                    when (it) {
+                        is Resource.Success -> {
+                            addOrEditGradeSuccess()
                         }
+                        is Resource.Error -> {
+                            addOrEditGradeError(
+                                errorMessage = it.message,
+                                gradeResult = it.data
+                            )
+                        }
+                    }
 
-                    }.launchIn(viewModelScope)
-                } else {
-                    _gradeErrorState.value = true
-                }
+                }.launchIn(viewModelScope)
             }
             is GradeEvent.LoadGrades -> {
                 viewModelScope.launch {
@@ -194,9 +202,10 @@ class GradeViewModel @Inject constructor(
                 )
             }
             is GradeEvent.EnteredGrade -> {
-                _gradeState.value = gradeState.value.copy(
-                    text = event.grade
-                )
+                viewModelScope.launch(Dispatchers.IO) {
+                    _gradeState.value =
+                        RoundOffDecimals.roundOffDoubleDecimals(event.grade.toDouble()).toFloat()
+                }
             }
             is GradeEvent.EnteredIsWritten -> {
                 _isWrittenState.value = event.isWritten
@@ -226,31 +235,26 @@ class GradeViewModel @Inject constructor(
             }
             is GradeEvent.UpdateGrade -> {
                 viewModelScope.launch {
-                    if (gradeState.value.text.trim().isNotBlank()) {
-                        specificGradeState.value?.let {
-                            updateGradeUseCase.invoke(
-                                grade = Grade(
-                                    id = it.id,
-                                    subjectId = it.subjectId,
-                                    description = classTestDescriptionState.value.text,
-                                    grade = gradeState.value.text.replace(
-                                        oldChar = ',',
-                                        newChar = '.'
-                                    ).toDouble(),
-                                    isWritten = isWrittenState.value,
-                                )
-                            ).collect() { result ->
-                                when (result) {
-                                    is Resource.Success -> {
-                                        addOrEditGradeSuccess()
-                                    }
-                                    is Resource.Loading -> {}
-                                    is Resource.Error -> {
-                                        addOrEditGradeError(
-                                            errorMessage = result.message,
-                                            gradeResult = result.data
-                                        )
-                                    }
+                    specificGradeState.value?.let {
+                        updateGradeUseCase.invoke(
+                            grade = Grade(
+                                id = it.id,
+                                subjectId = it.subjectId,
+                                description = classTestDescriptionState.value.text,
+                                grade = gradeState.value.toDouble(),
+                                isWritten = isWrittenState.value,
+                            )
+                        ).collect() { result ->
+                            when (result) {
+                                is Resource.Success -> {
+                                    addOrEditGradeSuccess()
+                                }
+                                is Resource.Loading -> {}
+                                is Resource.Error -> {
+                                    addOrEditGradeError(
+                                        errorMessage = result.message,
+                                        gradeResult = result.data
+                                    )
                                 }
                             }
                         }
@@ -304,7 +308,7 @@ class GradeViewModel @Inject constructor(
     }
 
     private fun confettiAnimationLogic() {
-        if (gradeState.value.text.toDouble() <= 1.75) {
+        if (gradeState.value.toDouble() <= 1.75) {
             viewModelScope.launch {
                 delay(200)
                 setConfettiDialogState(value = true)
@@ -312,13 +316,19 @@ class GradeViewModel @Inject constructor(
             viewModelScope.launch {
                 delay(5000)
                 setConfettiDialogState(value = false)
+                val inAppCounter = getInAppCounterUseCase.invoke()
+                d("Counter", "Counter: $inAppCounter")
+                delay(300)
+                if (inAppCounter > 0) {
+                    askForReview()
+                }
             }
         }
     }
 
     fun clearAfterGradeEvent() {
         _classTestDescriptionState.value.clearText()
-        _gradeState.value.clearText()
+        _gradeState.value = 0.75f
         _isWrittenState.value = true
         setSpecificGradeState(null)
     }
@@ -326,5 +336,9 @@ class GradeViewModel @Inject constructor(
     fun removeAllErrors() {
         _classTestDescriptionErrorState.value = false
         _gradeErrorState.value = false
+    }
+
+    private fun askForReview() {
+        //reviewService.askForReview(context = contexte)
     }
 }
