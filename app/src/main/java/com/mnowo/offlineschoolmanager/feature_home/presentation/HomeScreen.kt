@@ -53,6 +53,7 @@ import com.mnowo.offlineschoolmanager.core.theme.LightBlue
 import com.mnowo.offlineschoolmanager.core.theme.darkerWhite
 import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_home.presentation.CustomAverageCircle
+import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeEvent
 import com.mnowo.offlineschoolmanager.feature_home.presentation.HomeViewModel
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_todo.domain.use_case.util.FormatDate
@@ -166,7 +167,7 @@ fun HomeScreenTitle(
                 Icon(Icons.Default.Notifications, contentDescription = "")
             }
             IconButton(onClick = {
-                Toast.makeText(context, "Not yet implemented", Toast.LENGTH_LONG).show()
+                viewModel.onEvent(HomeEvent.NavigateToSettingsScreen)
             }) {
                 Icon(Icons.Default.Settings, contentDescription = "")
             }

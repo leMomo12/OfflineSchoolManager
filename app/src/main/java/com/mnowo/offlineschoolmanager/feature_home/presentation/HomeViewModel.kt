@@ -125,6 +125,13 @@ class HomeViewModel @Inject constructor(
                     listData = event.list
                 )
             }
+            is HomeEvent.NavigateToSettingsScreen -> {
+                viewModelScope.launch {
+                    _eventFlow.emit(
+                        UiEvent.Navigate(Screen.SettingsScreen.route)
+                    )
+                }
+            }
         }
     }
 

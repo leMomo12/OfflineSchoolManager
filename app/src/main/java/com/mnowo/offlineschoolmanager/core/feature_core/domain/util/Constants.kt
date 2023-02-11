@@ -12,6 +12,7 @@ object Constants {
     const val TODO_TABLE = "todo_table"
     const val TIMETABLE_TABLE = "timetable_table"
     const val EXAM_TABLE = "exam_table"
+    const val SETTINGS_TABLE = "settings_table"
 
     const val USER_IN_APP = "user_in_app"
 

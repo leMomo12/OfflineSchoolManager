@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.mnowo.offlineschoolmanager.*
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Constants
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
+import com.mnowo.offlineschoolmanager.feature_settings.SettingsScreen
 
 @Composable
 fun Navigation(navController: NavHostController) {
@@ -17,9 +18,11 @@ fun Navigation(navController: NavHostController) {
         composable(Screen.HomeScreen.route) {
             HomeScreen(navController = navController)
         }
+
         composable(Screen.TimetableScreen.route) {
             TimetableScreen(navController = navController)
         }
+
         composable(
             Screen.SubjectScreen.route,
             ) {
@@ -35,7 +38,6 @@ fun Navigation(navController: NavHostController) {
                     subjectId = it
                 )
             }
-
         }
 
         composable(Screen.ToDoScreen.route) {
@@ -44,6 +46,10 @@ fun Navigation(navController: NavHostController) {
 
         composable(Screen.ExamScreen.route) {
             ExamScreen(navController = navController)
+        }
+
+        composable(Screen.SettingsScreen.route) {
+            SettingsScreen(navController = navController)
         }
     }
 }

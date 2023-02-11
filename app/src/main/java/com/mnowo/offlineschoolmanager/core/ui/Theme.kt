@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager.core.theme
 
+import android.hardware.lights.Light
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
@@ -43,13 +44,15 @@ fun OfflineSchoolManagerTheme(
 
     if (darkTheme) {
         systemUiController.setStatusBarColor(
-            color = Color.DarkGray
+            color = Color.White
         )
     } else {
         systemUiController.setStatusBarColor(
             color = Color.White
         )
     }
+
+    systemUiController.setNavigationBarColor(color = Color.White)
 
     MaterialTheme(
         colors = colors,
