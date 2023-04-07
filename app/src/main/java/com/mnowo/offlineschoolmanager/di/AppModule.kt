@@ -20,6 +20,9 @@ import com.mnowo.offlineschoolmanager.feature_grade.domain.repository.GradeRepos
 import com.mnowo.offlineschoolmanager.feature_home.data.local.HomeDao
 import com.mnowo.offlineschoolmanager.feature_home.data.repository.HomeRepositoryImpl
 import com.mnowo.offlineschoolmanager.feature_home.domain.repository.HomeRepository
+import com.mnowo.offlineschoolmanager.feature_settings.data.local.SettingsDao
+import com.mnowo.offlineschoolmanager.feature_settings.data.repository.SettingsRepositoryImpl
+import com.mnowo.offlineschoolmanager.feature_settings.domain.repository.SettingsRepository
 import com.mnowo.offlineschoolmanager.feature_timetable.data.local.TimetableDao
 import com.mnowo.offlineschoolmanager.feature_timetable.data.repository.TimetableRepositoryImpl
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.repository.TimetableRepository
@@ -147,4 +150,14 @@ object AppModule {
     @Provides
     @Singleton
     fun provideReviewService(): ReviewService = ReviewService
+
+    @Provides
+    @Singleton
+    fun provideSettingsDao(db: SchoolManagerDatabase) = db.settingsDao()
+
+    @Provides
+    @Singleton
+    fun provideSettingsRepository(dao: SettingsDao): SettingsRepository {
+        return SettingsRepositoryImpl(settingsDao = dao)
+    }
 }

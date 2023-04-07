@@ -1,8 +1,6 @@
 package com.mnowo.offlineschoolmanager.feature_settings
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconToggleButton
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +13,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mnowo.offlineschoolmanager.R
+import com.mnowo.offlineschoolmanager.feature_settings.presentation.SettingsEvent
+import com.mnowo.offlineschoolmanager.feature_settings.presentation.SettingsViewModel
 import com.mnowo.offlineschoolmanager.rememberFredoka
 
 @Composable

@@ -1,23 +1,23 @@
 package com.mnowo.offlineschoolmanager.feature_grade.presentation.grade_screen
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log.d
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.use_case.GetSettingsUseCase
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ReviewService
+import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ReviewService.askForReview
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.*
 import com.mnowo.offlineschoolmanager.feature_grade.domain.use_case.util.RoundOffDecimals
+import com.mnowo.offlineschoolmanager.feature_settings.domain.models.Settings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -34,12 +34,10 @@ class GradeViewModel @Inject constructor(
     private val getSpecificSubjectUseCase: GetSpecificSubjectUseCase,
     private val deleteSpecificGradeUseCase: DeleteSpecificGradeUseCase,
     private val updateGradeUseCase: UpdateGradeUseCase,
-    private val reviewService: ReviewService,
     private val getInAppCounterUseCase: GetInAppCounterUseCase,
+    private val getSettingsUseCase: GetSettingsUseCase,
     @ApplicationContext context: Context
 ) : ViewModel() {
-
-    //private val contexte = context
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -96,6 +94,13 @@ class GradeViewModel @Inject constructor(
     private val _confettiDialogState = mutableStateOf(false)
     val confettiDialogState: State<Boolean> = _confettiDialogState
 
+    private val _settingsState = mutableStateOf<Settings>(Settings(1, true))
+    val settingsState: State<Settings> = _settingsState
+
+    fun setSettingsState(value: Settings) {
+        _settingsState.value = value
+    }
+
     fun setConfettiDialogState(value: Boolean) {
         _confettiDialogState.value = value
     }
@@ -134,6 +139,14 @@ class GradeViewModel @Inject constructor(
 
     fun setSubjectId(value: Int) {
         _subjectId.value = value
+    }
+
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            getSettingsUseCase.invoke().collect() {
+                setSettingsState(it)
+            }
+        }
     }
 
 
@@ -320,7 +333,7 @@ class GradeViewModel @Inject constructor(
                 d("Counter", "Counter: $inAppCounter")
                 delay(300)
                 if (inAppCounter > 0) {
-                    askForReview()
+                    //askForReview()
                 }
             }
         }
@@ -336,9 +349,5 @@ class GradeViewModel @Inject constructor(
     fun removeAllErrors() {
         _classTestDescriptionErrorState.value = false
         _gradeErrorState.value = false
-    }
-
-    private fun askForReview() {
-        //reviewService.askForReview(context = contexte)
     }
 }

@@ -215,7 +215,8 @@ fun HomeGradeAverage(windowInfo: WindowInfo, viewModel: HomeViewModel, fredoka: 
                         fredoka = fredoka,
                         foregroundIndicatorColor = viewModel.gradeColorState.value,
                         indicatorValue = 6 - viewModel.averageState.value + 1,
-                        indicatorText = "${viewModel.averageState.value}"
+                        indicatorText = "${viewModel.averageState.value}",
+                        smallText = stringResource(R.string.average)
                     )
                 }
                 HomeAverageDropdown(

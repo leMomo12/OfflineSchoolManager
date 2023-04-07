@@ -1,13 +1,10 @@
 package com.mnowo.offlineschoolmanager.feature_grade.domain.use_case
 
 import com.google.common.truth.Truth
-import com.mnowo.offlineschoolmanager.feature_grade.data.repository.GradeRepositoryImplTest
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.apache.tools.ant.taskdefs.Get
 import org.junit.Assert.*
 
 import org.junit.Before

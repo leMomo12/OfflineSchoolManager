@@ -37,8 +37,12 @@ fun AddGradeBottomSheet(
     scaffoldState: BottomSheetScaffoldState,
 ) {
 
-    var range by remember {
-        mutableStateOf(0.75f..6.5f)
+    val range by remember {
+        if(viewModel.settingsState.value.isNormalGrade) {
+            mutableStateOf(0.75f..6.5f)
+        } else {
+            mutableStateOf(0f..15f)
+        }
     }
 
     LaunchedEffect(key1 = true) {

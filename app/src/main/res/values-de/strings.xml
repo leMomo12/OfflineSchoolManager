@@ -83,4 +83,5 @@
     <string name="goodJob">Gut gemacht!</string>
     <string name="keepUpWithTheGoodGrades">Weiter so mit den guten Noten</string>
     <string name="settings">Einstellungen</string>
+    <string name="average">Schnitt</string>
 </resources>

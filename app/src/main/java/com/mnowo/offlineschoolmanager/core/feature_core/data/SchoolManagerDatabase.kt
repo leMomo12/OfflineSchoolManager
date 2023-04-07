@@ -13,14 +13,16 @@ import com.mnowo.offlineschoolmanager.feature_exam.domain.models.Exam
 import com.mnowo.offlineschoolmanager.feature_grade.data.local.GradeDao
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
 import com.mnowo.offlineschoolmanager.feature_home.data.local.HomeDao
+import com.mnowo.offlineschoolmanager.feature_settings.data.local.SettingsDao
+import com.mnowo.offlineschoolmanager.feature_settings.domain.models.Settings
 import com.mnowo.offlineschoolmanager.feature_timetable.data.local.TimetableDao
 import com.mnowo.offlineschoolmanager.feature_timetable.domain.models.Timetable
 import com.mnowo.offlineschoolmanager.feature_todo.data.local.ToDoDao
 import com.mnowo.offlineschoolmanager.feature_todo.domain.models.ToDo
 
 @Database(
-    entities = [Subject::class, Grade::class, ToDo::class, Timetable::class, Exam::class],
-    version = 30,
+    entities = [Subject::class, Grade::class, ToDo::class, Timetable::class, Exam::class, Settings::class],
+    version = 32,
     exportSchema = false
 )
 @TypeConverters(TimestampConverter::class, DaysConverter::class)
@@ -32,5 +34,6 @@ abstract class SchoolManagerDatabase : RoomDatabase() {
     abstract fun timetableDao(): TimetableDao
     abstract fun homeDao() : HomeDao
     abstract fun examDao() : ExamDao
+    abstract fun settingsDao() : SettingsDao
 
 }

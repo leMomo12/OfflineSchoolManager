@@ -1,46 +1,21 @@
 package com.mnowo.offlineschoolmanager.core.feature_core.domain.util
 
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.ColorUtils
 import com.mnowo.offlineschoolmanager.core.theme.*
 
 object CalculateGradeColor {
 
+    val MIN_GRADE = 0.7f
+    val MAX_GRADE = 6.5f
+
+    // Define the start and end colors (green and red)
+    val START_COLOR = 0xFF008F00.toInt() // Darker green
+    val END_COLOR = 0xFF8F0000.toInt() // Darker red
+
     fun calculateGradeColor(grade: Double): Int {
-        when {
-            grade > 0.75 && grade <= 1 -> {
-                return gradeOne.toArgb()
-            }
-            grade > 1 && grade <= 1.5 -> {
-                return gradeOneTwo.toArgb()
-            }
-            grade > 1.5 && grade <= 2.0 ->  {
-                return gradeTwo.toArgb()
-            }
-            grade > 2.0 && grade <= 2.5 -> {
-                return gradeTwoThree.toArgb()
-            }
-            grade > 2.5 && grade <= 3 -> {
-                return gradeThree.toArgb()
-            }
-            grade > 3 && grade <= 3.5 -> {
-                return gradeThreeFour.toArgb()
-            }
-            grade > 3.5 && grade <= 4.0 -> {
-                return gradeFour.toArgb()
-            }
-            grade > 4.0 && grade <= 4.5 -> {
-                return gradeFourFive.toArgb()
-            }
-            grade > 4.5 && grade <= 5.0 -> {
-                return gradeFive.toArgb()
-            }
-            grade > 5 && grade <= 5.5 -> {
-                return gradeFiveSix.toArgb()
-            }
-            grade > 5.5 && grade <= 6.5 -> {
-                return gradeSix.toArgb()
-            }
-        }
-        return -1
+        val floatGrade = grade.toFloat()
+        val fraction = (floatGrade - MIN_GRADE) / (MAX_GRADE - MIN_GRADE)
+        return ColorUtils.blendARGB(START_COLOR, END_COLOR, fraction)
     }
 }
