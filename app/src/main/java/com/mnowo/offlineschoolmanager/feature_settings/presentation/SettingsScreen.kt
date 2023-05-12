@@ -1,6 +1,11 @@
 package com.mnowo.offlineschoolmanager.feature_settings
 
+import android.inputmethodservice.Keyboard
+import android.widget.Switch
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +21,7 @@ import com.mnowo.offlineschoolmanager.R
 import com.mnowo.offlineschoolmanager.feature_settings.presentation.SettingsEvent
 import com.mnowo.offlineschoolmanager.feature_settings.presentation.SettingsViewModel
 import com.mnowo.offlineschoolmanager.rememberFredoka
+import org.w3c.dom.Text
 
 @Composable
 fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = hiltViewModel()) {
@@ -31,23 +37,21 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
             modifier = Modifier.padding(start = 20.dp)
         )
         Spacer(modifier = Modifier.padding(top = 5.dp))
-        SettingsListItem(viewModel = viewModel)
+
     }
 }
 
 @Composable
-fun SettingsListItem(viewModel: SettingsViewModel) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("Oberstufen Punkte-System")
-        Switch(
-            checked = viewModel.isNormalGradeFormatState.value,
-            onCheckedChange = { viewModel.onEvent(SettingsEvent.SetIsNormalGradeFormatState) }
-        )
-    }
+fun SettingsGradySystem(viewModel: SettingsViewModel) {
+
+}
+
+@Composable
+fun SettingsListItem(
+    viewModel: SettingsViewModel,
+    text: String,
+    check: Boolean,
+    onCheckedChange: () -> Unit
+) {
+
 }

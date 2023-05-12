@@ -18,6 +18,7 @@ class SettingsViewModel @Inject constructor(private val setSettingsUseCase: SetS
     private val _isNormalGradeFormatState = mutableStateOf<Boolean>(false)
     val isNormalGradeFormatState: State<Boolean> = _isNormalGradeFormatState
 
+
     fun onEvent(event: SettingsEvent) {
         when (event) {
             is SettingsEvent.SetIsNormalGradeFormatState -> {
