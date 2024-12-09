@@ -233,6 +233,8 @@ class TimetableViewModel @Inject constructor(
                     is TimetableResult.AlreadyTaken -> {
                         _alreadyTakenErrorState.value = Color.Red
                     }
+
+                    else -> {}
                 }
             }
             is Resource.Success -> {
@@ -240,6 +242,8 @@ class TimetableViewModel @Inject constructor(
                 onEvent(TimetableEvent.SetTimetableBottomSheet(false))
                 removeAllErrors()
             }
+
+            else -> {}
         }
     }
 
@@ -251,6 +255,8 @@ class TimetableViewModel @Inject constructor(
                         onEvent(TimetableEvent.SetTimetableList(listData))
                     }
                 }
+
+                else -> {}
             }
         }
     }

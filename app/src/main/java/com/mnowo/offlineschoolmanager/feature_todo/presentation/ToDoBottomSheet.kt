@@ -51,7 +51,7 @@ fun ToDoBottomSheet(
 
     val openSheet: () -> Unit = {
         scope.launch {
-            bottomState.animateTo(targetValue = ModalBottomSheetValue.Expanded)
+            bottomState.progress(from = ModalBottomSheetValue.Hidden,to = ModalBottomSheetValue.Expanded)
         }
     }
 

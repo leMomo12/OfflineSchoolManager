@@ -53,6 +53,8 @@ fun AddGradeBottomSheet(
                         message = it.uiText, duration = SnackbarDuration.Short
                     )
                 }
+
+                else -> {}
             }
         }
     }

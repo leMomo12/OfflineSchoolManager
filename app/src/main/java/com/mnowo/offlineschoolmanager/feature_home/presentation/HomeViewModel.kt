@@ -12,7 +12,6 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.play.core.review.ReviewManagerFactory
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Helper
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.ListState
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
@@ -229,6 +228,8 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                 }
+
+                else -> {}
             }
         }
     }
@@ -288,6 +289,8 @@ class HomeViewModel @Inject constructor(
                     onEvent(HomeEvent.SetExamListState(list = it.data ?: listOf()))
                     getNotExpiredList()
                 }
+
+                else -> {}
             }
         }
     }

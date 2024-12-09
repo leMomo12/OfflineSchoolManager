@@ -1,5 +1,6 @@
 package com.mnowo.offlineschoolmanager
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.hardware.lights.Light
@@ -43,7 +44,6 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.android.play.core.review.ReviewManagerFactory
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.WindowInfo
@@ -61,6 +61,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collectLatest
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(), navController: NavController

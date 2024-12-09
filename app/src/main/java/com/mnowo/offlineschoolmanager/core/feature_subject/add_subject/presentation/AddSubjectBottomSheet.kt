@@ -55,6 +55,8 @@ fun AddSubjectBottomSheet(
                 is UiEvent.ShowSnackbar -> {
 
                 }
+
+                else -> {}
             }
         }
     }

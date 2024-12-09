@@ -11,7 +11,6 @@ import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.TextFieldS
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.models.UiEvent
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.use_case.GetSettingsUseCase
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Resource
-import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.ReviewService.askForReview
 import com.mnowo.offlineschoolmanager.core.feature_core.domain.util.Screen
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.GradeResult
 import com.mnowo.offlineschoolmanager.feature_grade.domain.models.Grade
@@ -176,6 +175,8 @@ class GradeViewModel @Inject constructor(
                                 gradeResult = it.data
                             )
                         }
+
+                        else -> {}
                     }
 
                 }.launchIn(viewModelScope)
@@ -198,6 +199,8 @@ class GradeViewModel @Inject constructor(
                                     onEvent(GradeEvent.GradeListData(item))
                                 }
                             }
+
+                            else -> {}
                         }
                     }
                 }
@@ -242,6 +245,8 @@ class GradeViewModel @Inject constructor(
                                         )
                                     }
                                 }
+
+                                else -> {}
                             }
                         }
                 }
@@ -303,6 +308,8 @@ class GradeViewModel @Inject constructor(
                         )
                     )
                 }
+
+                else -> {}
             }
         }
     }

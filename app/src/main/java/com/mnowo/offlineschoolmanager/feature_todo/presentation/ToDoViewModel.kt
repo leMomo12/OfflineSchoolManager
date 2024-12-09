@@ -211,6 +211,8 @@ class ToDoViewModel @Inject constructor(
                                 is Resource.Error -> {
                                     addOrEditToDoError(toDoResult = result.data)
                                 }
+
+                                else -> {}
                             }
                         }
                     }
@@ -240,6 +242,8 @@ class ToDoViewModel @Inject constructor(
                             is Resource.Error -> {
                                 addOrEditToDoError(toDoResult = it.data)
                             }
+
+                            else -> {}
                         }
                     }
                 }
@@ -289,6 +293,8 @@ class ToDoViewModel @Inject constructor(
                 is ToDoResult.EmptyDescription -> {
                     setDescriptionErrorState(true)
                 }
+
+                else -> {}
             }
         }
 

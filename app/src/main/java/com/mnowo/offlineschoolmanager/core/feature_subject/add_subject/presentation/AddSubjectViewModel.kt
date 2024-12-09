@@ -167,6 +167,8 @@ class AddSubjectViewModel @Inject constructor(
                     }
                 }
             }
+
+            else -> {}
         }
     }
 

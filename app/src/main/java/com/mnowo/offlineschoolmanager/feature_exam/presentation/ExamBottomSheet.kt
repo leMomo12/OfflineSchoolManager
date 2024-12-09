@@ -38,7 +38,7 @@ fun ExamBottomSheet(viewModel: ExamViewModel, onCloseBottomSheet: () -> Unit, fr
 
     val openSheet: () -> Unit = {
         coroutineScope.launch {
-            bottomState.animateTo(targetValue = ModalBottomSheetValue.Expanded)
+            bottomState.progress(from = ModalBottomSheetValue.Hidden, to = ModalBottomSheetValue.Expanded)
         }
     }
 
